@@ -1,0 +1,25 @@
+{
+  "name": "pei-vivo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PEI Vivo — adaptação personalizada e colaborativa de materiais didáticos (TCC SI, CEUNI FAMETRO)",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "test:motor": "npm test -w packages/motor-adaptacao",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push"
+  },
+  "devDependencies": {
+    "supabase": "^2.0.0",
+    "typescript": "^5.5.0"
+  }
+}

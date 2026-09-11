@@ -27,11 +27,11 @@ function paraProximoNivel(
 ): NivelVocabulario {
   const idx = NIVEIS.indexOf(atual);
   if (direcao === "DESCER") {
-    return NIVEIS[Math.max(0, idx - 1)];
+    return NIVEIS[Math.max(0, idx - 1)] ?? atual;
   }
   // SUBIR só vale com 2+ ciclos consecutivos de observação "ampliada"
   if (ciclosConsecutivos >= 2) {
-    return NIVEIS[Math.min(NIVEIS.length - 1, idx + 1)];
+    return NIVEIS[Math.min(NIVEIS.length - 1, idx + 1)] ?? atual;
   }
   return atual;
 }
