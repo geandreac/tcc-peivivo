@@ -104,16 +104,26 @@ Marcos:
 local funcionando e quadro Kanban". O README avisa que **as migrations nunca
 rodaram num Postgres real** — este é o primeiro risco a eliminar.
 
-**Pré-requisitos.** Docker Desktop (Supabase local), Node ≥ 20, conta GitHub
-e Supabase.
+**Pré-requisitos.** Node ≥ 20, conta GitHub e Supabase. **Docker não está
+disponível na máquina de desenvolvimento** (virtualização do Windows), então
+`supabase start` local está fora. Estratégia adotada:
+
+- **Local:** migrations e seed validados em **PGlite** (Postgres 17 em WASM,
+  `npm run db:validar`), com stub de `auth.uid()`. Testes de policy RLS
+  também rodam aí (rápido, sem rede).
+- **CI:** o runner Ubuntu tem Docker — `supabase start` + `db reset` rodam lá
+  a cada push, validando o SQL no Postgres do Supabase de verdade.
+- **Cloud:** projeto Supabase **de desenvolvimento** (`pei-vivo-dev`) para
+  `db push`, Edge Functions e os testes que precisam do caminho
+  PostgREST + JWT. Um segundo projeto (`pei-vivo-demo`) só na Fase 6.
 
 | Card | Tarefa | Saída verificável |
 |---|---|---|
 | P0.1 | `git init`, `.gitignore` (node_modules, `.env*`, `supabase/.temp`), primeiro commit com o estado atual | Repo no GitHub, branch `main` protegida (PR obrigatório) |
 | P0.2 | Monorepo com npm workspaces: `package.json` raiz com `"workspaces": ["packages/*", "apps/*"]`, `tsconfig.base.json` | `npm install` na raiz instala tudo; `npm test -w packages/motor-adaptacao` passa 7/7 |
-| P0.3 | `npx supabase init` + `supabase start` + `supabase db reset` (roda 0001→0003) | Zero erro de SQL. Se houver, corrigir **na própria migration** (ainda não foi para produção) |
-| P0.4 | Criar projeto Supabase Cloud (free), `supabase link`, `db push` | Migrations aplicadas no cloud; anotar o `project-ref` no `.env.example` |
-| P0.5 | CI GitHub Actions: job `motor` (`npm test` + coverage), job `db` (`supabase start` + `db reset` — valida SQL a cada push) | Badge verde no README |
+| P0.3 | `npx supabase init` + `scripts/validar-migrations.mjs` (PGlite) rodando 0001→0002 + `seed.sql` | Zero erro de SQL. Se houver, corrigir **na própria migration** (ainda não foi para produção) — ✅ feito: 10 tabelas, 18 policies, RLS em todas |
+| P0.4 | Criar projeto Supabase Cloud `pei-vivo-dev` (free), `supabase link`, `db push`, depois `db reset --linked` para carregar o seed | Migrations aplicadas no cloud; `project-ref` no `.env.example`; secrets `SUPABASE_URL`/`SUPABASE_ANON_KEY` no GitHub |
+| P0.5 | CI GitHub Actions: job `motor` (typecheck + coverage + `db:validar`), job `db` (`supabase start` + `db reset` no runner — valida SQL a cada push), workflow de keep-alive | Badge verde no README — ✅ workflows escritos; verde após P0.1 (push) |
 | P0.6 | GitHub Projects: 5 colunas (Backlog → A Fazer → Em Desenvolvimento → Revisão/Teste → Concluído), WIP 2/pessoa, um card por linha deste plano, labels `fase:N`, `frente:A/B`, `RF..`, `D-..` | Screenshot do quadro (vira o slide 3) |
 | P0.7 | `docs/rastreabilidade.md` com o formato do quadro (RF · Texto · Motivação · Decisão · Teste · Commit), semeado a partir da §7 de `requisitos.md`, coluna Commit vazia | Arquivo versionado |
 | P0.8 | Mover `notion/` para `docs/tcc/` (fontes do TCC versionadas) e apagar o `.zip` da raiz | Raiz limpa |
@@ -153,15 +163,25 @@ no fim.
 
 ### 3.2 Testes RLS negativos
 
-**Ferramenta.** `supabase-js` + Vitest contra o Supabase local, em
-`packages/testes-rls/`. Motivo, e não pgTAP: o critério de rastreabilidade
-diz *"chamada direta à API com token válido"* — só um teste que passa por
-PostgREST + JWT prova isso. O `setup` cria os 4 usuários via
-`auth.admin.createUser` (service role) e os liga aos `usuarios` do seed.
+**Ferramenta — duas camadas, em `packages/testes-rls/`.**
+
+1. **PGlite + Vitest (local e CI, sem Docker).** Carrega migrations + seed
+   num Postgres WASM, faz `set role authenticated` + `set_config('request.jwt.claim.sub', …)`
+   para assumir cada papel e executa SQL direto. Testa a **lógica das
+   policies** em milissegundos. A PoC de RN02 já rodou assim
+   (docente → 0 linhas; insert barrado).
+2. **supabase-js + Vitest contra `pei-vivo-dev` (cloud).** O critério de
+   rastreabilidade diz *"chamada direta à API com token válido"* — só um teste
+   que passa por PostgREST + JWT prova isso. O `setup` cria os 4 usuários via
+   `auth.admin.createUser` (service role) e os liga aos `usuarios` do seed;
+   roda com `supabase db reset --linked` antes. No CI, roda só em `main`
+   (precisa dos secrets).
+
+Todo teste da tabela abaixo existe nas duas camadas com o mesmo nome.
 
 | Card | Testes (cada um começa pelo caminho NEGADO) |
 |---|---|
-| P1.11 | Infra: `supabase start` no `globalSetup`, 4 clientes autenticados (`comoDocente()`, `comoResponsavel()`, …), helper `esperaNegado(promise)` que aceita 401/403/42501 **ou** 0 linhas |
+| P1.11 | Infra: `globalSetup` PGlite (migrations + seed + 4 `auth.users`) e cliente cloud opcional; helpers `comoDocente()`, `comoResponsavel()`, …; `esperaNegado(promise)` que aceita 401/403/42501 **ou** 0 linhas |
 | P1.12 | **RN02** — docente lê `notas_clinicas` → 0 linhas; docente insere → erro; responsável e coordenação idem. Profissional lê e escreve. *Primeiro teste verde do projeto.* |
 | P1.13 | **RN01/RN08** — sem consentimento ATIVO: docente cria ciclo → erro; insere observação → erro; gera material → erro. Revogar e repetir → erro. Responsável e coordenação continuam lendo; docente e profissional recebem 0 linhas |
 | P1.14 | **RF02/D-06** — responsável `delete` em `consentimentos` → erro; revogar gera linha em `auditoria`; docente lê `auditoria` → 0 linhas |
@@ -237,7 +257,7 @@ supabase/functions/
 |---|---|
 | P3.1 | `_shared/auth.ts`: extrai `auth.uid()` do JWT, resolve `usuarios.id`, expõe `exigirPapel(estudanteId, papel)` e `exigirConsentimento(estudanteId)` — reutilizado por todas as funções |
 | P3.2 | `fechar-ciclo`: body `{cicloId}` validado com Zod → exige DOCENTE + consentimento → carrega observações do ciclo e dos ciclos anteriores do estudante → `calcularCiclosConsecutivos` → `aplicarCiclo(vigente.parametros, observacoes)` → `derivarInteresseAncora` → decide status: `PENDENTE` se existe vínculo PROFISSIONAL_SAUDE ativo, senão `VIGENTE` (RN06) → insere `versoes_perfil` → `ciclos_observacao.status = FECHADO` → auditoria → responde `{versao, diff}` |
-| P3.3 | Teste de integração (Vitest + Supabase local): cenário A → versão gerada bate com o seed; sem profissional → `VIGENTE`; ciclo já fechado → 409; docente sem consentimento → 403 |
+| P3.3 | Teste de integração (Vitest + `pei-vivo-dev`, ou `supabase functions serve` no CI): cenário A → versão gerada bate com o seed; sem profissional → `VIGENTE`; ciclo já fechado → 409; docente sem consentimento → 403 |
 
 ### 5.2 `gerar-material` (S5 · RF08–RF10, HU-D.03, HU-S.04, HU-S.05)
 
@@ -325,7 +345,7 @@ da 3 e as telas seguem a ordem em que o backend fica pronto.
 |---|---|
 | P4.17 | Painel **coordenação**: cadastrar estudante (RPC), convidar responsável, vincular docente/profissional (com `registro_conselho` obrigatório), desativar vínculo, `laudo_apresentado_em` |
 | P4.18 | Painel: **pendências** (view `pendencias_validacao`) e **histórico do PEI** (linha do tempo, botão exportar) |
-| P4.19 | Playwright **golden path** em viewport 375×812: coordenação cadastra → responsável consente → docente observa → fecha ciclo → profissional valida → docente gera, revisa, aprova → registra desfecho → responsável vê. Roda no CI contra Supabase local |
+| P4.19 | Playwright **golden path** em viewport 375×812: coordenação cadastra → responsável consente → docente observa → fecha ciclo → profissional valida → docente gera, revisa, aprova → registra desfecho → responsável vê. Roda no CI contra o Supabase do runner (Docker) e localmente contra `pei-vivo-dev` |
 | P4.20 | Playwright **caminhos negados** na UI: docente não vê link para nota clínica; responsável não vê rascunho; sem consentimento, botão "adaptar" desabilitado **e** a chamada direta retorna 403 |
 
 **Critério de saída (M4).** P4.19 e P4.20 verdes no CI; axe-core 0 violações
@@ -397,7 +417,7 @@ preenchidas; ambiente de demo testado duas vezes em dias diferentes.
 |---|---|
 | P7.1 | Roteiro de demo de 8 min **abrindo pelo Miguel** (§14): consentimento da Dona Rosa → observações dos três → fechar ciclo → Camila valida → Márcia gera no celular (projetar o celular) → revisa e aprova → registra desfecho → histórico da coordenação. Mostrar IA desligada **e** ligada |
 | P7.2 | Demo de segurança ao vivo: como docente, `curl` direto em `notas_clinicas` com token válido → 403. É a resposta a "Supabase não é só configurar um produto?" |
-| P7.3 | Plano B: vídeo gravado da demo completa + ambiente local (`supabase start`) no notebook caso a rede caia |
+| P7.3 | Plano B: vídeo gravado da demo completa + segundo projeto cloud (`pei-vivo-demo`) já semeado + build do PWA em cache no notebook. Sem Docker local, não há "ambiente offline" — o vídeo é o fallback real |
 | P7.4 | Slides finais a partir de `PEI_Vivo_Slides_Mapeamento.md` + números de `resultados.md`; screenshot real do Kanban (slide 3); matriz de rastreabilidade com commits (slide 6) |
 | P7.5 | Ensaio cronometrado ×2 com a orientadora |
 
@@ -432,12 +452,21 @@ A escrita acompanha as fases; cada marco fecha um capítulo.
 | Sem escola parceira | Piloto com docentes individuais e estudante fictício | P6.3 |
 | **Novo:** prazo de 12 semanas com 2 pessoas | Fase 5 inteira é incremento; HU-C.05 cortável; freeze em 26/11 | §0, P6.12 |
 | **Novo:** dois papéis para o mesmo usuário no mesmo estudante | `unique (usuario_id, estudante_id)` — D-14 | P1.3 |
+| **Novo:** sem Docker na máquina de desenvolvimento | PGlite local + Docker só no CI + projeto cloud de dev | P0.3, P0.5, P1.11 |
 
 ---
 
-## 12. Próxima ação
+## 12. Estado da Fase 0 (atualizado em 10/09)
 
-Fase 0, card P0.1: `git init` e primeiro commit com o estado atual
-(`CLAUDE.md`, `README.md`, `docs/`, `packages/`, `supabase/`). Depois P0.3 —
-rodar as migrations num Postgres real pela primeira vez. Tudo o mais depende
-de saber se o SQL que existe hoje funciona.
+| Card | Estado |
+|---|---|
+| P0.1 | ✅ repo local, 4 commits · ⏳ criar repositório no GitHub e proteger `main` |
+| P0.2 | ✅ workspaces, TS estrito, cobertura com threshold, 11/11 testes |
+| P0.3 | ✅ migrations + seed validados em PGlite (10 tabelas, 18 policies) |
+| P0.4 | ⏳ precisa de conta Supabase (criar `pei-vivo-dev`, link, push, secrets) |
+| P0.5 | ✅ workflows escritos · ⏳ ficam verdes no primeiro push |
+| P0.6 | ⏳ precisa do repositório no GitHub (Projects + cards) |
+| P0.7 | ✅ `docs/rastreabilidade.md` |
+| P0.8 | ✅ `docs/tcc/`, zip removido |
+
+Próxima ação: P0.1 (GitHub) → P0.6 (Kanban) → P0.4 (Supabase dev).

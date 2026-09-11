@@ -19,21 +19,23 @@ nada foi inventado nesta etapa.
 ## Como rodar agora
 
 ```bash
-# 1. motor de adaptação — não depende de banco nem de rede
-cd packages/motor-adaptacao
-npm install
-npm test          # deve passar 7/7
-
-# 2. schema + RLS — precisa de um projeto Supabase seu
-npx supabase init
-npx supabase link --project-ref <seu-project-ref>
-npx supabase db push     # aplica as 3 migrations em ordem
+npm install                 # instala todos os workspaces
+npm run test:motor          # motor de adaptação — 11/11, sem banco nem rede
+npm run db:validar          # roda migrations + seed num Postgres real (PGlite, sem Docker)
 ```
 
-⚠️ **As migrations SQL foram revisadas com cuidado mas não executadas contra um
-Postgres real** — o sandbox onde foram geradas não teve acesso de rede para
-instalar o Postgres. Rode `supabase db push` num projeto de teste antes de
-confiar nelas em produção.
+Para o banco na nuvem (projeto de desenvolvimento, ver `docs/plano-desenvolvimento.md` P0.4):
+
+```bash
+npx supabase login
+npx supabase link --project-ref <ref-do-pei-vivo-dev>
+npx supabase db push          # aplica as migrations (o seed NÃO vai junto)
+npx supabase db reset --linked  # zera o projeto de dev e carrega supabase/seed.sql
+```
+
+> **Docker não é necessário na máquina de desenvolvimento.** As migrations são
+> validadas localmente em PGlite e, a cada push, no Supabase real dentro do CI
+> (`.github/workflows/ci.yml`). Ver `docs/plano-desenvolvimento.md` §2.
 
 ## Por que essa ordem e não outra
 
@@ -48,18 +50,12 @@ confiar nelas em produção.
    de aprovação de material quando o dado que ela mostra já existe e já está
    protegido.
 
-## Próximos passos (nesta ordem, viram cards no Kanban)
+## Próximos passos
 
-- [ ] Criar projeto Supabase real e rodar as 3 migrations
-- [ ] Escrever testes das políticas RLS (pgTAP ou supabase-js + usuários de
-      teste) — o Exemplo 3 da rastreabilidade (docente tentando ler laudo
-      clínico deve receber 403) vira o primeiro teste de segurança
-- [ ] Scaffold do frontend: `npm create vite@latest apps/web -- --template react-ts`
-- [ ] Edge Function `gerar-material`, seguindo o Diagrama de Sequência
-      mensagem por mensagem (as 18 mensagens já numeradas viram,
-      literalmente, a ordem das linhas de código)
-- [ ] Conectar `motor-adaptacao` como dependência do Edge Function
-- [ ] CI: rodar `npm test` do motor a cada push (GitHub Actions)
+O plano completo, com fases, cards e datas, está em
+`docs/plano-desenvolvimento.md`. Requisitos por perfil e decisões de projeto
+em `docs/requisitos.md`; rastreabilidade RF → decisão → teste → commit em
+`docs/rastreabilidade.md`.
 
 ## Estrutura de pastas prevista (o que ainda falta criar)
 
@@ -68,11 +64,19 @@ pei-vivo/
 ├── apps/
 │   └── web/                    # React + Vite PWA — RF08-RF12, RNF01-RNF03
 ├── supabase/
-│   ├── migrations/             # ✅ já existe
+│   ├── migrations/             # ✅ 0001 schema, 0002 RLS
+│   ├── seed.sql                # ✅ cenário A fictício (só db reset)
 │   └── functions/
+│       ├── fechar-ciclo/       # D-09
 │       └── gerar-material/     # Diagrama de Sequência → código
 ├── packages/
-│   └── motor-adaptacao/        # ✅ já existe
+│   ├── motor-adaptacao/        # ✅ regras + testes
+│   └── testes-rls/             # Fase 1
+├── scripts/
+│   └── validar-migrations.mjs  # ✅ PGlite
 └── docs/
-    └── rastreabilidade.md      # já existe como slide — vale versionar aqui também
+    ├── requisitos.md           # ✅
+    ├── plano-desenvolvimento.md# ✅
+    ├── rastreabilidade.md      # ✅
+    └── tcc/                    # ✅ fontes do TCC (pré-projeto, diagramas)
 ```
