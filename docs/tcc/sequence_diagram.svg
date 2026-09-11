@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1650 1300" width="1650" height="1300" font-family="Calibri, Arial, sans-serif">
+<rect x="0" y="0" width="1650" height="1300" fill="#FFFFFF"/>
+<defs>
+  <marker id="arrowOpen" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#4A6478" stroke-width="1.6"/>
+  </marker>
+  <marker id="arrowOpenTeal" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#1C7293" stroke-width="1.8"/>
+  </marker>
+  <marker id="arrowFilled" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#0B3D63"/>
+  </marker>
+  <marker id="arrowFilledWhite" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#FFFFFF"/>
+  </marker>
+  <marker id="diamondFilled" markerWidth="18" markerHeight="12" refX="16" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,6 L9,1 L17,6 L9,11 Z" fill="#0B3D63"/>
+  </marker>
+</defs>
+<text x="40" y="42" font-size="18.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="start" font-family="Cambria, Georgia, serif">DIAGRAMA DE SEQUÊNCIA — GERAÇÃO E APROVAÇÃO DE MATERIAL ADAPTADO</text>
+<text x="40" y="64" font-size="12" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">Fluxo entre o docente e as camadas do sistema, incluindo o desvio condicional quando a camada de IA está habilitada ou não (RN06).</text>
+<line x1="90.0" y1="204" x2="90.0" y2="1240" stroke="#9FB4C2" stroke-width="1.4" stroke-dasharray="5,4"/>
+<line x1="384.0" y1="170" x2="384.0" y2="1240" stroke="#9FB4C2" stroke-width="1.4" stroke-dasharray="5,4"/>
+<line x1="678.0" y1="170" x2="678.0" y2="1240" stroke="#9FB4C2" stroke-width="1.4" stroke-dasharray="5,4"/>
+<line x1="972.0" y1="170" x2="972.0" y2="1240" stroke="#9FB4C2" stroke-width="1.4" stroke-dasharray="5,4"/>
+<line x1="1266.0" y1="170" x2="1266.0" y2="1240" stroke="#9FB4C2" stroke-width="1.4" stroke-dasharray="5,4"/>
+<line x1="1560.0" y1="170" x2="1560.0" y2="1240" stroke="#9FB4C2" stroke-width="1.4" stroke-dasharray="5,4"/>
+<circle cx="90.0" cy="121" r="11" fill="#FFFFFF" stroke="#0B3D63" stroke-width="2"/>
+<line x1="90.0" y1="132" x2="90.0" y2="158" stroke="#0B3D63" stroke-width="2"/>
+<line x1="75.0" y1="140" x2="105.0" y2="140" stroke="#0B3D63" stroke-width="2"/>
+<line x1="90.0" y1="158" x2="78.0" y2="178" stroke="#0B3D63" stroke-width="2"/>
+<line x1="90.0" y1="158" x2="102.0" y2="178" stroke="#0B3D63" stroke-width="2"/>
+<text x="90.0" y="198" font-size="12.5" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Docente</text>
+<rect x="300.0" y="110" width="168" height="54" rx="5" ry="5" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<text x="384.0" y="134.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">App</text>
+<text x="384.0" y="149.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">(React PWA)</text>
+<rect x="594.0" y="110" width="168" height="54" rx="5" ry="5" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<text x="678.0" y="134.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">API</text>
+<text x="678.0" y="149.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">(Edge Function)</text>
+<rect x="888.0" y="110" width="168" height="54" rx="5" ry="5" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<text x="972.0" y="134.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Motor</text>
+<text x="972.0" y="149.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Determinístico</text>
+<rect x="1182.0" y="110" width="168" height="54" rx="5" ry="5" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<text x="1266.0" y="142.0" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Camada de IA</text>
+<rect x="1476.0" y="110" width="168" height="54" rx="5" ry="5" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<text x="1560.0" y="134.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Banco de Dados</text>
+<text x="1560.0" y="149.5" font-size="12" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">(Supabase)</text>
+<rect x="1555.0" y="322" width="10" height="46" rx="2" ry="2" fill="#DCE9F0" stroke="#0B3D63" stroke-width="1.1"/>
+<rect x="967.0" y="404" width="10" height="72" rx="2" ry="2" fill="#DCE9F0" stroke="#0B3D63" stroke-width="1.1"/>
+<rect x="1261.0" y="538" width="10" height="72" rx="2" ry="2" fill="#DCE9F0" stroke="#0B3D63" stroke-width="1.1"/>
+<rect x="1555.0" y="716" width="10" height="72" rx="2" ry="2" fill="#DCE9F0" stroke="#0B3D63" stroke-width="1.1"/>
+<rect x="1555.0" y="1006" width="10" height="72" rx="2" ry="2" fill="#DCE9F0" stroke="#0B3D63" stroke-width="1.1"/>
+<rect x="379.0" y="220" width="10" height="960" rx="2" ry="2" fill="#DCE9F0" stroke="#0B3D63" stroke-width="1.1"/>
+<rect x="673.0" y="266" width="10" height="864" rx="2" ry="2" fill="#DCE9F0" stroke="#0B3D63" stroke-width="1.1"/>
+<rect x="82.20000000000002" y="218" width="309.59999999999997" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="237.0" y="230" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1. insere texto original e seleciona estudante</text>
+<line x1="90.0" y1="236" x2="384.0" y2="236" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="379.5" y="264" width="303.0" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="531.0" y="276" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">2. POST /materiais/gerar {texto, estudanteId}</text>
+<line x1="384.0" y1="282" x2="678.0" y2="282" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="974.1" y="310" width="289.8" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1119.0" y="322" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">3. buscar VersaoPerfil vigente do estudante</text>
+<line x1="678.0" y1="328" x2="1560.0" y2="328" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="1043.4" y="356" width="151.2" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1119.0" y="368" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">4. parametros vigentes</text>
+<line x1="1560.0" y1="374" x2="678.0" y2="374" stroke="#4A6478" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+<rect x="726.3" y="402" width="197.39999999999998" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="825.0" y="414" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">5. aplicar(texto, parametros)</text>
+<line x1="678.0" y1="420" x2="972.0" y2="420" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="723.0" y="448" width="204.0" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="825.0" y="460" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">6. texto parcialmente adaptado</text>
+<line x1="972.0" y1="466" x2="678.0" y2="466" stroke="#4A6478" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+<rect x="860.1" y="536" width="223.79999999999998" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="972.0" y="548" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">7. simplificar(texto, parametros)</text>
+<line x1="678.0" y1="554" x2="1266.0" y2="554" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="893.1" y="582" width="157.79999999999998" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="972.0" y="594" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">8. texto adaptado final</text>
+<line x1="1266.0" y1="600" x2="678.0" y2="600" stroke="#4A6478" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+<text x="694.0" y="680" font-size="10.7" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">[camada de IA desabilitada — RN06: modo pedagógico]</text>
+<rect x="911.4" y="714" width="415.2" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1119.0" y="726" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">9. salvar MaterialAdaptado (rascunho + snapshot de parâmetros)</text>
+<line x1="678.0" y1="732" x2="1560.0" y2="732" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="1033.5" y="760" width="171.0" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1119.0" y="772" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">10. confirma persistência</text>
+<line x1="1560.0" y1="778" x2="678.0" y2="778" stroke="#4A6478" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+<rect x="402.6" y="806" width="256.79999999999995" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="531.0" y="818" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">11. retorna material gerado (rascunho)</text>
+<line x1="678.0" y1="824" x2="384.0" y2="824" stroke="#4A6478" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+<rect x="55.80000000000001" y="852" width="362.4" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="237.0" y="864" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">12. exibe comparação lado a lado (original × adaptado)</text>
+<line x1="384.0" y1="870" x2="90.0" y2="870" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="135.0" y="912" width="204.0" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="237.0" y="924" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">13. aprova (ou edita e aprova)</text>
+<line x1="90.0" y1="930" x2="384.0" y2="930" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="382.8" y="958" width="296.4" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="531.0" y="970" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">14. PATCH /materiais/{id} {status: aprovado}</text>
+<line x1="384.0" y1="976" x2="678.0" y2="976" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="967.5" y="1004" width="303.0" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1119.0" y="1016" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">15. atualizar status e persistir versão final</text>
+<line x1="678.0" y1="1022" x2="1560.0" y2="1022" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="1076.4" y="1050" width="85.19999999999999" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1119.0" y="1062" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">16. confirma</text>
+<line x1="1560.0" y1="1068" x2="678.0" y2="1068" stroke="#4A6478" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+<rect x="455.4" y="1096" width="151.2" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="531.0" y="1108" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">17. confirma aprovação</text>
+<line x1="678.0" y1="1114" x2="384.0" y2="1114" stroke="#4A6478" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+<rect x="62.400000000000006" y="1142" width="349.2" height="15" rx="6" ry="6" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="237.0" y="1154" font-size="11.3" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">18. disponibiliza versão web e versão para impressão</text>
+<line x1="384.0" y1="1160" x2="90.0" y2="1160" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowFilled)"/>
+<rect x="616.0" y="524" width="712.0" height="178" rx="4" ry="4" fill="none" stroke="#1C7293" stroke-width="1.6"/>
+<path d="M616.0,524 h46 v14 l-6,6 h-40 Z" fill="#1C7293"/>
+<text x="624.0" y="538" font-size="11" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="start" font-family="Consolas, monospace">alt</text>
+<text x="684.0" y="538" font-size="10.7" fill="#1C7293" font-weight="bold" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">IA habilitada</text>
+<line x1="616.0" y1="654" x2="1328.0" y2="654" stroke="#1C7293" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="40" y="1254" font-size="10.5" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">Numeração 1–18 corresponde à ordem de execução; mensagens tracejadas são retornos. RF08–RF11 e RN06 mapeados a este fluxo.</text>
+</svg>

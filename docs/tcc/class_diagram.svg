@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 1200" width="1720" height="1200" font-family="Calibri, Arial, sans-serif">
+<rect x="0" y="0" width="1720" height="1200" fill="#FFFFFF"/>
+<defs>
+  <marker id="arrowOpen" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#4A6478" stroke-width="1.6"/>
+  </marker>
+  <marker id="arrowOpenTeal" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#1C7293" stroke-width="1.8"/>
+  </marker>
+  <marker id="arrowFilled" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#0B3D63"/>
+  </marker>
+  <marker id="arrowFilledWhite" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#FFFFFF"/>
+  </marker>
+  <marker id="diamondFilled" markerWidth="18" markerHeight="12" refX="16" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,6 L9,1 L17,6 L9,11 Z" fill="#0B3D63"/>
+  </marker>
+</defs>
+<text x="40" y="42" font-size="20" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="start" font-family="Cambria, Georgia, serif">DIAGRAMA DE CLASSES — PEI VIVO</text>
+<text x="40" y="64" font-size="12" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">Modelo de dados do núcleo do sistema: consentimento, observação periódica, validação clínica e adaptação de material.</text>
+<rect x="40" y="110" width="340" height="163" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="40" y="110" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="40" y="130" width="340" height="14" fill="#0B3D63"/>
+<text x="210.0" y="138" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Usuario</text>
+<text x="52" y="160" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="52" y="181" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- nome: string</text>
+<text x="52" y="202" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- email: string</text>
+<text x="52" y="223" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- senhaHash: string</text>
+<line x1="40" y1="240" x2="380" y2="240" stroke="#C7D4DC" stroke-width="1"/>
+<text x="52" y="256" font-size="11.3" fill="#1C7293" font-weight="bold" font-style="normal" text-anchor="start" font-family="Consolas, monospace">+ autenticar(): boolean</text>
+<rect x="460" y="110" width="340" height="151" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="460" y="110" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="460" y="130" width="340" height="14" fill="#0B3D63"/>
+<text x="630.0" y="138" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">VinculoUsuarioEstudante</text>
+<text x="472" y="160" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="472" y="181" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- papel: PapelUsuario</text>
+<text x="472" y="202" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataVinculo: Date</text>
+<text x="472" y="223" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- status: string</text>
+<text x="472" y="244" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- registroConselho: string [0..1]</text>
+<rect x="880" y="110" width="340" height="130" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="880" y="110" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="880" y="130" width="340" height="14" fill="#0B3D63"/>
+<text x="1050.0" y="138" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Estudante</text>
+<text x="892" y="160" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="892" y="181" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- nome: string</text>
+<text x="892" y="202" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataNascimento: Date</text>
+<text x="892" y="223" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- turma: string</text>
+<rect x="1300" y="110" width="340" height="184" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="1300" y="110" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="1300" y="130" width="340" height="14" fill="#0B3D63"/>
+<text x="1470.0" y="138" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Consentimento</text>
+<text x="1312" y="160" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="1312" y="181" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataConcessao: Date</text>
+<text x="1312" y="202" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- escopo: string</text>
+<text x="1312" y="223" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- status: StatusConsentimento</text>
+<text x="1312" y="244" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataRevogacao: Date [0..1]</text>
+<line x1="1300" y1="261" x2="1640" y2="261" stroke="#C7D4DC" stroke-width="1"/>
+<text x="1312" y="277" font-size="11.3" fill="#1C7293" font-weight="bold" font-style="normal" text-anchor="start" font-family="Consolas, monospace">+ revogar(): void</text>
+<rect x="40" y="470" width="340" height="151" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="40" y="470" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="40" y="490" width="340" height="14" fill="#0B3D63"/>
+<text x="210.0" y="498" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">CicloObservacao</text>
+<text x="52" y="520" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="52" y="541" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- numero: int</text>
+<text x="52" y="562" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataInicio: Date</text>
+<text x="52" y="583" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataFim: Date</text>
+<text x="52" y="604" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- status: string</text>
+<rect x="460" y="470" width="340" height="151" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="460" y="470" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="460" y="490" width="340" height="14" fill="#0B3D63"/>
+<text x="630.0" y="498" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Observacao</text>
+<text x="472" y="520" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="472" y="541" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dimensao: DimensaoObservada</text>
+<text x="472" y="562" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- valorEscala: EscalaObservacao</text>
+<text x="472" y="583" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- evidencia: string</text>
+<text x="472" y="604" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataRegistro: Date</text>
+<rect x="880" y="470" width="340" height="184" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="880" y="470" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="880" y="490" width="340" height="14" fill="#0B3D63"/>
+<text x="1050.0" y="498" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">VersaoPerfil</text>
+<text x="892" y="520" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="892" y="541" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- numeroCiclo: int</text>
+<text x="892" y="562" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- statusValidacao: StatusValidacao</text>
+<text x="892" y="583" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataVigencia: Date</text>
+<line x1="880" y1="600" x2="1220" y2="600" stroke="#C7D4DC" stroke-width="1"/>
+<text x="892" y="616" font-size="11.3" fill="#1C7293" font-weight="bold" font-style="normal" text-anchor="start" font-family="Consolas, monospace">+ aprovar(): void</text>
+<text x="892" y="637" font-size="11.3" fill="#1C7293" font-weight="bold" font-style="normal" text-anchor="start" font-family="Consolas, monospace">+ solicitarAjuste(): void</text>
+<rect x="1300" y="470" width="340" height="167" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="1300" y="470" width="340" height="50" rx="4" ry="4" fill="#1C7293" stroke="#1C7293" stroke-width="0"/>
+<rect x="1300" y="506" width="340" height="14" fill="#1C7293"/>
+<text x="1470.0" y="490" font-size="10.5" fill="#CADCFC" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">«value object»</text>
+<text x="1470.0" y="508" font-size="14.5" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">ParametrosAdaptacao</text>
+<text x="1312" y="536" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- maxLinhasPorBloco: int</text>
+<text x="1312" y="557" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- nivelVocabulario: NivelVocabulario</text>
+<text x="1312" y="578" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- interesseAncora: string</text>
+<text x="1312" y="599" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- formatoEnunciado: FormatoEnunciado</text>
+<text x="1312" y="620" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- contrasteMinimo: float</text>
+<rect x="460" y="830" width="340" height="205" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="460" y="830" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="460" y="850" width="340" height="14" fill="#0B3D63"/>
+<text x="630.0" y="858" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">MaterialAdaptado</text>
+<text x="472" y="880" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="472" y="901" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- textoOriginal: string</text>
+<text x="472" y="922" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- textoAdaptado: string</text>
+<text x="472" y="943" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataGeracao: Date</text>
+<text x="472" y="964" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- statusAprovacao: string</text>
+<line x1="460" y1="981" x2="800" y2="981" stroke="#C7D4DC" stroke-width="1"/>
+<text x="472" y="997" font-size="11.3" fill="#1C7293" font-weight="bold" font-style="normal" text-anchor="start" font-family="Consolas, monospace">+ aprovar(): void</text>
+<text x="472" y="1018" font-size="11.3" fill="#1C7293" font-weight="bold" font-style="normal" text-anchor="start" font-family="Consolas, monospace">+ descartar(): void</text>
+<rect x="880" y="830" width="340" height="130" rx="4" ry="4" fill="#FFFFFF" stroke="#0B3D63" stroke-width="1.8"/>
+<rect x="880" y="830" width="340" height="34" rx="4" ry="4" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<rect x="880" y="850" width="340" height="14" fill="#0B3D63"/>
+<text x="1050.0" y="858" font-size="15" fill="#FFFFFF" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Desfecho</text>
+<text x="892" y="880" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- id: UUID</text>
+<text x="892" y="901" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- resultado: ResultadoDesfecho</text>
+<text x="892" y="922" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- observacaoLivre: string</text>
+<text x="892" y="943" font-size="11.3" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Consolas, monospace">- dataRegistro: Date</text>
+<line x1="380" y1="191.5" x2="460" y2="185.5" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="387.0" y="181.5" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="400" y="193.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="420.7" y="175.5" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="440" y="187.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<rect x="391.9" y="170.5" width="56.199999999999996" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="420.0" y="182.5" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">vincula</text>
+<line x1="800" y1="185.5" x2="880" y2="175.0" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="800.7" y="175.5" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="820" y="187.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<rect x="847.0" y="165.0" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="860" y="177.0" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<line x1="1220" y1="175.0" x2="1300" y2="202.0" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="1227.0" y="165.0" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1240" y="177.0" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="1260.7" y="192.0" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1280" y="204.0" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1..*</text>
+<rect x="1235.2" y="170.5" width="49.599999999999994" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1260.0" y="182.5" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">possui</text>
+<line x1="380" y1="545.5" x2="460" y2="545.5" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="387.0" y="535.5" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="400" y="547.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="420.7" y="535.5" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="440" y="547.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<rect x="395.2" y="527.5" width="49.599999999999994" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="420.0" y="539.5" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">contém</text>
+<polyline points="1050.0,240 1050.0,380 210.0,380 210.0,470" fill="none" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="1037.0" y="250" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1050.0" y="262" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="190.7" y="440" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="210.0" y="452" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<line x1="1050.0" y1="240" x2="1050.0" y2="470" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="1037.0" y="250" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1050.0" y="262" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="1030.7" y="440" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1050.0" y="452" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<line x1="1220" y1="562.0" x2="1300" y2="553.5" stroke="#4A6478" stroke-width="1.6" marker-start="url(#diamondFilled)"/>
+<rect x="1227.0" y="552.0" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1240" y="564.0" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="1267.0" y="543.5" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1280" y="555.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="1235.2" y="539.75" width="49.599999999999994" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1260.0" y="551.75" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">define</text>
+<polyline points="210.0,621 210.0,655 1050.0,655 1050.0,654" fill="none" stroke="#1C7293" stroke-width="1.6" marker-end="url(#arrowOpenTeal)"/>
+<rect x="197.0" y="631" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="210.0" y="643" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="1030.7" y="664" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1050.0" y="676" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..1</text>
+<rect x="1021.9" y="629" width="56.199999999999996" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1050.0" y="641" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">origina</text>
+<line x1="800" y1="932.5" x2="880" y2="895.0" stroke="#4A6478" stroke-width="1.6" marker-start="url(#diamondFilled)"/>
+<rect x="807.0" y="922.5" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="820" y="934.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="840.7" y="885.0" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="860" y="897.0" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..1</text>
+<rect x="802.0" y="895.75" width="76.0" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="840.0" y="907.75" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">resulta em</text>
+<polyline points="630.0,830 630.0,796 1050.0,796 1050.0,654" fill="none" stroke="#1C7293" stroke-width="1.6" marker-end="url(#arrowOpenTeal)"/>
+<rect x="610.7" y="800" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="630.0" y="812" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<rect x="1037.0" y="664" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1050.0" y="676" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="1008.7" y="770" width="82.6" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1050.0" y="782" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">parametriza</text>
+<polyline points="1470.0,110 1470.0,86 210.0,86 210.0,110" fill="none" stroke="#9FB4C2" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="1450.7" y="80" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="1470.0" y="92" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<rect x="197.0" y="80" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="210.0" y="92" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="115.9" y="60" width="188.2" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="210.0" y="72" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="middle" font-family="Calibri, Arial, sans-serif">concedido por (responsável)</text>
+<polyline points="460,521.34 396,521.34 396,144 380,144" fill="none" stroke="#9FB4C2" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="420.7" y="511.34000000000003" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="440" y="523.34" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<rect x="387.0" y="134" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="400" y="146" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="406" y="342" width="43.0" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="406" y="354" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">autor</text>
+<polyline points="880,525.2 412,525.2 412,191.5 380,191.5" fill="none" stroke="#9FB4C2" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="840.7" y="515.2" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="860" y="527.2" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..1</text>
+<rect x="387.0" y="181.5" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="400" y="193.5" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="406" y="368" width="89.19999999999999" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="406" y="380" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">validado por</text>
+<polyline points="460,875.1 428,875.1 428,239 380,239" fill="none" stroke="#9FB4C2" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<rect x="420.7" y="865.1" width="38.6" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="440" y="877.1" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">0..*</text>
+<rect x="387.0" y="229" width="26" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="400" y="241" font-size="10.5" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">1</text>
+<rect x="406" y="394" width="142.0" height="15" rx="2" ry="2" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="406" y="406" font-size="10.3" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">gerado por (docente)</text>
+<rect x="40" y="1082" width="1640" height="96" rx="6" ry="6" fill="#EEF4F7" stroke="#D5E0E6" stroke-width="1"/>
+<text x="60" y="1106" font-size="11" fill="#1C7293" font-weight="bold" font-style="normal" text-anchor="start" font-family="Calibri, Arial, sans-serif" letter-spacing="1.5">LEGENDA</text>
+<line x1="60" y1="1128" x2="100" y2="1128" stroke="#4A6478" stroke-width="1.6" marker-end="url(#arrowOpen)"/>
+<text x="110" y="1132" font-size="11" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Calibri, Arial, sans-serif">Associação simples</text>
+<line x1="300" y1="1128" x2="340" y2="1128" stroke="#0B3D63" stroke-width="1.6" marker-start="url(#diamondFilled)"/>
+<text x="350" y="1132" font-size="11" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Calibri, Arial, sans-serif">Composição (parte não existe sem o todo)</text>
+<rect x="700" y="1118" width="20" height="20" rx="3" ry="3" fill="#0B3D63" stroke="#0B3D63" stroke-width="0"/>
+<text x="728" y="1132" font-size="11" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Calibri, Arial, sans-serif">Entidade principal</text>
+<rect x="900" y="1118" width="20" height="20" rx="3" ry="3" fill="#1C7293" stroke="#1C7293" stroke-width="0"/>
+<text x="928" y="1132" font-size="11" fill="#16222B" font-weight="normal" font-style="normal" text-anchor="start" font-family="Calibri, Arial, sans-serif">Objeto de valor (« value object »)</text>
+<text x="60" y="1160" font-size="10" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">Enumerações referenciadas: PapelUsuario, StatusConsentimento, DimensaoObservada, EscalaObservacao,</text>
+<text x="60" y="1174" font-size="10" fill="#5B6B79" font-weight="normal" font-style="italic" text-anchor="start" font-family="Calibri, Arial, sans-serif">StatusValidacao, NivelVocabulario, FormatoEnunciado, ResultadoDesfecho — omitidas como classes para preservar a legibilidade do diagrama.</text>
+</svg>
