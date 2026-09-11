@@ -4,7 +4,7 @@
 -- Cada tabela referencia, em comentário, a classe UML de origem.
 -- ============================================================================
 
-create extension if not exists "pgcrypto"; -- gen_random_uuid()
+-- gen_random_uuid() é nativo do PostgreSQL ≥ 13; nenhuma extensão necessária.
 
 -- ---------------------------------------------------------------- enums
 -- Correspondem às enumerações citadas na legenda do diagrama de classes,

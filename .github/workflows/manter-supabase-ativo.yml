@@ -1,0 +1,21 @@
+name: Manter Supabase ativo
+
+# Risco §10 do pré-projeto: projeto gratuito pausa após 7 dias sem uso.
+# Um ping semanal via REST evita a pausa. Requer os secrets
+# SUPABASE_URL e SUPABASE_ANON_KEY no repositório (card P0.4).
+on:
+  schedule:
+    - cron: "0 9 * * 1,4" # segunda e quinta, 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    if: ${{ vars.SUPABASE_PING_ATIVO == 'true' }}
+    steps:
+      - run: |
+          curl --fail --silent --show-error \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/estudantes?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" > /dev/null
+          echo "ping ok"

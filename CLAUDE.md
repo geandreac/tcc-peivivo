@@ -20,7 +20,7 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 
 ```bash
 cd packages/motor-adaptacao && npm test     # deve passar 100%
-npx supabase db push                        # aplica as migrations em ordem
+npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
 ```
 
 ## Convenções
@@ -61,7 +61,7 @@ qualquer feature; toda decisão nova ganha um `D-nn` lá.
 ## Dados
 
 **Nunca use dados reais de estudante, nem em desenvolvimento.**
-`0003_seed_dev.sql` é fictício por design — mantenha assim. Qualquer dado de
+`supabase/seed.sql` é fictício por design — mantenha assim. Qualquer dado de
 teste novo segue o mesmo padrão (nomes claramente fictícios, comentário no
 topo do arquivo).
 

@@ -146,7 +146,7 @@ de permissões v2 está no banco.
 | P1.7 | D-07 | `alter type status_validacao add value 'EXPIRADA'`; `versoes_perfil.justificativa_revisao text`; view `pendencias_validacao` |
 | P1.8 | D-11 | Reescrever `vinculado_le_*` (7 policies) com `or fn_meu_papel(x) in ('RESPONSAVEL','COORDENACAO')` após revogação; adicionar `fn_tem_consentimento_ativo` em `papel_autorizado_registra_observacao` e `profissional_valida_versao` |
 | P1.9 | D-12 | `vinculado_le_material` → docente vê tudo; demais só `APROVADO`. Mesma regra em `vinculado_le_desfecho` |
-| P1.10 | — | Atualizar `0003_seed_dev.sql`: `papel_institucional` na coordenação, `papel_autor` nas observações, um material APROVADO + um RASCUNHO, um desfecho, `laudo_apresentado_em`. Continua 100 % fictício |
+| P1.10 | — | Atualizar `supabase/seed.sql`: `papel_institucional` na coordenação, `papel_autor` nas observações, um material APROVADO + um RASCUNHO, um desfecho, `laudo_apresentado_em`. Continua 100 % fictício |
 
 Regra: `supabase db reset` precisa continuar passando após cada card, não só
 no fim.
@@ -196,7 +196,7 @@ testável em milissegundos.
 | P2.4 | `src/adaptador.ts` | `adaptar(texto: string, p: ParametrosAdaptacao): TextoAdaptado` — segmenta parágrafos em blocos ≤ `maxLinhasPorBloco` (linha ≈ 60 caracteres), corta em `blocosPorMaterial`, detecta enunciados imperativos compostos ("leia … e depois …") e divide em etapas quando `formatoEnunciado = ETAPA_UNICA` | Mesma entrada → mesma saída; nenhum bloco excede o limite; texto original é recuperável por concatenação (nada se perde); `ETAPA_UNICA` nunca gera enunciado com "e depois"/"em seguida" |
 | P2.5 | `src/index.ts` | Barrel exportando tudo; `package.json` com `"exports"` e `"type": "module"` | Importável de Node (Vitest) e de Deno (Edge Function) — **spike de 1 h**: testar `import` relativo de `supabase/functions/_shared/` |
 | P2.6 | Cobertura | `vitest --coverage` no CI com threshold 70 % (RNF07) | CI falha abaixo de 70 % |
-| P2.7 | Cenário A | Teste de integração do motor: seed do cenário A (3 observações do ciclo 3) → `aplicarCiclo` + `derivarInteresseAncora` reproduz exatamente o `parametros` de `0003_seed_dev.sql` | Verde |
+| P2.7 | Cenário A | Teste de integração do motor: seed do cenário A (3 observações do ciclo 3) → `aplicarCiclo` + `derivarInteresseAncora` reproduz exatamente o `parametros` de `supabase/seed.sql` | Verde |
 
 **Critério de saída (M2).** `npm test -w packages/motor-adaptacao` verde,
 cobertura ≥ 70 %, spike P2.5 respondido (documentar em `packages/motor-adaptacao/README.md`

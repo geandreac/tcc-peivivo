@@ -1,6 +1,6 @@
 -- ============================================================================
--- PEI Vivo — Dados de desenvolvimento (100% fictícios)
--- Nunca rode este arquivo em produção. Reproduz o cenário demonstrativo A
+-- PEI Vivo — Dados de desenvolvimento (100% fictícios) — supabase/seed.sql
+-- Roda em `supabase db reset` (local/CI e `--linked` no projeto de dev); NUNCA em `db push`. Reproduz o cenário demonstrativo A
 -- do pré-projeto (estudante fictício, TEA nível 1, interesse em dinossauros)
 -- exclusivamente para desenvolvimento local e testes automatizados.
 -- ============================================================================

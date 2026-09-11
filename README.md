@@ -13,7 +13,7 @@ nada foi inventado nesta etapa.
 | Quadro 7 — Matriz de permissões | `supabase/migrations/0002_rls_policies.sql` |
 | Quadro 5 — Regras de conversão | `packages/motor-adaptacao/src/regras.ts` |
 | RN03 — Assimetria conservadora | `regras.test.ts`, testes "RN03" |
-| Cenário demonstrativo A (seção 6.7) | `0003_seed_dev.sql` + teste "Cenário demonstrativo A" |
+| Cenário demonstrativo A (seção 6.7) | `supabase/seed.sql` + teste "Cenário demonstrativo A" |
 | Diagrama de Sequência | ainda não implementado — é o próximo passo (ver abaixo) |
 
 ## Como rodar agora

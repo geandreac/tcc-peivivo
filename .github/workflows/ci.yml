@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  motor:
+    name: motor-adaptacao (Vitest + cobertura ≥ 70 %)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run db:validar
+      - run: npm run typecheck -w packages/motor-adaptacao
+      - run: npm run test:coverage -w packages/motor-adaptacao
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cobertura-motor
+          path: packages/motor-adaptacao/coverage/lcov.info
+
+  db:
+    # Valida as migrations num Postgres real a cada push. O runner tem Docker;
+    # a máquina dos desenvolvedores não precisa ter (ver plano, P0.3).
+    name: migrations (supabase db reset)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,storage-api
+      - run: supabase db reset
+      - name: Sanidade do seed (cenário A)
+        run: |
+          psql "$(supabase status -o env | grep DB_URL | cut -d= -f2- | tr -d '"')" -v ON_ERROR_STOP=1 -c "
+            select count(*) as tabelas from information_schema.tables where table_schema='public';
+            select count(*) as politicas from pg_policies where schemaname='public';
+            select nome, status_validacao from estudantes e join versoes_perfil v on v.estudante_id=e.id;
+          "
+      - if: always()
+        run: supabase stop
