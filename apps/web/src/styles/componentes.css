@@ -756,6 +756,7 @@ dl.dados dd {
 .perfil--link:hover strong {
   text-decoration: underline;
 }
+.perfil .perfil__glifo,
 .perfil__glifo {
   display: inline-flex;
   align-items: center;
