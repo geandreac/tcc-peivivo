@@ -228,12 +228,13 @@ Ordem do `CLAUDE.md` (schema/RLS → motor → Edge Functions → frontend):
 5. **Fase 5:** IA real com fallback; offline; Flesch.
 6. **Fase 6/7:** piloto, métricas (`docs/resultados.md`), defesa.
 
-Plano completo: `docs/plano-desenvolvimento.md`. Rastreabilidade: `docs/rastreabilidade.md`.
+Plano completo: `docs/plano-desenvolvimento.md`. Rastreabilidade: `docs/rastreabilidade.md`. Fluxo de branches: `CONTRIBUTING.md`. Passo a passo de uso: `docs/guia-de-uso.md`.
 
 ## Documentação
 
 | Documento | Conteúdo |
 |---|---|
+| `docs/guia-de-uso.md` | Passo a passo do zero ao ciclo completo, por perfil |
 | `docs/validacao-da-ideia.md` | Diagnóstico, problema/solução, personas, hipóteses e métodos de validação |
 | `docs/requisitos.md` | Decisões D-01…D-18, requisitos por perfil, HU-*, matriz v2, MVP e MoSCoW (§11) |
 | `docs/acessibilidade.md` | Diretrizes e tabela por componente |
