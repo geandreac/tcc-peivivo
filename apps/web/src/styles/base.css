@@ -1,0 +1,313 @@
+/* ============================================================================
+   Base: reset leve, tipografia, foco, landmarks, skip link, movimento.
+   ============================================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  font-size: 100%; /* respeita a preferência do navegador (1.4.4) */
+}
+
+body {
+  margin: 0;
+  font-family: var(--fonte-base);
+  font-size: var(--tamanho-sm);
+  line-height: var(--altura-linha);
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  min-height: 100dvh;
+  text-rendering: optimizeLegibility;
+}
+
+/* 2.3.3 — nada anima se o usuário pediu redução de movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-movimento="reduzido"] *,
+:root[data-movimento="reduzido"] *::before,
+:root[data-movimento="reduzido"] *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+  margin: 0 0 var(--esp-3);
+  font-weight: var(--peso-negrito);
+  overflow-wrap: anywhere;
+}
+h1 {
+  font-size: var(--tamanho-xl);
+}
+h2 {
+  font-size: var(--tamanho-lg);
+}
+h3 {
+  font-size: var(--tamanho-md);
+}
+h4 {
+  font-size: var(--tamanho-sm);
+}
+p,
+ul,
+ol,
+dl {
+  margin: 0 0 var(--esp-4);
+}
+p:last-child {
+  margin-bottom: 0;
+}
+small {
+  font-size: var(--tamanho-xs);
+}
+
+a {
+  color: var(--cor-primaria);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 0.08em;
+  border-radius: var(--raio-sm);
+}
+a:hover {
+  color: var(--cor-primaria-escura);
+  text-decoration-thickness: 0.15em;
+}
+
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* 2.4.7 / 2.4.11 / 2.4.13 — foco visível, nunca removido sem substituto */
+:focus-visible {
+  outline: 3px solid var(--cor-foco);
+  outline-offset: 3px;
+  border-radius: var(--raio-sm);
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip link (2.4.1) — visível ao receber foco */
+.skip-link {
+  position: absolute;
+  left: var(--esp-4);
+  top: -100%;
+  z-index: 1000;
+  padding: var(--esp-3) var(--esp-4);
+  background: var(--cor-primaria);
+  color: #fff;
+  font-weight: var(--peso-negrito);
+  border-radius: var(--raio-md);
+  text-decoration: none;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: var(--esp-4);
+  outline-color: var(--cor-texto);
+}
+
+/* utilitário de leitor de tela */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* landmarks e container */
+.container {
+  width: 100%;
+  max-width: var(--largura-conteudo);
+  margin-inline: auto;
+  padding-inline: var(--esp-4);
+}
+main {
+  display: block;
+}
+main:focus {
+  outline: none;
+}
+main > .container {
+  padding-block: var(--esp-5) var(--esp-8);
+}
+
+/* cabeçalho */
+.cabecalho {
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda-suave);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.cabecalho__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  min-height: 3.5rem;
+  flex-wrap: wrap;
+  padding-block: var(--esp-2);
+}
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-weight: var(--peso-negrito);
+  font-size: var(--tamanho-md);
+  color: var(--cor-primaria);
+  text-decoration: none;
+  min-height: var(--alvo-minimo);
+}
+.marca:hover {
+  text-decoration: underline;
+}
+.marca__logo {
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+}
+
+.nav-principal ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1);
+}
+.nav-principal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo-minimo);
+  padding: var(--esp-2) var(--esp-3);
+  text-decoration: none;
+  border-radius: var(--raio-md);
+  color: var(--cor-texto);
+  font-weight: var(--peso-medio);
+}
+.nav-principal a:hover {
+  background: var(--cor-primaria-tint);
+  color: var(--cor-primaria-escura);
+  text-decoration: underline;
+}
+.nav-principal a[aria-current="page"] {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+.sessao {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-size: var(--tamanho-xs);
+  color: var(--cor-texto-secundario);
+  flex-wrap: wrap;
+}
+
+.rodape {
+  border-top: 1px solid var(--cor-borda-suave);
+  background: var(--cor-superficie);
+  color: var(--cor-texto-secundario);
+  font-size: var(--tamanho-xs);
+}
+.rodape .container {
+  padding-block: var(--esp-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-4);
+  justify-content: space-between;
+}
+.rodape ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+}
+.rodape a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo-minimo);
+}
+
+/* migalhas / voltar */
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  min-height: var(--alvo-minimo);
+  margin-bottom: var(--esp-3);
+}
+
+/* tabelas responsivas (só tabelas rolam horizontalmente — 1.4.10) */
+.tabela-rolagem {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: var(--tamanho-sm);
+}
+caption {
+  text-align: left;
+  font-weight: var(--peso-negrito);
+  padding-block: var(--esp-2);
+}
+th,
+td {
+  text-align: left;
+  padding: var(--esp-3);
+  border-bottom: 1px solid var(--cor-borda-suave);
+  vertical-align: top;
+}
+th {
+  background: var(--cor-superficie-2);
+  font-weight: var(--peso-negrito);
+}
+
+code,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.95em;
+}
+pre {
+  background: var(--cor-superficie-2);
+  padding: var(--esp-3);
+  border-radius: var(--raio-md);
+  overflow-x: auto;
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--cor-borda-suave);
+  margin: var(--esp-5) 0;
+}

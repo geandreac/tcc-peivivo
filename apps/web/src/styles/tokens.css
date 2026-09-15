@@ -1,0 +1,132 @@
+/* ============================================================================
+   PEI Vivo — Design tokens (docs/ux-ui.md §3)
+   Todos os pares texto/fundo foram verificados numericamente (WCAG 1.4.3 ≥ 4,5:1;
+   1.4.11 ≥ 3:1 para componentes). Ver tabela de contraste em docs/ux-ui.md.
+   ============================================================================ */
+:root {
+  color-scheme: light;
+
+  /* --- cores de marca --- */
+  --cor-primaria: #1d4e89;          /* 8,39:1 sobre branco */
+  --cor-primaria-escura: #163b68;   /* 11,29:1 */
+  --cor-primaria-tint: #e8eff8;     /* fundo suave; texto primário 7,24:1 */
+  --cor-secundaria: #0f6e56;        /* 6,20:1 */
+
+  /* --- neutros --- */
+  --cor-texto: #1b1b1b;             /* 17,2:1 */
+  --cor-texto-secundario: #4d4d4d;  /* 8,45:1 */
+  --cor-fundo: #f6f8fb;
+  --cor-superficie: #ffffff;
+  --cor-superficie-2: #edeff2;
+  --cor-borda: #767676;             /* 4,54:1 — bordas de campos (1.4.11) */
+  --cor-borda-suave: #d5d9e0;       /* decorativa (cards) */
+  --cor-desabilitado-texto: #6b6b6b;
+  --cor-desabilitado-fundo: #e9e9e9;
+
+  /* --- semânticas --- */
+  --cor-sucesso: #1e6b3a;           /* 6,52:1 */
+  --cor-sucesso-fundo: #e3f3e8;
+  --cor-aviso: #8a5300;             /* 6,33:1 */
+  --cor-aviso-fundo: #fff3d6;
+  --cor-erro: #b42318;              /* 6,57:1 */
+  --cor-erro-fundo: #fde8e6;
+  --cor-info: #1d4e89;
+  --cor-info-fundo: #e8eff8;
+
+  /* --- foco (2.4.7 / 2.4.11) --- */
+  --cor-foco: #1d4e89;
+  --anel-foco: 0 0 0 2px var(--cor-superficie), 0 0 0 5px var(--cor-foco);
+
+  /* --- material adaptado (D-10: CSS a partir de parametros) --- */
+  --material-fundo: #fffdf5;
+  --material-texto: #1b1b1b;
+
+  /* --- tipografia --- */
+  --fonte-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --fonte-leitura: "Atkinson Hyperlegible", "Verdana", system-ui, sans-serif;
+  --tamanho-xs: 0.875rem;  /* 14px — só metadados */
+  --tamanho-sm: 1rem;      /* 16px — mínimo do corpo */
+  --tamanho-md: 1.125rem;  /* 18px */
+  --tamanho-lg: 1.375rem;  /* 22px */
+  --tamanho-xl: 1.75rem;   /* 28px */
+  --tamanho-2xl: 2.25rem;  /* 36px */
+  --altura-linha: 1.6;
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-negrito: 700;
+
+  /* --- espaçamento (base 4px) --- */
+  --esp-1: 0.25rem;
+  --esp-2: 0.5rem;
+  --esp-3: 0.75rem;
+  --esp-4: 1rem;
+  --esp-5: 1.5rem;
+  --esp-6: 2rem;
+  --esp-7: 3rem;
+  --esp-8: 4rem;
+
+  /* --- forma --- */
+  --raio-sm: 4px;
+  --raio-md: 8px;
+  --raio-lg: 12px;
+  --raio-pill: 999px;
+  --sombra-1: 0 1px 2px rgba(27, 27, 27, 0.08), 0 1px 3px rgba(27, 27, 27, 0.06);
+  --sombra-2: 0 4px 12px rgba(27, 27, 27, 0.12);
+
+  /* --- alvos de toque (2.5.8 exige 24px; adotamos 44px) --- */
+  --alvo-minimo: 2.75rem;
+
+  /* --- layout --- */
+  --largura-conteudo: 64rem;
+  --largura-leitura: 44rem;
+
+  /* --- movimento --- */
+  --duracao: 160ms;
+}
+
+/* Tema de alto contraste (P4.1: contrasteMinimo 7). Ativado por preferência
+   do usuário (data-contraste="alto") — todos os pares ≥ 9:1. */
+:root[data-contraste="alto"] {
+  --cor-primaria: #0b2a50;
+  --cor-primaria-escura: #061a33;
+  --cor-primaria-tint: #ffffff;
+  --cor-secundaria: #0a4a3a;
+  --cor-texto: #000000;
+  --cor-texto-secundario: #333333;
+  --cor-fundo: #ffffff;
+  --cor-superficie: #ffffff;
+  --cor-superficie-2: #f2f2f2;
+  --cor-borda: #000000;
+  --cor-borda-suave: #000000;
+  --cor-sucesso: #0f4a24;
+  --cor-sucesso-fundo: #ffffff;
+  --cor-aviso: #5c3600;
+  --cor-aviso-fundo: #ffffff;
+  --cor-erro: #8b1a10;
+  --cor-erro-fundo: #ffffff;
+  --cor-info: #0b2a50;
+  --cor-info-fundo: #ffffff;
+  --cor-foco: #000000;
+  --material-fundo: #ffffff;
+  --material-texto: #000000;
+  --sombra-1: none;
+  --sombra-2: none;
+}
+
+/* Preferência de tamanho de fonte (1.4.4 — além do zoom do navegador). */
+:root[data-fonte="grande"] {
+  font-size: 118.75%; /* 19px */
+}
+:root[data-fonte="maior"] {
+  font-size: 137.5%; /* 22px */
+}
+
+/* 2.3.3 — respeita a preferência do sistema E a escolha na página. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duracao: 0ms;
+  }
+}
+:root[data-movimento="reduzido"] {
+  --duracao: 0ms;
+}
