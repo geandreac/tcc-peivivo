@@ -456,17 +456,36 @@ A escrita acompanha as fases; cada marco fecha um capítulo.
 
 ---
 
-## 12. Estado da Fase 0 (atualizado em 10/09)
+## 12. Estado (atualizado em 14/09/2026)
 
 | Card | Estado |
 |---|---|
-| P0.1 | ✅ repo local, 4 commits · ⏳ criar repositório no GitHub e proteger `main` |
-| P0.2 | ✅ workspaces, TS estrito, cobertura com threshold, 11/11 testes |
+| P0.1 | ✅ repo local · ⏳ criar repositório no GitHub e proteger `main` |
+| P0.2 | ✅ workspaces (`packages/*`, `apps/*`), TS estrito, cobertura com threshold |
 | P0.3 | ✅ migrations + seed validados em PGlite (10 tabelas, 18 policies) |
 | P0.4 | ⏳ precisa de conta Supabase (criar `pei-vivo-dev`, link, push, secrets) |
-| P0.5 | ✅ workflows escritos · ⏳ ficam verdes no primeiro push |
-| P0.6 | ⏳ precisa do repositório no GitHub (Projects + cards) |
+| P0.5 | ✅ workflows escritos (jobs `motor`, `db`, `web`) · ⏳ verdes no primeiro push |
+| P0.6 | ⏳ precisa do repositório no GitHub (`scripts/criar-kanban.sh`) |
 | P0.7 | ✅ `docs/rastreabilidade.md` |
 | P0.8 | ✅ `docs/tcc/`, zip removido |
+| **P2.1–P2.5** | ✅ `ciclos.ts`, `ancora.ts`, `adaptador.ts`, `index.ts`, `exports` — 30 testes, 97 % (D-18) |
+| P2.6 | ✅ threshold 70 % no CI |
+| P2.7 | ✅ cenário A reproduzido (`regras.test.ts`) |
+| **P4.1** | ✅ substituído por protótipo em código (`apps/web`) — 19 telas, design system em CSS (D-15), `docs/ux-ui.md` |
+| P4.2 | ⏳ validar com 2 docentes (roteiro em `docs/plano-de-testes.md` §2) |
+| P4.3 | ✅ scaffold Vite + React + TS (sem Tailwind/TanStack — D-15/D-17; sem PWA plugin ainda) |
+| P4.4 | 🟡 sessão em contexto (`useSessao`) com modo demonstração (D-16); Supabase Auth pendente |
+| P4.5 | ✅ `Botao`, `Campo`, `Escala3`, `MaterialAdaptado` (+ `Modal`, `Alerta`, `Badge`, `Card`, estados) |
+| P4.6 | ✅ tela consentimento |
+| P4.7 | ✅ axe-core no Vitest em todos os componentes e telas (jsdom); Playwright pendente |
+| P4.8–P4.11 | ✅ observar, fechar ciclo, validar, nota clínica |
+| P4.12–P4.16 | ✅ gerar, revisar, material (+ impressão), desfecho, histórico |
+| P4.17–P4.18 | ✅ cadastrar, vínculos, pendências, histórico com exportação |
+| P4.19–P4.20 | 🟡 equivalentes em jsdom (`paginas.test.tsx`, `mockApi.test.ts`); Playwright contra Supabase pendente |
 
-Próxima ação: P0.1 (GitHub) → P0.6 (Kanban) → P0.4 (Supabase dev).
+**Ordem preservada.** O protótipo roda sobre `mockApi` (D-17), que aplica a
+matriz de permissões v2; a Fase 1 (migration `0004` + RLS) e a Fase 3 (Edge
+Functions) continuam pré-requisito de `supabaseApi`. Os 34 cenários de
+`mockApi.test.ts` são a especificação dos testes P1.11–P1.19.
+
+Próxima ação: P0.1 (GitHub) → P0.6 (Kanban) → P0.4 (Supabase dev) → Fase 1.

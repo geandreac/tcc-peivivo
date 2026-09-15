@@ -1,6 +1,6 @@
 # PEI Vivo — Análise de requisitos por perfil de usuário
 
-**Versão:** 1.0 — 10/09/2026
+**Versão:** 1.1 — 14/09/2026 (v1.0 em 10/09; D-14…D-18 e §11 adicionados)
 **Fontes:** pré-projeto (`docs/tcc/TCC - Geandre & Jean.md`), mapeamento dos slides
 (`docs/tcc/PEI_Vivo_Slides_Mapeamento.md`), diagramas de casos de uso, classes e
 sequência (`docs/tcc/*.svg`), foto do quadro com o formato de rastreabilidade
@@ -277,6 +277,64 @@ de IA.
 - `vinculos_usuario_estudante.status text` → enum `status_vinculo ('ATIVO','INATIVO')`.
 - `registro_conselho` obrigatório quando `papel = PROFISSIONAL_SAUDE`: virar
   `check constraint`, não comentário.
+
+### D-14 · Um papel por usuário por estudante
+
+**Divergência.** `unique (usuario_id, estudante_id, papel)` permite que a mesma
+pessoa tenha dois papéis no mesmo estudante (coordenadora que também é mãe);
+`fn_meu_papel` com `limit 1` devolveria um papel arbitrário.
+
+**Decisão.** `unique (usuario_id, estudante_id)` — uma pessoa, um papel por
+estudante. Quem acumula funções usa duas contas. O mock já aplica a regra
+(`vincular` → `CONFLITO`). Entra na migration `0004` (P1.3).
+
+### D-15 · Design system em CSS com tokens, sem Tailwind (por enquanto)
+
+**Divergência.** Pré-projeto §9.1 lista Tailwind CSS. A orientação da
+disciplina exige paleta em HEX com contraste verificado, estados de
+componente documentados e um design system auditável pela banca.
+
+**Decisão.** `apps/web/src/styles/tokens.css` define os tokens (cores,
+tipografia, espaçamento, raios, foco, movimento); `componentes.css` define os
+componentes e estados. Todo par texto/fundo tem a razão de contraste anotada
+(`docs/ux-ui.md` §3.2). Tailwind pode entrar depois consumindo os mesmos
+tokens (`@theme`), sem refatorar telas. Motivo: um framework utilitário
+esconde os pares de cor que a matriz WCAG precisa provar, e o material
+adaptado depende de CSS derivado de `parametros` (D-10), mais legível em CSS puro.
+
+### D-16 · Autenticação em modo demonstração até o Supabase Auth (P4.4)
+
+**Decisão.** A tela **Entrar** é uma porta de entrada com **uma tela de login
+por perfil** (`/entrar/familia`, `/entrar/docente`, `/entrar/saude`,
+`/entrar/coordenacao`), cada uma com a especificação do papel (o que faz, o que
+vê, o que nunca vê, como será o acesso real) e só os perfis fictícios daquele
+papel — especificação em `apps/web/src/utils/perfisLogin.ts`. Sem senha.
+Atende WCAG 3.3.8 (nenhum teste cognitivo) e permite demonstrar a matriz de
+permissões trocando de perfil. Será substituída por e-mail/senha + convite
+(`inviteUserByEmail`) sem mudar nenhuma outra tela: a sessão é um contexto
+(`useSessao`) que só conhece `Usuario`.
+
+### D-17 · Camada de serviços com contrato único e mock que aplica permissões
+
+**Divergência.** O `CLAUDE.md` proíbe tela antes da policy. As Edge Functions
+(Fase 3) ainda não existem, mas a orientação da disciplina pede protótipo
+funcional agora.
+
+**Decisão.** `apps/web/src/services/api.ts` define `PeiVivoApi`; a única
+implementação atual é `mockApi.ts`, que **reproduz a matriz de permissões v2 e
+RN01–RN08** e nega (`ErroApi("NEGADO")`, 0 linhas) exatamente o que o RLS
+negará. As telas nunca decidem permissão; só exibem o resultado. Os 34 testes
+de `mockApi.test.ts` são, cenário a cenário, os testes P1.11–P1.19, que serão
+reexecutados contra `supabaseApi` na Fase 4. Nenhuma policy foi afrouxada nem
+"lembrada" na interface.
+
+### D-18 · `adaptador.ts` implementado na Fase 2, antes das Edge Functions
+
+**Decisão.** P2.1–P2.5 (`ciclos.ts`, `ancora.ts`, `adaptador.ts`, barrel)
+foram implementados agora porque a tela de geração precisa da camada
+determinística real para ser um protótipo funcional (e não uma tela com texto
+falso). O motor continua puro e isomórfico; `gerar-material` (P3.4–P3.8) vai
+importá-lo sem alteração.
 
 ---
 
@@ -721,3 +779,58 @@ Function → frontend.
 - **Pré-projeto §7 (modelo)** — substituir `Gatilho/Estrategia/Interesse` pela
   tabela de mapeamento de D-03.
 - **Pré-projeto §8** — esclarecer "roda no cliente" = apresentação (D-10).
+
+---
+
+## 11. Requisitos consolidados do MVP e priorização (14/09/2026)
+
+Esta seção consolida, no formato pedido pela disciplina, o que as seções 2–8
+detalham por perfil. Histórias de usuário e critérios *Dado/Quando/Então*
+continuam nas HU-* acima; aqui cada RF ganha **critério de aceite resumido** e
+**prioridade MoSCoW** para o MVP demonstrável (M3/M4).
+
+### 11.1 Requisitos funcionais
+
+| ID | Requisito | Descrição | Prioridade | Critério de aceite | Histórias | Estado no protótipo |
+|---|---|---|---|---|---|---|
+| RF01 | Cadastrar estudante e vincular | Coordenação cria estudante (RPC atômica) e vínculos; profissional exige registro no conselho | Must | Sem `papel_institucional` → negado; com → estudante + vínculo na mesma transação; profissional sem registro → erro de validação | HU-C.01–C.03 | ✅ telas *Cadastrar estudante*, *Vínculos*; mock aplica D-08/D-13/D-14 |
+| RF02 | Consentimento com auditoria | Responsável concede/revoga; trilha append-only | Must | Concessão/revogação geram evento; revogação bloqueia escrita imediatamente; outro papel → negado | HU-R.01, R.02 | ✅ tela *Consentimento* (termo simples, escopos, dupla confirmação, trilha) |
+| RF03 | Observação pedagógica por ciclo | Docente registra 6 dimensões, escala 3 pontos, evidência opcional | Must | Sem consentimento → negado; grava `papel_autor = DOCENTE`; < 60 s no celular | HU-D.01 | ✅ tela *Registrar observação* (rótulos leigos por dimensão) |
+| RF04 | Observações de responsável e profissional | Mesma tela, rótulo por papel; coordenação não escreve | Must | Coordenação → negado; `papel_autor` do vínculo | HU-R.03, P.02 | ✅ |
+| RF05 | Converter observações em parâmetros | Regras determinísticas (Quadro 5), RN03 | Must | `regras.test.ts` + `ciclos.test.ts`; diff mostra "aguardando 2º ciclo" | HU-D.02, S.01, S.02 | ✅ motor completo; tela *Fechar ciclo* com diff |
+| RF06 | Submeter à validação clínica | Versão nasce PENDENTE se há profissional | Must | Com profissional → PENDENTE; vigente anterior mantida | HU-D.02 | ✅ |
+| RF07 | Aprovar / ajustar / expirar em 7 dias | Profissional decide; job diário expira | Must | Aprovar → VIGENTE; ajuste exige justificativa; 8 dias → EXPIRADA, anterior segue; aparece em pendências | HU-P.01, P.05, C.06 | ✅ telas *Validar parâmetros* e *Pendências* (expiração simulada na leitura) |
+| RF08 | Gerar material a partir de texto | Docente cola texto; snapshot da versão vigente; cache | Must | Sem vigente → conflito; texto 1–20 000; mesmo texto + versão → mesmo material; < 60 s | HU-D.03 | ✅ tela *Gerar material* |
+| RF09 | Camada determinística | Blocos ≤ limite, etapa única, contraste via CSS | Must | `adaptador.test.ts`: determinístico, nada se perde, sem conectores | HU-S.03 | ✅ `adaptador.ts` + `MaterialAdaptado` |
+| RF10 | Camada de IA | Simplificação lexical + âncora, desligável | Could | IA off → 200 só com camada 1; on → glossário | HU-S.05 | ⬜ desligada (Fase 5); aviso na tela de revisão |
+| RF11 | Revisão, edição e aprovação humana | Original × adaptado; rascunho privado | Must | Responsável não vê rascunho; após aprovar vê; IA nunca aprova | HU-D.04 | ✅ tela *Revisar* |
+| RF12 | Versão web acessível + impressão | CSS a partir de `parametros`; `@media print` | Must | 0 violações axe A/AA; contraste ≥ `contrasteMinimo`; impressão sem cabeçalho/rodapé | HU-D.05 | ✅ tela *Material* + `print.css` |
+| RF13 | Registrar desfecho | 3 opções + texto; 1:1 com material | Must | Segundo desfecho → conflito; só docente; só material aprovado | HU-D.06 | ✅ tela *Desfecho* |
+| RF14 | RBAC + permissões granulares | Matriz v2 no dado | Must | Docente lê nota clínica → negado mesmo por rota direta | HU-P.03 | ✅ mock (34 testes negativos); RLS `0002` (+ `0004` pendente) |
+| RF15 | Exportar / excluir dados | LGPD art. 18 | Should | Docente → negado; export sem notas clínicas; exclusão exige nome exato e apaga notas | HU-R.05, R.06 | ✅ tela *Dados do estudante* |
+| RF16 | Ajuda e acessibilidade na interface | Página de ajuda; preferências (contraste, fonte, movimento); declaração | Should | Preferências persistem; alto contraste ≥ 9:1 | — | ✅ telas *Ajuda* e *Acessibilidade* |
+
+### 11.2 Requisitos não funcionais (categorias da disciplina ↔ RNF do pré-projeto)
+
+| ID | Categoria | Requisito | Verificação | Estado |
+|---|---|---|---|---|
+| RNF-A | Responsividade | Mobile-first; layout reflui de 320 px a 1440 px sem rolagem horizontal (exceto tabelas em contêiner próprio); comparação lado a lado só ≥ 768 px | Zoom 400 % em 1280 px = 320 px; Playwright 375×812 (P4.19) | ✅ CSS; ⬜ Playwright |
+| RNF-B | Desempenho | Geração < 60 s (RNF02); bundle inicial < 150 kB gzip; sem web fonts | `duracaoMs` instrumentado; `vite build` (104 kB gzip) | ✅ |
+| RNF-C | Segurança básica | Permissão no dado (RLS/RNF04); sem segredo no cliente; sessão em contexto; nenhuma decisão de permissão na UI | Testes negativos do mock; revisão de código | ✅ mock; ⬜ Supabase |
+| RNF-D | Organização e manutenibilidade | TS estrito; componentes pequenos; contrato `PeiVivoApi`; cobertura ≥ 70 % (RNF07) | `tsc --noEmit`; Vitest coverage | ✅ motor 97 %; web ver `npm run test:coverage -w apps/web` |
+| RNF-E | Usabilidade | SUS ≥ 68 (RNF01); fluxo docente ≤ 4 telas; heurísticas de Nielsen sem severidade ≥ 3 aberta | `docs/avaliacao-heuristica.md`; piloto | ✅ heurística; ⬜ SUS |
+| RNF-F | Acessibilidade | WCAG 2.2 AA + NBR 17225 (RNF03); teclado; leitor de tela; contraste; reflow; alvos ≥ 44 px | `docs/wcag-2.2.md`; axe; NVDA manual | ✅ axe 0 violações (jsdom); ⬜ NVDA |
+| RNF-G | Compatibilidade entre navegadores | Chrome, Firefox, Safari (iOS 16+), Edge atuais; `<dialog>`, `:has()`, `dvh` com fallback aceitável | Checklist manual em `docs/plano-de-testes.md` | ⬜ |
+| RNF-H | Tratamento de erros | Todo estado de erro tem mensagem em linguagem simples, código estável (`ErroApi.codigo`) e ação de recuperação; falha de rede simulável | `mensagemAmigavel`; botão "Simular falha de rede" | ✅ |
+| RNF-I | Consistência visual | Tokens únicos; componentes reutilizados; navegação idêntica em todas as telas | `docs/ux-ui.md` §3 | ✅ |
+| RNF-J | Integração futura com API REST | Contrato `PeiVivoApi` isolado em `services/`; erros mapeados para 401/403/404/409/400; troca por `supabaseApi` sem alterar telas | Revisão de arquitetura | ✅ |
+| RNF05/06 | Offline / PWA | Cache de leitura e instalável | `vite-plugin-pwa` (P5.6) | ⬜ manifest presente; SW pendente |
+
+### 11.3 Priorização MoSCoW do MVP
+
+| | Itens |
+|---|---|
+| **Must have** | RF01–RF09, RF11–RF14; RNF-A, C, D, F, H, I, J; telas: entrar, painel, estudante, consentimento, observar, fechar ciclo, validar, nota clínica, gerar, revisar, material, desfecho, 404 |
+| **Should have** | RF15 (exportar/excluir), RF16 (ajuda/acessibilidade), histórico do PEI, pendências, vínculos/cadastro (coordenação), preferências de acessibilidade, impressão |
+| **Could have** | RF10 (IA real, Fase 5), PWA offline (P5.6), índice Flesch na revisão (P5.8), indicadores agregados (HU-C.05), tema escuro |
+| **Won't have (neste MVP)** | Notificações push/e-mail, geração de material pelo profissional de saúde, sincronização offline bidirecional, app nativo, auditoria de leitura, sugestão automática de intervenção |
