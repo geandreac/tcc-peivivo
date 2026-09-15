@@ -1,0 +1,578 @@
+[
+ {
+  "id": "P0.1",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "`git init`, `.gitignore` (node_modules, `.env*`, `supabase/.temp`), primeiro commit com o estado atual"
+ },
+ {
+  "id": "P0.2",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "Monorepo com npm workspaces: `package.json` raiz com `\"workspaces\": [\"packages/*\", \"apps/*\"]`, `tsconfig.base."
+ },
+ {
+  "id": "P0.3",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "`npx supabase init` + `scripts/validar-migrations.mjs` (PGlite) rodando 0001→0002 + `seed.sql`"
+ },
+ {
+  "id": "P0.4",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "Criar projeto Supabase Cloud `pei-vivo-dev` (free), `supabase link`, `db push`, depois `db reset --linked` par"
+ },
+ {
+  "id": "P0.5",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "CI GitHub Actions: job `motor` (typecheck + coverage + `db:validar`), job `db` (`supabase start` + `db reset` "
+ },
+ {
+  "id": "P0.6",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "GitHub Projects: 5 colunas (Backlog → A Fazer → Em Desenvolvimento → Revisão/Teste → Concluído), WIP 2/pessoa,"
+ },
+ {
+  "id": "P0.7",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "`docs/rastreabilidade.md` com o formato do quadro (RF · Texto · Motivação · Decisão · Teste · Commit), semeado"
+ },
+ {
+  "id": "P0.8",
+  "fase": "0",
+  "frente": "ambos",
+  "titulo": "Mover `notion/` para `docs/tcc/` (fontes do TCC versionadas) e apagar o `.zip` da raiz"
+ },
+ {
+  "id": "P1.1",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-13"
+ },
+ {
+  "id": "P1.2",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-01"
+ },
+ {
+  "id": "P1.3",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-04"
+ },
+ {
+  "id": "P1.4",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-08"
+ },
+ {
+  "id": "P1.5",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-06"
+ },
+ {
+  "id": "P1.6",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-06"
+ },
+ {
+  "id": "P1.7",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-07"
+ },
+ {
+  "id": "P1.8",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-11"
+ },
+ {
+  "id": "P1.9",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "D-12"
+ },
+ {
+  "id": "P1.10",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "—"
+ },
+ {
+  "id": "P1.11",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "Infra: `globalSetup` PGlite (migrations + seed + 4 `auth.users`) e cliente cloud opcional; helpers `comoDocent"
+ },
+ {
+  "id": "P1.12",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**RN02** — docente lê `notas_clinicas` → 0 linhas; docente insere → erro; responsável e coordenação idem. Prof"
+ },
+ {
+  "id": "P1.13",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**RN01/RN08** — sem consentimento ATIVO: docente cria ciclo → erro; insere observação → erro; gera material → "
+ },
+ {
+  "id": "P1.14",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**RF02/D-06** — responsável `delete` em `consentimentos` → erro; revogar gera linha em `auditoria`; docente lê"
+ },
+ {
+  "id": "P1.15",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**D-08** — usuário sem `papel_institucional` chama `fn_cadastrar_estudante` → erro; coordenação chama → estuda"
+ },
+ {
+  "id": "P1.16",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**D-12/RN04** — responsável lê material RASCUNHO → 0 linhas; após `APROVADO` → 1 linha; profissional `update` "
+ },
+ {
+  "id": "P1.17",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**RF14 vínculos** — docente cria vínculo → erro; docente vê só os próprios; coordenação desativa vínculo → o d"
+ },
+ {
+  "id": "P1.18",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**D-04** — responsável insere observação com `autor_id` de outro → erro; `papel_autor` preenchido = RESPONSAVE"
+ },
+ {
+  "id": "P1.19",
+  "fase": "1",
+  "frente": "A",
+  "titulo": "**D-13** — vínculo PROFISSIONAL_SAUDE sem `registro_conselho` → violação de check"
+ },
+ {
+  "id": "P2.1",
+  "fase": "2",
+  "frente": "B",
+  "titulo": "`src/ciclos.ts`"
+ },
+ {
+  "id": "P2.2",
+  "fase": "2",
+  "frente": "B",
+  "titulo": "`src/ancora.ts`"
+ },
+ {
+  "id": "P2.3",
+  "fase": "2",
+  "frente": "B",
+  "titulo": "`src/tipos.ts`"
+ },
+ {
+  "id": "P2.4",
+  "fase": "2",
+  "frente": "B",
+  "titulo": "`src/adaptador.ts`"
+ },
+ {
+  "id": "P2.5",
+  "fase": "2",
+  "frente": "B",
+  "titulo": "`src/index.ts`"
+ },
+ {
+  "id": "P2.6",
+  "fase": "2",
+  "frente": "B",
+  "titulo": "Cobertura"
+ },
+ {
+  "id": "P2.7",
+  "fase": "2",
+  "frente": "B",
+  "titulo": "Cenário A"
+ },
+ {
+  "id": "P3.1",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "`_shared/auth.ts`: extrai `auth.uid()` do JWT, resolve `usuarios.id`, expõe `exigirPapel(estudanteId, papel)` "
+ },
+ {
+  "id": "P3.2",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "`fechar-ciclo`: body `{cicloId}` validado com Zod → exige DOCENTE + consentimento → carrega observações do cic"
+ },
+ {
+  "id": "P3.3",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "Teste de integração (Vitest + `pei-vivo-dev`, ou `supabase functions serve` no CI): cenário A → versão gerada "
+ },
+ {
+  "id": "P3.4",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "[msg 2] `POST` body `{texto, estudanteId}` — Zod: texto 1–20 000 chars"
+ },
+ {
+  "id": "P3.5",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "[msg 3–4] `select … from versoes_perfil where estudante_id=? and status_validacao='VIGENTE' order by data_vige"
+ },
+ {
+  "id": "P3.6",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "[msg 5–6] `adaptar(texto, parametros)`"
+ },
+ {
+  "id": "P3.7",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "[msg 7–8 (alt)] `ProvedorIA.simplificar(textoAdaptado, parametros)` só se `IA_HABILITADA=true` **e** existe PR"
+ },
+ {
+  "id": "P3.8",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "[msg 9–10] `insert materiais_adaptados (…, versao_perfil_id, status_aprovacao='RASCUNHO', hash_texto)` — adici"
+ },
+ {
+  "id": "P3.9",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "[msg —] Instrumentação: `duracaoMs` logado — é o dado do RNF02"
+ },
+ {
+  "id": "P3.10",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "Testes: IA off → 200 com `iaAplicada:false`; sem vigente → 409; texto repetido → mesmo `materialId`; responsáv"
+ },
+ {
+  "id": "P3.11",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "`convidar-responsavel`"
+ },
+ {
+  "id": "P3.12",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "`exportar-dados-estudante`"
+ },
+ {
+  "id": "P3.13",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "`excluir-estudante`"
+ },
+ {
+  "id": "P3.14",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "Expiração RN05"
+ },
+ {
+  "id": "P3.15",
+  "fase": "3",
+  "frente": "A",
+  "titulo": "Roteiro HTTP de demo"
+ },
+ {
+  "id": "P4.1",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Figma, 375 px de largura, 6 telas: consentimento (R), observação quinzenal (D), fechar ciclo com diff (D), val"
+ },
+ {
+  "id": "P4.2",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Validar o protótipo com 2 docentes (pode ser informal, 15 min cada) — anotar o que confundiu. É insumo para RN"
+ },
+ {
+  "id": "P4.3",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "`npm create vite@latest apps/web -- --template react-ts`; Tailwind; TanStack Query; Zod; `@supabase/supabase-j"
+ },
+ {
+  "id": "P4.4",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Auth: login por e-mail/senha e aceite de convite (link do `inviteUserByEmail`); `useUsuario()` que resolve `us"
+ },
+ {
+  "id": "P4.5",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Design system mínimo: `Botao`, `Campo`, `Escala3` (REDUZIDA/ESTÁVEL/AMPLIADA com rótulos leigos por dimensão),"
+ },
+ {
+  "id": "P4.6",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **consentimento** (HU-R.01/R.02) — termo em linguagem simples, escopos, botão único; revogação com dupla"
+ },
+ {
+  "id": "P4.7",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "axe-core no Vitest (`vitest-axe`) para cada componente + Playwright com `@axe-core/playwright` para cada tela"
+ },
+ {
+  "id": "P4.8",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **observação quinzenal** (HU-D.01, HU-R.03, HU-P.02) — 6 dimensões, `Escala3`, evidência opcional; mesma"
+ },
+ {
+  "id": "P4.9",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **fechar ciclo** (HU-D.02) — chama `fechar-ciclo`, mostra o diff vigente → proposto, sinaliza \"aguardand"
+ },
+ {
+  "id": "P4.10",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **validar parâmetros** (HU-P.01) — conjunto completo, observações de origem, aprovar / solicitar ajuste "
+ },
+ {
+  "id": "P4.11",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **nota clínica** (HU-P.03) — visualmente separada (\"só profissionais de saúde veem\")"
+ },
+ {
+  "id": "P4.12",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **gerar** (HU-D.03) — textarea, seletor de estudante, botão \"adaptar para [nome]\"; estado de progresso c"
+ },
+ {
+  "id": "P4.13",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **revisar** (HU-D.04) — original × adaptado (empilhado no celular, lado a lado em ≥ 768 px), edição inli"
+ },
+ {
+  "id": "P4.14",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **material final** (HU-D.05) — web acessível com CSS a partir de `parametros`; `@media print` (RF12); gl"
+ },
+ {
+  "id": "P4.15",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **desfecho** (HU-D.06) — 3 botões + texto livre; 2 toques"
+ },
+ {
+  "id": "P4.16",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Tela: **histórico do responsável** (HU-R.04) — só APROVADOS com desfecho"
+ },
+ {
+  "id": "P4.17",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Painel **coordenação**: cadastrar estudante (RPC), convidar responsável, vincular docente/profissional (com `r"
+ },
+ {
+  "id": "P4.18",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Painel: **pendências** (view `pendencias_validacao`) e **histórico do PEI** (linha do tempo, botão exportar)"
+ },
+ {
+  "id": "P4.19",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Playwright **golden path** em viewport 375×812: coordenação cadastra → responsável consente → docente observa "
+ },
+ {
+  "id": "P4.20",
+  "fase": "4",
+  "frente": "B",
+  "titulo": "Playwright **caminhos negados** na UI: docente não vê link para nota clínica; responsável não vê rascunho; sem"
+ },
+ {
+  "id": "P5.1",
+  "fase": "5",
+  "frente": "A",
+  "titulo": "`ProvedorIA` real: chamada à API de LLM (modelo capaz de seguir instruções estruturadas; chave via `supabase s"
+ },
+ {
+  "id": "P5.2",
+  "fase": "5",
+  "frente": "A",
+  "titulo": "Saída validada por Zod: `{texto, glossario[]}`; falha de schema → fallback camada 1 (nunca erro para o docente"
+ },
+ {
+  "id": "P5.3",
+  "fase": "5",
+  "frente": "A",
+  "titulo": "Limite por usuário (ex.: 30 gerações/dia) em tabela `cotas_ia`; cache já existe (P3.5)"
+ },
+ {
+  "id": "P5.4",
+  "fase": "5",
+  "frente": "A",
+  "titulo": "Teste com IA ligada: glossário presente; conceitos preservados (asserção: números e nomes próprios do original"
+ },
+ {
+  "id": "P5.5",
+  "fase": "5",
+  "frente": "A",
+  "titulo": "Chave de \"IA desligada\" no painel da coordenação (variável por instituição) — é o botão do modo demo"
+ },
+ {
+  "id": "P5.6",
+  "fase": "5",
+  "frente": "B",
+  "titulo": "Service Worker (`vite-plugin-pwa` + Workbox): cache de leitura de materiais APROVADOS e do shell. **Sem** fila"
+ },
+ {
+  "id": "P5.7",
+  "fase": "5",
+  "frente": "B",
+  "titulo": "Teste: Playwright com `context.setOffline(true)` abre material já visto"
+ },
+ {
+  "id": "P5.8",
+  "fase": "5",
+  "frente": "B",
+  "titulo": "`packages/motor-adaptacao/src/legibilidade.ts`: índice Flesch adaptado PT-BR (fórmula de Martins et al.) — pur"
+ },
+ {
+  "id": "P5.9",
+  "fase": "5",
+  "frente": "B",
+  "titulo": "Simulação de rede móvel no Playwright (throttling \"Slow 4G\"): `gerar-material` com IA < 60 s (RNF02)"
+ },
+ {
+  "id": "P6.1",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Deploy: `apps/web` na Vercel, Edge Functions e migrations no Supabase Cloud, `secrets` configurados, domínio"
+ },
+ {
+  "id": "P6.2",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Script `scripts/seed-demo.ts` que recria o cenário do Miguel no cloud em 1 comando (dados fictícios)"
+ },
+ {
+  "id": "P6.3",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Recrutar 3–5 docentes individuais (não depende de escola parceira, §10). Termo de participação simples; nenhum"
+ },
+ {
+  "id": "P6.4",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Cronometragem comparativa: mesmo texto, adaptação manual × PEI Vivo, 3 textos por docente"
+ },
+ {
+  "id": "P6.5",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Escala SUS aplicada após o uso (Google Forms)"
+ },
+ {
+  "id": "P6.6",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Flesch antes/depois em todos os materiais gerados (P5.8)"
+ },
+ {
+  "id": "P6.7",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Relatório axe-core + sessão manual com NVDA nas 6 telas principais"
+ },
+ {
+  "id": "P6.8",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Relatório dos testes RLS negativos (P1.11–P1.19) + P4.20"
+ },
+ {
+  "id": "P6.9",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Desfechos registrados no piloto: taxa ALCANÇADO com vs. sem âncora"
+ },
+ {
+  "id": "P6.10",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "`duracaoMs` de todas as gerações do piloto, p95"
+ },
+ {
+  "id": "P6.11",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Relatório de cobertura do Vitest (motor + testes-rls + web)"
+ },
+ {
+  "id": "P6.12",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "**Freeze de features em 26/11.** Só bug fix depois. Branch `demo` congelada e testada do zero em 30/11 e 01/12"
+ },
+ {
+  "id": "P6.13",
+  "fase": "6",
+  "frente": "ambos",
+  "titulo": "Tabular tudo em `docs/resultados.md` — vira o capítulo de resultados"
+ },
+ {
+  "id": "P7.1",
+  "fase": "7",
+  "frente": "ambos",
+  "titulo": "Roteiro de demo de 8 min **abrindo pelo Miguel** (§14): consentimento da Dona Rosa → observações dos três → fe"
+ },
+ {
+  "id": "P7.2",
+  "fase": "7",
+  "frente": "ambos",
+  "titulo": "Demo de segurança ao vivo: como docente, `curl` direto em `notas_clinicas` com token válido → 403. É a respost"
+ },
+ {
+  "id": "P7.3",
+  "fase": "7",
+  "frente": "ambos",
+  "titulo": "Plano B: vídeo gravado da demo completa + segundo projeto cloud (`pei-vivo-demo`) já semeado + build do PWA em"
+ },
+ {
+  "id": "P7.4",
+  "fase": "7",
+  "frente": "ambos",
+  "titulo": "Slides finais a partir de `PEI_Vivo_Slides_Mapeamento.md` + números de `resultados.md`; screenshot real do Kan"
+ },
+ {
+  "id": "P7.5",
+  "fase": "7",
+  "frente": "ambos",
+  "titulo": "Ensaio cronometrado ×2 com a orientadora"
+ }
+]
