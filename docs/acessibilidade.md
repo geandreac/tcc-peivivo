@@ -1,11 +1,44 @@
 # PEI Vivo — Diretrizes de acessibilidade digital
 
-**Versão:** 1.0 — 14/09/2026
+**Versão:** 1.1 — 21/09/2026 (1.0 em 14/09/2026; acrescentado o §0 com o mapa dos requisitos mínimos da disciplina → implementação → verificação).
 **Etapa da orientação:** 3 (Documento de Acessibilidade e Design — pilar *Acessibilidade*).
 **Normas de referência:** WCAG 2.2 AA (matriz em `docs/wcag-2.2.md`), ABNT NBR 17225:2025 (web), NBR 17060:2022 (mobile), eMAG.
 **Onde está implementado:** `apps/web/src/styles/*.css`, `apps/web/src/components/*`, `apps/web/src/layouts/Layout.tsx`, hooks `useTitulo`, `useAnuncio`, `usePreferencias`.
 
 Acessibilidade aqui não é adendo: o público-alvo inclui um estudante com sensibilidade visual, uma responsável com baixa familiaridade digital e uma docente que usa o celular à noite com brilho baixo. O próprio produto — material adaptado — é um artefato de acessibilidade; a interface que o produz precisa ser, no mínimo, tão acessível quanto ele.
+
+---
+
+## 0. Requisitos mínimos da disciplina — onde cada um está
+
+| Requisito | Implementação | Como verificar | Status |
+|---|---|---|---|
+| HTML semântico | Só elementos nativos (`button`, `a`, `input`, `select`, `textarea`, `details`, `dialog`, `table`, `ul/ol/dl`) | axe (`semViolacoesAxe`) em 21 telas/componentes; §1 | ✅ |
+| Hierarquia correta de títulos | Um `h1` por tela; `h2` seções; `h3` cards; sem salto | axe `heading-order`; `paginas.test.tsx › …um único h1` | ✅ |
+| `header`, `nav`, `main`, `footer` (`aside` não é necessário — não há conteúdo complementar) | `Layout.tsx` | `paginas.test.tsx › tem skip link, landmarks…`; §1.2 | ✅ |
+| Skip link | `.skip-link` → `main#conteudo tabindex=-1` | Tab uma vez ao carregar; teste | ✅ |
+| Navegação integral por teclado | Nenhum `div`/`span` clicável; sem handlers só de mouse | Testes com `userEvent`; checklist A1–A2 | ✅ |
+| Ordem de foco lógica | DOM = ordem visual; sem `tabindex > 0`; foco no `h1` a cada rota | Checklist A1; `useTitulo` | ✅ |
+| Foco visível | `:focus-visible` 3 px + offset 3 px em tudo; cartões de rádio com `:has()` | Checklist A5; 2.4.7/2.4.13 | ✅ |
+| Contraste WCAG AA | Tokens ≥ 4,5:1 texto / ≥ 3:1 componentes; alto contraste ≥ 9:1 | `npm run contraste` (CI); Lighthouse (manual) | ✅ num / 🟡 navegador |
+| Labels associados aos campos | `Campo` gera `label for`; `fieldset/legend` para grupos | axe `label`; `componentes.test.tsx › Campo` | ✅ |
+| Mensagens de erro claras e acessíveis | `ResumoErros` (`role=alert`, focado, links) + erro por campo | `paginas.test.tsx › valida o formulário…` | ✅ |
+| `aria-describedby` | Dica e erro ligados ao campo | `componentes.test.tsx › Campo` (`toHaveAccessibleDescription`) | ✅ |
+| `aria-live` para mensagens dinâmicas | `AnuncioProvider` (polite/assertive) + `role=status` em carregando | `autenticacao.test.tsx`, `paginas.test.tsx` (toasts) | ✅ |
+| Texto alternativo adequado | Logo `aria-hidden` (link nomeado); imagem da tela Entrar `alt=""` decorativa; não há imagens informativas | axe `image-alt` | ✅ |
+| Imagens decorativas com `alt=""` | `Entrar.tsx` (`<img alt="">`) | axe | ✅ |
+| Botões reais para ações / links reais para navegação | Regra do CLAUDE.md; `Botao` = `<button>`, `LinkBotao` = `<a>` | Revisão de PR; axe `button-name`/`link-name` | ✅ |
+| Sem `div`/`span` clicáveis | `onClick` só em `button`/`a`/`input`/`dialog` | Revisão de PR | ✅ |
+| Não remover foco sem alternativa | Nenhum `outline: none` sem substituto | grep em `styles/` | ✅ |
+| Layout responsivo / reflow | Mobile-first, 320 px sem rolagem horizontal, grades → coluna | §8; checklist A9–A11 | ✅ CSS / 🟡 dispositivo |
+| Zoom 200 % e 400 % | `rem`; sem altura fixa | Checklist A9–A10 (manual) | 🟡 pendente sessão |
+| Redução de movimento | `prefers-reduced-motion` + preferência na tela | §9; checklist A23 | ✅ |
+| Informação não só por cor/forma/posição/ícone | Badges com texto; diff com coluna "Situação"; alertas com título | §3; 1.4.1 | ✅ |
+| Alvos de toque adequados | `--alvo-minimo: 2.75rem` (44 px) | §8; Lighthouse `target-size` | ✅ |
+| Linguagem clara | Rótulos leigos (`utils/rotulos.ts`), termo em 5 perguntas, mensagens que dizem como corrigir | §4; teste de compreensão H5 (piloto) | ✅ / 🟡 piloto |
+| Compatibilidade com leitores de tela | ARIA mínima; nativos; live regions no DOM desde o início | Sessão NVDA/VoiceOver (P6.7) | 🟡 pendente sessão |
+
+**Requisitos de perfil (enunciado):** cada perfil tem tela de login própria com linguagem do seu contexto, redirecionamento após login, dashboard com a ação do papel, controle de acesso, estados, logout e navegação por teclado — verificado em `autenticacao.test.tsx` (7 testes) e `paginas.test.tsx`.
 
 ---
 

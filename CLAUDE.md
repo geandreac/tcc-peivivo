@@ -23,7 +23,7 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (30) + web (61, com axe-core) — deve passar 100%
+npm test                                    # motor (30) + web (68, com axe-core) — deve passar 100%
 npm run dev                                 # protótipo em http://localhost:5173
 npm run contraste                           # tokens de cor ≥ 4,5:1 / 3:1
 npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
@@ -63,6 +63,11 @@ de implementar qualquer feature; toda decisão nova ganha um `D-nn` lá. Para
 telas: `docs/ux-ui.md` (arquitetura, telas, design system),
 `docs/acessibilidade.md`, `docs/wcag-2.2.md`, `docs/avaliacao-heuristica.md`,
 `docs/plano-de-testes.md`; prompt de extensão em `docs/prompt-design-ia.md`.
+Governança e processo (auditoria de 21/09/2026): `docs/relatorio-de-conformidade.md`
+(plano de ação), `docs/checklist-final-tcc.md`, `docs/matriz-rastreabilidade.md`,
+`docs/bpmn-processos.md`, `docs/pdca.md`, `docs/itil-servicos.md`,
+`docs/cobit-governanca.md`, `docs/gestao-de-riscos.md`, `docs/seguranca-e-privacidade.md`.
+Fluxo de branches e commits (Conventional Commits, `feature/<autor>-…`): `CONTRIBUTING.md`.
 
 ## Testes
 
@@ -82,9 +87,11 @@ topo do arquivo).
 ## Onde estamos
 
 Migrations validadas em PGlite (P0.3). Motor completo (P2.1–P2.5, 30 testes,
-97 %). Protótipo `apps/web` funcional sobre mock com permissões (19 telas, 59
-testes com axe-core), documentação de UX/acessibilidade/WCAG/heurísticas/testes
-entregue (14/09/2026). Plano completo em `docs/plano-desenvolvimento.md`.
-Próximos: P0.1 (GitHub), P0.4 (Supabase dev), Fase 1 (migration `0004` + testes
-RLS reaproveitando `apps/web/src/services/mockApi.test.ts`), Fase 3 (Edge
-Functions), depois `supabaseApi` em `apps/web/src/services/`.
+97 %). Protótipo `apps/web` funcional sobre mock com permissões (22 telas, 68
+testes com axe-core, incluindo login/logout por perfil), documentação de
+UX/acessibilidade/WCAG/heurísticas/testes (14/09) e de governança/processos
+(21/09/2026). Plano completo em `docs/plano-desenvolvimento.md`.
+Próximos (ordem em `docs/relatorio-de-conformidade.md` §16): proteger branches e
+abrir tudo via PR revisado (A-01…A-05), Fase 1 (migration `0004` + testes RLS
+reaproveitando `apps/web/src/services/mockApi.test.ts`), Fase 3 (Edge Functions),
+depois `supabaseApi` + Supabase Auth em `apps/web/src/services/`.

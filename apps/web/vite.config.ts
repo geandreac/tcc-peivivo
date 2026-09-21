@@ -17,6 +17,9 @@ export default defineConfig({
       include: ["src/**/*.{ts,tsx}"],
       exclude: ["src/**/*.test.{ts,tsx}", "src/test/**", "src/main.tsx"],
       reporter: ["text", "lcov"],
+      // RNF07 (cobertura ≥ 70 %) valia só no motor; desde 21/09/2026 o CI
+      // também falha aqui abaixo do limiar (medido: 78 % linhas, 81 % ramos).
+      thresholds: { lines: 70, statements: 70, functions: 70, branches: 60 },
     },
   },
 });

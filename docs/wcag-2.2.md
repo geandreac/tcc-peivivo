@@ -1,6 +1,6 @@
 # PEI Vivo — Matriz de conformidade WCAG 2.2 nível AA
 
-**Versão:** 1.0 — 14/09/2026
+**Versão:** 1.1 — 21/09/2026 (1.0 em 14/09/2026; acrescentados os testes de login por perfil como evidência, o §6 com os critérios priorizados pela disciplina e o plano de fechamento das pendências).
 **Etapa da orientação:** 3 (pilar *WCAG* — os quatro princípios).
 **Escopo:** `apps/web` (protótipo funcional). Critérios AAA citados só quando adotados voluntariamente.
 **Legenda de status:** ✅ atende (verificado) · 🟡 atende parcialmente / verificação manual pendente · ⬜ não verificado · N/A não se aplica.
@@ -98,3 +98,24 @@
 **Pendências para fechar AA com evidência completa** (todas em `docs/plano-de-testes.md`): sessão NVDA (4.1.2, 4.1.3), verificação de contraste no navegador renderizado (1.4.3), espaçamento de texto (1.4.12), reflow em Playwright (1.4.10), foco não obscurecido com toast aberto (2.4.11), validação W3C do HTML. Nenhuma pendência é de implementação; todas são de **verificação manual** ainda não executada.
 
 **Critérios AAA adotados voluntariamente:** 2.3.3 (animação), 2.4.13 (aparência do foco), 3.1.5 (leitura — parcial), contraste 7:1 no tema de alto contraste e no material quando `contrasteMinimo = 7` (1.4.6).
+
+## 6. Critérios priorizados pela disciplina — situação e evidência
+
+| Prioridade da disciplina | Critério(s) | Evidência técnica | Método | Status |
+|---|---|---|---|---|
+| Contraste mínimo | 1.4.3, 1.4.11 | `tokens.css`; `scripts/contraste.mjs` no CI | num + Lighthouse | ✅ num / 🟡 navegador |
+| Reflow | 1.4.10 | grades → 1 coluna; `.tabela-rolagem` | manual 320 px; Playwright (P4.19) | 🟡 |
+| Redimensionamento de texto | 1.4.4, 1.4.12 | `rem`, sem altura fixa | manual 200 % / bookmarklet | ✅ / 🟡 |
+| Navegação por teclado | 2.1.1 | só nativos; `userEvent` nos testes | teste + manual | ✅ |
+| Foco visível | 2.4.7, 2.4.11, 2.4.13 | `:focus-visible` 3 px; cabeçalho baixo | manual | ✅ / 🟡 (2.4.11 com toast) |
+| Sem armadilhas de teclado | 2.1.2 | `<dialog>` + Esc | teste `Modal`; manual | ✅ |
+| Tamanho de alvos | 2.5.8 | `--alvo-minimo` 44 px | Lighthouse `target-size` | ✅ |
+| Rótulos e instruções | 3.3.2, 2.4.6 | `Campo`, `fieldset/legend`, dicas | axe `label`; teste | ✅ |
+| Identificação de erros | 3.3.1 | `ResumoErros` + `aria-invalid` | teste `valida o formulário…` | ✅ |
+| Sugestão de correção | 3.3.3 | mensagens dizem como corrigir | manual | ✅ |
+| Mensagens de status | 4.1.3 | `aria-live` global, `role=status` | teste `autenticacao.test.tsx › falha…`; NVDA | ✅ auto / 🟡 NVDA |
+| Autenticação acessível | 3.3.8 | demo sem senha/CAPTCHA; real: colar permitido | testes de login por perfil (7); manual (P4.4) | ✅ demo / 🟡 real |
+| Nome, função e valor | 4.1.2 | nativos + `aria-pressed/busy/current` | axe; NVDA | ✅ auto / 🟡 NVDA |
+| Compatibilidade com tecnologias assistivas | robusto (boa prática) | ARIA mínima | sessão NVDA/VoiceOver (P6.7) | ⬜ |
+
+**Plano de fechamento das 9 pendências 🟡/⬜ (todas de verificação, nenhuma de implementação):** uma sessão de 3 h antes de M4 — (1) Lighthouse + axe DevTools em 6 telas (1.4.3, 2.5.8); (2) zoom 200 %/400 % e bookmarklet de espaçamento (1.4.4, 1.4.10, 1.4.12); (3) Tab com toast aberto (2.4.11); (4) NVDA + Firefox nas 6 telas principais (4.1.2, 4.1.3, robustez); (5) validador W3C no `dist/`. Resultado registrado em `docs/resultados.md` com capturas em `docs/evidencias/`.
