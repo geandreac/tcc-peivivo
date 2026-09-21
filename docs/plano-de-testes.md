@@ -1,8 +1,113 @@
 # PEI Vivo — Plano de testes
 
-**Versão:** 1.0 — 14/09/2026
+**Versão:** 1.1 — 21/09/2026 (1.0 em 14/09/2026). Mudanças: §0 (estrutura formal do plano), TF-41…TF-47 (login por perfil, logout, origem, falha de autenticação), §1.1 (testes de integração), ferramentas e evidências.
 **Escopo:** protótipo `apps/web` + `packages/motor-adaptacao`. Testes de RLS/Edge Functions seguem em `docs/plano-desenvolvimento.md` (P1.11–P1.19, P3.x).
-**Automatizado hoje:** 30 testes do motor (`packages/motor-adaptacao/src/*.test.ts`) e 61 do app (`apps/web/src/**/*.test.tsx`), incluindo axe-core em todas as telas. Comando: `npm test`.
+**Automatizado hoje:** 30 testes do motor (`packages/motor-adaptacao/src/*.test.ts`) e 68 do app (`apps/web/src/**/*.test.tsx`, incluindo `autenticacao.test.tsx`), com axe-core em todas as telas. Comando: `npm test`.
+
+---
+
+## 0. Plano
+
+### 0.1 Objetivo
+
+Verificar que o PEI Vivo (a) executa o ciclo observar → validar → adaptar → retroalimentar para os quatro perfis; (b) **nega** todo acesso que a matriz de permissões v2 nega, mesmo por URL direta; (c) é operável por teclado e leitor de tela e atende WCAG 2.2 AA; (d) é utilizável por uma docente no celular em menos de 60 s para a tarefa central (gerar → aprovar). Evidências servem à banca e à Fase 6 (piloto).
+
+### 0.2 Escopo e itens testados
+
+| Item | O que é testado |
+|---|---|
+| Autenticação e sessão (D-16) | Porta de entrada, login por perfil (família, professores, equipe de saúde, coordenação), redirecionamento, logout, falha de autenticação, 404 |
+| Controle de acesso (RF14, RN01–RN08) | 34 cenários negativos na camada de serviços + caminhos negados na interface |
+| Fluxos por perfil | Responsável (consentimento, LGPD), docente (observar, fechar ciclo, gerar, revisar, aprovar, desfecho), profissional (validar, notas), coordenação (cadastrar, vincular, histórico, pendências) |
+| Motor de adaptação | Regras (RN03), ciclos, âncora, adaptador determinístico |
+| Componentes | Rótulos, erros, teclado, modal, material adaptado |
+| Estados de interface | Carregando, vazio, sucesso, erro, negado |
+| Acessibilidade | axe-core (auto) + checklist manual §3 |
+| Usabilidade | Roteiro §2 com participantes |
+| Compatibilidade | Navegadores §4 |
+| Migrations | `npm run db:validar` (PGlite) e job `db` (Supabase real) |
+
+### 0.3 Fora do escopo (nesta versão)
+
+- Testes de carga/estresse (RNF10 é arquitetural; sem ambiente publicado).
+- Testes de segurança ofensivos (pentest) — o modelo de ameaças está em `docs/seguranca-e-privacidade.md`.
+- Camada de IA (RF10, Fase 5) e modo offline (P5.6/P5.7).
+- Login real por e-mail/senha, recuperação de senha e expiração de sessão (P4.4) — **planejados**, listados como TF-46/TF-47 com status "planejado".
+- Testes RLS contra PostgREST (P1.11–P1.19) — especificados pelos 34 cenários do mock.
+
+### 0.4 Ambiente de testes
+
+| Ambiente | Uso | Configuração |
+|---|---|---|
+| Local (dupla) | Vitest + jsdom, PGlite | Node ≥ 20, `npm test`, `npm run db:validar`; sem Docker |
+| CI (GitHub Actions, Ubuntu) | Mesmos testes + Supabase real para migrations + cobertura ≥ 70 % + build + contraste | `.github/workflows/ci.yml`, jobs `motor`, `db`, `web` |
+| Navegador (manual) | Chrome + axe DevTools + Lighthouse; Firefox + NVDA; iOS Safari + VoiceOver | `npm run dev` ou `npm run preview`; celular real 375 px |
+| Piloto (Fase 6) | Protótipo publicado; participantes reais; estudante fictício | P6.2 deploy |
+
+### 0.5 Responsáveis
+
+| Atividade | Responsável | Revisor |
+|---|---|---|
+| Testes funcionais e de fluxo (Vitest em tela; Playwright P4.19/P4.20) | Jean | Geandre |
+| Testes de acessibilidade (axe, teclado, NVDA) e de usabilidade (roteiro, SUS) | Geandre | Jean |
+| Testes de permissão (mock hoje, RLS na Fase 1) | Geandre | Jean |
+| Testes do motor | Jean | Geandre |
+| Consolidação de evidências para a banca (`docs/resultados.md`) | ambos | orientadora |
+
+### 0.6 Critérios de entrada
+
+- Branch atualizada com `development`; `npm run typecheck` sem erros.
+- Dados fictícios restaurados ("Restaurar dados da demonstração" ou `api.reiniciarDados()`).
+- Para testes manuais: checklist da tela aberto; ferramenta (axe DevTools/NVDA) instalada.
+- Para usabilidade: termo de participação assinado; roteiro §2.3; cronômetro; formulário SUS.
+
+### 0.7 Critérios de saída
+
+- 100 % dos testes automatizados verdes no CI; cobertura ≥ 70 % (motor e web).
+- 100 % dos casos de prioridade **A** executados (auto ou manual) com resultado registrado.
+- Nenhum defeito aberto de severidade 3 ou 4 (escala de `docs/avaliacao-heuristica.md`).
+- Checklist de acessibilidade §3.2 executado por tela com resultado registrado.
+
+### 0.8 Critérios de aprovação (por marco)
+
+| Marco | Critério |
+|---|---|
+| M1 (RLS) | Todos os cenários negativos verdes contra PostgREST com token válido |
+| M3 (fluxo HTTP) | TF-01…TF-33 verdes com `supabaseApi` |
+| M4 (interface) | Golden path Playwright 375×812 verde; 0 violações axe A/AA com contraste real |
+| M6 (piloto) | SUS ≥ 68; T3 ≤ 60 s mediana; taxa de sucesso ≥ 80 %; nenhum problema novo sev. ≥ 3 |
+
+### 0.9 Tipos de teste
+
+Unitário (motor, serviços), de componente (Testing Library + axe), de tela/fluxo (app inteiro numa rota), de integração (§1.1), de permissão (negativos), de acessibilidade (auto + manual), de usabilidade (moderado), de compatibilidade (manual), de migrations (PGlite/Supabase), E2E em navegador (Playwright — planejado).
+
+### 0.10 Riscos do processo de teste
+
+| Risco | Mitigação |
+|---|---|
+| jsdom não calcula contraste nem layout (falsos negativos em 1.4.3/1.4.10/2.5.8) | Contraste numérico (`scripts/contraste.mjs`) + Lighthouse/axe DevTools no navegador antes de cada marco |
+| Ferramentas automáticas cobrem ~30–40 % das barreiras | Sessão manual NVDA obrigatória (P6.7); checklist §3.2 |
+| Sem participantes para o piloto | Recrutamento individual (3 docentes mínimo); estudante fictício |
+| Testes do mock não equivalem a RLS | Mesmos cenários reexecutados na Fase 1; teste de contrato |
+| Avisos `act(...)` mascaram falhas reais | Revisar saída do CI; corrigir no backlog |
+
+### 0.11 Ferramentas
+
+Vitest 2, @testing-library/react + user-event, axe-core 4.10, jsdom, @vitest/coverage-v8, PGlite, Supabase CLI (CI), Lighthouse, axe DevTools, WAVE, WebAIM Contrast Checker, NVDA, VoiceOver, validador W3C, Playwright (planejado). Detalhes em §3.1.
+
+> **Ferramentas automatizadas não substituem testes manuais.** Elas apontam problemas de estrutura (rótulos, ARIA, ordem de títulos), mas não verificam sentido, ordem de leitura, compreensão de mensagens nem a experiência real com leitor de tela.
+
+### 0.12 Evidências esperadas
+
+| Evidência | Onde fica |
+|---|---|
+| Saída do CI (jobs verdes, artefatos `cobertura-motor`, `cobertura-web`) | GitHub Actions |
+| Relatórios lcov | `apps/web/coverage/`, `packages/motor-adaptacao/coverage/` (gerados, não versionados) |
+| Nomes dos testes por requisito | `docs/matriz-rastreabilidade.md` |
+| Checklist manual preenchido por tela + capturas | `docs/resultados.md` (P6.7) |
+| Relatórios Lighthouse/axe DevTools (JSON/HTML) | `docs/evidencias/` (a criar no P6.7) |
+| Gravações/anotações do piloto, planilha SUS | `docs/resultados.md` (P6.5) |
+| Defeitos encontrados e correções | issues do GitHub + `docs/pdca.md` (Act) |
 
 ---
 
@@ -53,8 +158,33 @@ Prioridade: **A** (bloqueia demo) · **B** (importante) · **C** (desejável). C
 | TF-38 | Motor | RN03 assimetria | — | `npm run test:motor` | 4 testes RN03 verdes | A | `regras.test.ts` |
 | TF-39 | Motor | Adaptador determinístico | — | idem | 9 testes verdes (nada se perde, blocos ≤ limite, etapa única) | A | `adaptador.test.ts` |
 | TF-40 | Motor | Ciclos consecutivos e âncora | — | idem | 10 testes verdes | A | `ciclos.test.ts` |
+| TF-41 | Login família | Porta própria e dashboard do papel | Sem sessão | 1. Abrir `/entrar/familia` 2. Tocar em "Rosa" | Tela "Entrar como família" (faz / vê / nunca vê); painel com "Ver consentimento" e sem "Gerar material" | A | `autenticacao.test.tsx › família: entra por /entrar/familia…` |
+| TF-42 | Login equipe de saúde | Porta própria e dashboard do papel | Sem sessão | 1. Abrir `/entrar/saude` 2. Tocar em "Camila" | Painel com "Validar parâmetros" | A | `autenticacao.test.tsx › equipe de saúde…` |
+| TF-43 | Login coordenação | Porta própria; navegação institucional | Sem sessão | 1. Abrir `/entrar/coordenacao` 2. Entrar | Painel; item "Cadastrar estudante" no menu **só** para coordenação | A | `autenticacao.test.tsx › coordenação…`, `› docente não vê 'Cadastrar estudante'…` |
+| TF-44 | Redirecionamento | Volta à rota de origem após login | Sem sessão | 1. Abrir `/estudantes/e-0010/consentimento` 2. Ser levado a Entrar 3. Família → Rosa | Após o login, tela *Consentimento* (não o painel) | A | `autenticacao.test.tsx › rota protegida sem sessão → Entrar → volta à origem` |
+| TF-37b | Sessão | Sair (teste de tela) | Márcia logada | 1. "Sair" | Início; menu mostra "Entrar" e esconde "Meus estudantes"; `usuarioAtual()` nulo | A | `autenticacao.test.tsx › sair encerra a sessão…` |
+| TF-45 | Login | Falha de autenticação | Ajuda → "Simular falha de rede" | 1. `/entrar/docente` 2. Tocar em "Márcia" | Alerta "Não foi possível entrar. Tente novamente." (`role=alert`); continua na tela de login; sem sessão | A | `autenticacao.test.tsx › falha na autenticação…` |
+| TF-46 | Login real | Credenciais inválidas / campos obrigatórios | Supabase Auth (P4.4) | 1. E-mail vazio 2. Senha errada | Resumo de erros focável; mensagem "E-mail ou senha incorretos" sem revelar qual; sem bloqueio de colar (3.3.8) | A | **planejado** (P4.4) |
+| TF-47 | Recuperação de acesso | Esqueci a senha | Supabase Auth (P4.4) | 1. "Esqueci a senha" 2. E-mail 3. Link recebido 4. Nova senha | E-mail de redefinição; nova senha aceita; sessão iniciada | B | **planejado** (P4.4) |
 
-**Cobertura atual:** 41 cenários; 32 automatizados; 9 manuais (TF-08, 10 parcial, 14, 15, 21, 22, 35, 36 e compatibilidade de navegadores).
+**Cobertura atual (21/09/2026):** 49 cenários; 39 automatizados; 8 manuais (TF-08, 10 parcial, 14, 15, 21, 22, 35, 36 e compatibilidade de navegadores); 2 planejados (TF-46, TF-47 — dependem do login real).
+
+### 1.1 Testes de integração
+
+Integração aqui significa **componentes reais trabalhando juntos** dentro do app (router + providers + serviços + telas), sem mocks de módulo — `renderizarApp` monta a mesma tabela de rotas da produção sobre `mockApi` sem latência. A integração com o backend real é a Fase 1/3.
+
+| ID | Integração verificada | Como | Teste |
+|---|---|---|---|
+| TI-01 | Formulário ↔ validação ↔ resumo de erros ↔ foco no campo | Enviar vazio; clicar no link do resumo | `paginas.test.tsx › valida o formulário com resumo de erros focável…` |
+| TI-02 | Autenticação ↔ rotas protegidas ↔ estado de origem | Rota protegida sem sessão → login → volta | `autenticacao.test.tsx › …volta à origem` |
+| TI-03 | Perfil autenticado ↔ dashboard (ação principal por papel) ↔ navegação condicional | Login por 4 portas | `autenticacao.test.tsx` (4 testes), `paginas.test.tsx › escolher um perfil…` |
+| TI-04 | Serviços ↔ dados mockados ↔ regras (RN01–RN08) ↔ tela | Caminhos negados por URL direta | `paginas.test.tsx › Caminhos negados na interface` (4) |
+| TI-05 | Motor ↔ serviços ↔ tela (adaptador aplicado, diff RN03 renderizado) | Gerar com texto de exemplo; fechar ciclo | `paginas.test.tsx › gera com o texto de exemplo…`, `› …diff com RN03 ao fechar` |
+| TI-06 | Componentes reutilizáveis ↔ telas (Campo, Escala3, Modal, Alerta) | Fluxos de consentimento e observação | `paginas.test.tsx › Consentimento`, `› Observação…`; `componentes.test.tsx` |
+| TI-07 | Estados de interface ↔ hooks (`useConsulta`, `useMutacao`) ↔ `aria-live` | Vazio, erro de autenticação, sucesso com toast | `paginas.test.tsx › docente sem vínculo vê estado vazio`; `autenticacao.test.tsx › falha…` |
+| TI-08 | Preferências ↔ `<html data-*>` ↔ todas as telas | Ligar alto contraste | `paginas.test.tsx › Ajuda e Acessibilidade…` |
+| TI-09 | Migrations ↔ seed ↔ RLS habilitado | `npm run db:validar`; job `db` | `scripts/validar-migrations.mjs`; CI |
+| TI-10 | `supabaseApi` ↔ PostgREST ↔ RLS (mesmos 34 cenários) | Teste de contrato | **planejado** P1.11–P1.19 / P4.4 |
 
 ---
 
@@ -155,7 +285,7 @@ Sem escola parceira: recrutamento individual (risco §10). Nenhum dado real de e
 | A25 | HTML válido | Validador W3C | 0 erros | index + DOM |
 | A26 | Impressão do material | Ctrl+P | Só o material; blocos inteiros | material |
 
-**Estado em 14/09/2026:** A1–A7, A12–A20, A24 verificados em jsdom/axe (automático) e por inspeção do código; A8 verificado numericamente; A9–A11, A21–A23, A25–A26 pendentes de sessão manual (P6.7).
+**Estado em 21/09/2026:** A1–A7, A12–A20, A24 verificados em jsdom/axe (automático, agora também nas 4 telas de login por perfil — `autenticacao.test.tsx`) e por inspeção do código; A8 verificado numericamente; A9–A11, A21–A23, A25–A26 pendentes de sessão manual (P6.7). Resultado a registrar em `docs/resultados.md`.
 
 ---
 

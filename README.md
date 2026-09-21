@@ -148,7 +148,7 @@ Em **Ajuda** há "Restaurar dados" e "Simular falha de rede".
 | `npm run build` | Typecheck + build do app |
 | `npm test` | Todos os testes (motor + web) |
 | `npm run test:motor` | 30 testes do motor |
-| `npm run test:web` | 61 testes do app (inclui axe-core) |
+| `npm run test:web` | 68 testes do app (inclui axe-core e autenticação por perfil) |
 | `npm run test:coverage` | Cobertura de motor e web |
 | `npm run typecheck` | `tsc --noEmit` em todos os workspaces |
 | `npm run contraste` | Verifica as razões de contraste dos tokens |
@@ -191,11 +191,12 @@ Decisões de projeto D-01…D-18 em `docs/requisitos.md` §1.
 | Motor (regras puras) | Vitest | 30 testes, 97 % (RN03, ciclos, âncora, adaptador, cenário A) |
 | Camada de serviços (permissões) | Vitest | 34 cenários negativos — cada um começa pelo acesso NEGADO |
 | Componentes | Testing Library + axe-core | 10 testes (rótulos, erros, teclado, modal, material) |
-| Telas | Testing Library + axe-core (MemoryRouter) | 15 testes: fluxo principal, validação, vazio, 404, caminhos negados |
+| Telas | Testing Library + axe-core (MemoryRouter) | 17 testes: fluxo principal, validação, vazio, 404, caminhos negados |
+| Autenticação e rotas por perfil | Testing Library + axe-core | 7 testes: login família/saúde/coordenação, navegação condicional, volta à origem, logout, falha de autenticação |
 | Migrations | PGlite | `npm run db:validar` |
 | Planejado | Playwright 375×812 + axe, NVDA, SUS, Flesch | `docs/plano-de-testes.md` |
 
-Documentação: `docs/plano-de-testes.md` (40 casos funcionais, roteiro de usabilidade, checklist de acessibilidade com 26 itens).
+Documentação: `docs/plano-de-testes.md` (49 casos funcionais, 10 integrações, roteiro de usabilidade, checklist de acessibilidade com 26 itens). Cobertura mínima de 70 % obrigatória no CI nos dois workspaces.
 
 Mapa artefato do TCC → código:
 
@@ -221,7 +222,7 @@ Mapa artefato do TCC → código:
 
 Ordem do `CLAUDE.md` (schema/RLS → motor → Edge Functions → frontend):
 
-1. **Fase 0 (restante):** P0.1 repositório no GitHub, P0.4 projeto Supabase dev, P0.6 Kanban.
+1. **Fase 0 (restante):** proteger `main`/`development`, adicionar Jean, P0.4 projeto Supabase dev, P0.6 Kanban (ações A-01…A-05 de `docs/relatorio-de-conformidade.md` §16).
 2. **Fase 1:** migration `0004` (D-01…D-14) + testes RLS negativos (reaproveitar os 34 cenários de `mockApi.test.ts`).
 3. **Fase 3:** Edge Functions (`fechar-ciclo`, `gerar-material`, ciclo de vida).
 4. **Fase 4:** `supabaseApi` implementando `PeiVivoApi`; login real; Playwright golden path + caminhos negados; NVDA.
@@ -245,4 +246,16 @@ Plano completo: `docs/plano-desenvolvimento.md`. Rastreabilidade: `docs/rastreab
 | `docs/prompt-design-ia.md` | Prompt estruturado para gerar/estender a interface com IA |
 | `docs/plano-desenvolvimento.md` | Fases, cards, marcos, riscos |
 | `docs/rastreabilidade.md` | RF · Motivação · Decisão · Teste · Commit |
+| `docs/matriz-rastreabilidade.md` | Requisito → tela → arquivos → teste → status |
+| `docs/guia-de-uso-do-sistema.md` | Guia não técnico por perfil + roteiro de 10 min para a banca |
+| `docs/diagnostico-inicial.md` | Auditoria de 21/09/2026: inventário, problemas, lacunas, suposições |
+| `docs/qualidade-iso-25010.md` | Avaliação de qualidade do produto (referência ISO/IEC 25010) |
+| `docs/bpmn-processos.md` | 10 processos em BPMN (Mermaid) |
+| `docs/pdca.md` | Ciclos de melhoria contínua por marco |
+| `docs/itil-servicos.md` | Catálogo de serviços, incidentes, requisições, base de conhecimento |
+| `docs/cobit-governanca.md` | Objetivos, indicadores, controles, RACI |
+| `docs/gestao-de-riscos.md` | 17 riscos com probabilidade × impacto e resposta |
+| `docs/seguranca-e-privacidade.md` | Dados tratados, LGPD, senhas, segredos, retenção, incidentes |
+| `docs/checklist-final-tcc.md` | Evidências por pilar para a banca |
+| `docs/relatorio-de-conformidade.md` | Relatório final da auditoria + plano de ação |
 | `docs/tcc/` | Pré-projeto, slides, diagramas, orientação da disciplina |
