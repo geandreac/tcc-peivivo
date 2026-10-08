@@ -309,3 +309,20 @@ describe("Reformulação R4.5 — painel da escola", () => {
     expect(screen.queryByRole("list", { name: "Resumo da escola" })).not.toBeInTheDocument();
   });
 });
+
+describe("R2.1 — convidar por e-mail na tela de vínculos", () => {
+  it("valida antes de enviar e anuncia o convite; o profissional aparece aguardando a família", async () => {
+    const { container } = await renderizarApp(`/estudantes/${ID.estudanteA}/vinculos`, ID.coordenacao);
+    const form = await screen.findByRole("form", { name: "Convidar alguém novo por e-mail" });
+    await userEvent.click(within(form).getByRole("radio", { name: /Profissional de saúde/ }));
+    await userEvent.click(within(form).getByRole("button", { name: "Enviar convite" }));
+    expect(await within(form).findByText("Informe um e-mail válido.", { selector: ".campo__erro" })).toBeInTheDocument();
+    await semViolacoesAxe(container);
+    await userEvent.type(within(form).getByLabelText(/^Nome/), "Fono nova (fictícia)");
+    await userEvent.type(within(form).getByLabelText(/^E-mail/), "fono.nova@example.test");
+    await userEvent.type(within(form).getByLabelText(/Registro no conselho/), "CRFa-NOVO");
+    await userEvent.click(within(form).getByRole("button", { name: "Enviar convite" }));
+    const aguardando = await screen.findByRole("list", { name: "Aguardando a família" });
+    expect(within(aguardando).getByText("Fono nova (fictícia)")).toBeInTheDocument();
+  });
+});

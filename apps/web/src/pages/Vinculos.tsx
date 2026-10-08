@@ -11,6 +11,7 @@ import { Campo } from "../components/Campo";
 import { Modal } from "../components/Modal";
 import { PAPEL } from "../utils/rotulos";
 import { formatarData } from "../utils/datas";
+import { ConvidarPessoa } from "./ConvidarPessoa";
 
 const PAPEIS: Papel[] = ["RESPONSAVEL", "DOCENTE", "PROFISSIONAL_SAUDE"];
 
@@ -132,6 +133,8 @@ export function Vinculos() {
             </Card>
           )}
 
+          <ConvidarPessoa estudanteId={id!} aoConvidar={dados.recarregar} />
+
           <form
             noValidate
             onSubmit={(e) => {
@@ -141,7 +144,7 @@ export function Vinculos() {
             aria-labelledby="titulo-novo-vinculo"
             style={{ maxWidth: "var(--largura-leitura)" }}
           >
-            <h2 id="titulo-novo-vinculo">Novo vínculo</h2>
+            <h2 id="titulo-novo-vinculo">Vincular quem já tem conta</h2>
             <ResumoErros erros={erros} />
             {vincular.erro && (
               <Alerta tom="erro" vivo>

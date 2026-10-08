@@ -393,3 +393,21 @@ describe("Reformulação R4.5 — painel da escola (sem dado clínico)", () => {
     for (const proibido of ["evidencia", "conteudo", "parametros", "textoOriginal", "laudo"]) expect(texto).not.toContain(proibido);
   });
 });
+
+describe("R2.1 — convite por e-mail (coordenação)", () => {
+  it("negado a quem não é coordenação; responsável exige conferência; profissional exige registro", async () => {
+    await api.entrar(ID.docente);
+    await esperaNegado(api.convidar({ email: "novo@example.test", papel: "DOCENTE" }));
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.convidar({ email: "sem-arroba", papel: "DOCENTE" }), "VALIDACAO");
+    await esperaNegado(api.convidar({ email: "mae@example.test", papel: "RESPONSAVEL", estudanteId: ID.estudanteA }), "VALIDACAO");
+    await esperaNegado(api.convidar({ email: "fono@example.test", papel: "PROFISSIONAL_SAUDE", estudanteId: ID.estudanteA }), "VALIDACAO");
+  });
+  it("profissional convidado fica aguardando a família (D-24)", async () => {
+    await api.entrar(ID.coordenacao);
+    const r = await api.convidar({ email: "Fono.Nova@Example.TEST", nome: "Fono nova (fictícia)", papel: "PROFISSIONAL_SAUDE", estudanteId: ID.estudanteA, registroConselho: "CRFa-NOVO" });
+    expect(r.emailEnviado).toBe(true);
+    const v = (await api.listarVinculos(ID.estudanteA)).find((x) => x.nomeUsuario === "Fono nova (fictícia)");
+    expect(v?.status).toBe("PENDENTE_RESPONSAVEL");
+  });
+});

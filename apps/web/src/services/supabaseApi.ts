@@ -14,7 +14,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { calcularFechamento } from "@pei-vivo/funcoes";
 import type { CorpoErro, RespostaFecharCiclo, RespostaGerarMaterial } from "@pei-vivo/contratos";
 import type { ObservacaoHistorica, ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
-import type { NovaObservacao, NovoEstudante, NovoVinculo, PeiVivoApi } from "./api";
+import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, PeiVivoApi, RespostaConvite } from "./api";
 import { ErroApi, type CodigoErro } from "./erros";
 import type {
   Auditoria,
@@ -395,6 +395,20 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
     confirmarVinculo: async (vinculoId, aceitar) => {
       await exec(sb.rpc("fn_confirmar_vinculo", { p_vinculo: vinculoId, p_aceitar: aceitar }));
       return obterVinculo(vinculoId);
+    },
+
+    convidar: async (dados: NovoConvite) => {
+      const escola = eu().escolaCoordenada;
+      if (!escola) throw new ErroApi("NEGADO", "Só a coordenação da escola convida pessoas.");
+      return funcao<RespostaConvite>("convidar", {
+        escolaId: escola,
+        email: dados.email,
+        nome: dados.nome ?? "",
+        papel: dados.papel,
+        estudanteId: dados.estudanteId ?? null,
+        registroConselho: dados.registroConselho?.trim() || null,
+        conferidoPresencialmente: Boolean(dados.conferidoPresencialmente),
+      });
     },
 
     // ---- notificações

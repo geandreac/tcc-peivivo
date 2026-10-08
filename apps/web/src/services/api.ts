@@ -54,6 +54,21 @@ export interface NovoVinculo {
   conferidoPresencialmente?: boolean;
 }
 
+export interface NovoConvite {
+  email: string;
+  nome?: string;
+  papel: Papel;
+  /** Obrigatório para RESPONSAVEL e PROFISSIONAL_SAUDE. */
+  estudanteId?: string | null;
+  registroConselho?: string | null;
+  conferidoPresencialmente?: boolean;
+}
+
+export interface RespostaConvite {
+  emailEnviado: boolean;
+  avisos: string[];
+}
+
 export interface PeiVivoApi {
   /** "demonstracao" = mock (D-16/D-17); "real" = Supabase Auth + PostgREST (D-32). */
   readonly modo: "demonstracao" | "real";
@@ -92,6 +107,8 @@ export interface PeiVivoApi {
   desativarVinculo(vinculoId: string): Promise<void>;
   /** D-24: o responsável confirma (ou recusa) o profissional proposto pela coordenação. */
   confirmarVinculo(vinculoId: string, aceitar: boolean): Promise<Vinculo>;
+  /** R2.1: coordenação convida por e-mail (Edge Function `convidar` no sistema real). */
+  convidar(dados: NovoConvite): Promise<RespostaConvite>;
 
   // notificações (D-28)
   listarNotificacoes(): Promise<Notificacao[]>;
