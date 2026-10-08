@@ -82,7 +82,8 @@ begin
     raise exception 'Ninguém pode convidar a si mesmo.' using errcode = '42501';
   end if;
   return jsonb_build_object('autorId', privado.usuario_atual(), 'email', v_email,
-    'jaTemConta', exists (select 1 from public.usuarios u where u.email = v_email and u.auth_user_id is not null));
+    -- "já tem conta" = já aceitou um convite (definiu senha e aceitou os termos)
+    'jaTemConta', exists (select 1 from public.usuarios u where u.email = v_email and u.termos_aceitos_em is not null));
 end $$;
 
 create function public.fn_registrar_convite(
