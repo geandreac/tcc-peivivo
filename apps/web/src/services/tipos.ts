@@ -14,7 +14,7 @@ export type { DimensaoObservada, EscalaObservacao, ParametrosAdaptacao, TextoAda
 
 export type Papel = "RESPONSAVEL" | "DOCENTE" | "PROFISSIONAL_SAUDE" | "COORDENACAO";
 export type StatusConsentimento = "ATIVO" | "REVOGADO" | "EXPIRADO";
-export type StatusValidacao = "PENDENTE" | "VIGENTE" | "EM_REVISAO" | "EXPIRADA";
+export type StatusValidacao = "PENDENTE" | "VIGENTE" | "EM_REVISAO" | "EXPIRADA" | "SUBSTITUIDA";
 export type StatusAprovacao = "RASCUNHO" | "APROVADO" | "DESCARTADO";
 export type StatusCiclo = "ABERTO" | "FECHADO";
 export type StatusVinculo = "ATIVO" | "INATIVO";

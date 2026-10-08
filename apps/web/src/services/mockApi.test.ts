@@ -265,3 +265,43 @@ describe("RF15 / D-05 / D-06 — LGPD e auditoria", () => {
     await esperaNegado(api.listarEstudantes(), "NAO_AUTENTICADO");
   });
 });
+
+describe("Reformulação R1 — regras alinhadas às políticas v3 (packages/politicas)", () => {
+  async function docente2NoEstudanteA() {
+    await api.entrar(ID.coordenacao);
+    await api.vincular({ usuarioId: ID.docente2, estudanteId: ID.estudanteA, papel: "DOCENTE" });
+    await api.entrar(ID.docente2);
+  }
+  it("S-18/S-19 D-34: outro docente não vê, não aprova, não descarta o rascunho do colega", async () => {
+    await docente2NoEstudanteA();
+    const visiveis = await api.listarMateriais(ID.estudanteA);
+    expect(visiveis.every((m) => m.statusAprovacao === "APROVADO")).toBe(true);
+    await esperaNegado(api.obterMaterial(ID.materialRascunho), "NAO_ENCONTRADO");
+    await esperaNegado(api.aprovarMaterial(ID.materialRascunho));
+    await esperaNegado(api.descartarMaterial(ID.materialRascunho));
+  });
+  it("S-23: desfecho só pelo docente autor do material", async () => {
+    await docente2NoEstudanteA();
+    await esperaNegado(api.registrarDesfecho(ID.materialAprovado, "ALCANCADO"));
+  });
+  it("M-01/S-25 D-35: aprovar deixa UMA versão vigente; a anterior vira SUBSTITUIDA", async () => {
+    await api.entrar(ID.docente);
+    const ciclo = await api.obterCicloAberto(ID.estudanteA);
+    await api.registrarObservacao(ciclo!.id, { dimensao: "FADIGA_TAREFA", valorEscala: "REDUZIDA" });
+    const { versao } = await api.fecharCiclo(ciclo!.id);
+    await api.entrar(ID.profissional);
+    await api.validarVersao(versao.id, "APROVAR");
+    const versoes = await api.listarVersoes(ID.estudanteA);
+    expect(versoes.filter((v) => v.statusValidacao === "VIGENTE").map((v) => v.id)).toEqual([versao.id]);
+    expect(versoes.find((v) => v.id === ID.versao3)?.statusValidacao).toBe("SUBSTITUIDA");
+  });
+  it("D-35: versão já decidida ou expirada não é decidida de novo", async () => {
+    await api.entrar(ID.docente);
+    const ciclo = await api.obterCicloAberto(ID.estudanteA);
+    await api.registrarObservacao(ciclo!.id, { dimensao: "FADIGA_TAREFA", valorEscala: "REDUZIDA" });
+    const { versao } = await api.fecharCiclo(ciclo!.id);
+    await api.entrar(ID.profissional);
+    await api.validarVersao(versao.id, "AJUSTE", "Rever a fadiga.");
+    await esperaNegado(api.validarVersao(versao.id, "APROVAR"), "CONFLITO");
+  });
+});

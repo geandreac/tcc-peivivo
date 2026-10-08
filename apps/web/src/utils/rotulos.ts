@@ -66,6 +66,7 @@ export const STATUS_VALIDACAO: Record<StatusValidacao, { texto: string; tom: "su
   PENDENTE: { texto: "Aguardando validação clínica", tom: "aviso" },
   EM_REVISAO: { texto: "Ajuste solicitado", tom: "erro" },
   EXPIRADA: { texto: "Expirada (7 dias sem validação)", tom: "neutro" },
+  SUBSTITUIDA: { texto: "Substituída por uma versão mais nova", tom: "neutro" },
 };
 
 export const STATUS_APROVACAO: Record<StatusAprovacao, { texto: string; tom: "sucesso" | "aviso" | "neutro" }> = {
