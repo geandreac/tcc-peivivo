@@ -80,6 +80,10 @@ describe("Convites — registrar (só service role)", () => {
   it("cliente não registra convite direto", async () => {
     negado(await db.como("coordenacao", registrar(usuarioId("coordenacao"), "x@example.test", "DOCENTE")));
   });
+  it("D-25: service role também recusa responsável sem conferência presencial (revalidação)", async () => {
+    const r = await db.como("servico", registrar(usuarioId("coordenacao"), "resp.sem.conferencia@example.test", "RESPONSAVEL", `'${ID.e2}'`, "null", "false"));
+    expect(r.codigo, r.mensagem).toBe("22023");
+  });
   it("service role recusa autor que não coordena a escola", async () => {
     negado(await db.como("servico", registrar(usuarioId("docente"), "x@example.test", "DOCENTE")));
   });

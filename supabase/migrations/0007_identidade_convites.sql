@@ -124,6 +124,10 @@ begin
      where not exists (select 1 from public.membros_escola m where m.usuario_id = v_usuario and m.escola_id = p_escola
                         and m.papel = 'DOCENTE' and m.status = 'ATIVO');
   elsif p_papel = 'RESPONSAVEL' then
+    -- D-25: revalida aqui também (achado do `supabase db lint`: o parâmetro era ignorado)
+    if not p_conferido_presencialmente then
+      raise exception 'Confirme que o vínculo legal foi conferido presencialmente, com documento.' using errcode = '22023';
+    end if;
     insert into public.vinculos_usuario_estudante (usuario_id, estudante_id, papel, status, proposto_por, conferido_por, conferido_em)
     values (v_usuario, p_estudante, 'RESPONSAVEL', 'ATIVO', p_autor, p_autor, now())
     on conflict do nothing returning id into v_vinculo;
