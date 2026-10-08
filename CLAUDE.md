@@ -23,11 +23,17 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (30) + web (68, com axe-core) — deve passar 100%
+npm test                                    # motor (30) + políticas RLS (71, PGlite) + web (72, axe-core) — 100%
 npm run dev                                 # protótipo em http://localhost:5173
 npm run contraste                           # tokens de cor ≥ 4,5:1 / 3:1
+npm run db:validar                          # migrations + seed no PGlite (sem Docker)
+node scripts/sondar-rls.mjs                 # evidência histórica: 25/31 ataques passavam em 0002
 npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
 ```
+
+**A máquina da dupla não roda Docker.** Nada de `supabase start`/`db reset` local:
+banco e políticas são validados no PGlite; o Supabase real roda só no job `db` do CI
+(mesma suíte `packages/politicas` via `DATABASE_URL`).
 
 ## Convenções
 
@@ -37,6 +43,14 @@ npx supabase db push                        # aplica as migrations (sem seed) no
   tipo paralelo, estenda esse.
 - Todo `id` é `uuid` (`gen_random_uuid()`), nunca serial incremental.
 - Toda tabela sensível a estudante tem RLS habilitado antes do primeiro `insert`.
+- Políticas (D-20, `0004`): nunca `for all`; toda escrita com `with check`; tabelas
+  que definem acesso de outra pessoa (vínculos, consentimentos, versões, materiais,
+  notas) só são escritas por RPC `security definer` (`search_path = ''`) ou Edge
+  Function. Helpers ficam em `privado` (não exposto). Negado → `42501`, conflito →
+  `PT409`, inválido → `22023`. Toda policy/RPC nova ganha teste negado em
+  `packages/politicas`.
+- GRANT por coluna em `estudantes`, `consentimentos`, `usuarios`: no cliente,
+  **nunca `select *`** — liste as colunas.
 - Front-end (`apps/web`): `button` para ação, `a` para navegação; todo campo com
   `label`; erros via `ResumoErros` + `aria-describedby`; estados carregando /
   vazio / sucesso / erro / negado em toda tela; cores só de `styles/tokens.css`
@@ -48,17 +62,17 @@ npx supabase db push                        # aplica as migrations (sem seed) no
 | Código | Regra |
 |---|---|
 | RN01 | Sem consentimento ativo do responsável, nenhuma escrita nem geração no estudante; leitura só para responsável e coordenação (D-11). |
-| RN02 | Docente nunca lê nota clínica — só `observacoes` e `versoes_perfil.parametros`. O sistema **não armazena laudo/diagnóstico** (D-01). |
+| RN02 | Docente nunca lê nota clínica — só `observacoes` e `versoes_perfil.parametros`. O sistema **não armazena laudo/diagnóstico** (D-01). Nota clínica só via `fn_ler_notas_clinicas` (aal2, auditada). |
 | RN03 | Elevar parâmetro exige 2 ciclos consecutivos "ampliada"; reduzir é imediato. |
 | RN04 | Nenhum material chega ao estudante sem `status_aprovacao = 'APROVADO'` pelo docente. |
-| RN05 | Sem validação do profissional em 7 dias, mantém a última `VersaoPerfil` `VIGENTE`. |
+| RN05 | Sem validação do profissional em 7 dias, a proposta vira `EXPIRADA` (não volta) e mantém a última `VersaoPerfil` `VIGENTE` — no máximo uma `VIGENTE` por estudante (D-35). |
 | RN06 | Sem `PROFISSIONAL_SAUDE` vinculado, só a camada determinística roda (sem IA). |
 | RN07 | Validação clínica é por ciclo (conjunto de parâmetros), nunca por material individual. |
 | RN08 | Responsável revoga consentimento a qualquer momento; bloqueia geração imediatamente. |
 
 A tabela completa de RF/RNF e o mapeamento para código está em `README.md`.
 A análise de requisitos por perfil, as decisões de projeto (`D-nn`, hoje até
-D-18) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
+D-39) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
 de implementar qualquer feature; toda decisão nova ganha um `D-nn` lá. Para
 telas: `docs/ux-ui.md` (arquitetura, telas, design system),
 `docs/acessibilidade.md`, `docs/wcag-2.2.md`, `docs/avaliacao-heuristica.md`,
@@ -86,12 +100,15 @@ topo do arquivo).
 
 ## Onde estamos
 
-Migrations validadas em PGlite (P0.3). Motor completo (P2.1–P2.5, 30 testes,
-97 %). Protótipo `apps/web` funcional sobre mock com permissões (22 telas, 68
-testes com axe-core, incluindo login/logout por perfil), documentação de
-UX/acessibilidade/WCAG/heurísticas/testes (14/09) e de governança/processos
-(21/09/2026). Plano completo em `docs/plano-desenvolvimento.md`.
-Próximos (ordem em `docs/relatorio-de-conformidade.md` §16): proteger branches e
-abrir tudo via PR revisado (A-01…A-05), Fase 1 (migration `0004` + testes RLS
-reaproveitando `apps/web/src/services/mockApi.test.ts`), Fase 3 (Edge Functions),
-depois `supabaseApi` + Supabase Auth em `apps/web/src/services/`.
+Motor completo (30 testes, 97 %). Protótipo `apps/web` funcional sobre mock com
+permissões (22 telas, 72 testes com axe-core). Documentação de UX/acessibilidade
+(14/09) e de governança/processos (21/09/2026).
+
+**Reformulação (desde 07/10/2026)** — fonte de verdade: `docs/reformulacao/`
+(AUDITORIA, FLUXOS, DECISOES = ADR-00…20 = D-19…D-39, PLANO R0–R5, marcos/).
+Trilha mínima aprovada até o congelamento de 26/11. **R1 (banco que nega) feito:**
+migrations `0003`–`0005`, 71 testes de política verdes no PGlite, mock alinhado;
+falta o CI rodar contra o Supabase real. Próximos: R2 (identidade real: EF
+`convidar`, telas de auth, `supabaseApi`, TOTP), R3 (EFs `fechar-ciclo` /
+`gerar-material`), R4 (UX), R5 (E2E e provas). O diagrama de classes do artigo
+está desatualizado → `docs/reformulacao/DIAGRAMA-CLASSES.md`.
