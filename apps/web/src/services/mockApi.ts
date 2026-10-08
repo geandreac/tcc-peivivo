@@ -12,16 +12,8 @@
  * latência simulada (estados de carregamento reais) e chave de falha
  * (estados de erro reais).
  */
-import {
-  PARAMETROS_PADRAO,
-  adaptar,
-  aplicarCiclo,
-  derivarInteresseAncora,
-  observacoesDoUltimoCiclo,
-  type DimensaoObservada,
-  type ObservacaoHistorica,
-  type ParametrosAdaptacao,
-} from "@pei-vivo/motor-adaptacao";
+import { adaptar, type ObservacaoHistorica, type ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
+import { calcularFechamento } from "@pei-vivo/funcoes";
 import type { NovaObservacao, NovoEstudante, NovoVinculo, PeiVivoApi } from "./api";
 import { ErroApi } from "./erros";
 import type {
@@ -64,15 +56,6 @@ interface Estado {
 const CHAVE_ESTADO = "pei-vivo:demo:v1";
 const CHAVE_SESSAO = "pei-vivo:sessao";
 const DIAS_EXPIRACAO = 7; // RN05
-
-const DIMENSAO_PARA_CAMPO: Record<DimensaoObservada, keyof ParametrosAdaptacao> = {
-  ATENCAO_SUSTENTADA: "maxLinhasPorBloco",
-  COMPREENSAO_ENUNCIADOS: "formatoEnunciado",
-  AUTONOMIA_LEXICAL: "nivelVocabulario",
-  INTERESSE_MANIFESTO: "interesseAncora",
-  SENSIBILIDADE_VISUAL: "contrasteMinimo",
-  FADIGA_TAREFA: "blocosPorMaterial",
-};
 
 const clonar = <T>(v: T): T => (v === undefined ? v : (JSON.parse(JSON.stringify(v)) as T));
 
@@ -227,34 +210,10 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       .map((o) => ({ numeroCiclo: o.numeroCiclo, dimensao: o.dimensao, valorEscala: o.valorEscala, evidencia: o.evidencia }));
   }
 
-  function formatarValor(v: unknown): string {
-    if (v === null || v === undefined) return "—";
-    return String(v);
-  }
-
-  function calcularProposta(ciclo: Ciclo): { proposta: ParametrosAdaptacao; diff: DiffParametro[]; base: ParametrosAdaptacao } {
+  /** Mesmo cálculo da Edge Function fechar-ciclo (packages/funcoes): RN03, âncora, diff. */
+  function calcularProposta(ciclo: Ciclo): { proposta: ParametrosAdaptacao; diff: DiffParametro[] } {
     const vigente = versaoVigente(ciclo.estudanteId);
-    const base = vigente?.parametros ?? PARAMETROS_PADRAO;
-    const hist = historico(ciclo.estudanteId, ciclo.numero);
-    const obsCiclo = observacoesDoUltimoCiclo(hist.filter((h) => h.numeroCiclo === ciclo.numero).length ? hist : []);
-    const proposta = aplicarCiclo(base, obsCiclo);
-    proposta.interesseAncora = derivarInteresseAncora(hist, base.interesseAncora);
-
-    const aguardando = new Set<keyof ParametrosAdaptacao>();
-    for (const o of obsCiclo) {
-      const eleva = o.valorEscala === "AMPLIADA" && ["ATENCAO_SUSTENTADA", "COMPREENSAO_ENUNCIADOS", "AUTONOMIA_LEXICAL"].includes(o.dimensao);
-      if (eleva && o.ciclosConsecutivos < 2) aguardando.add(DIMENSAO_PARA_CAMPO[o.dimensao]);
-    }
-
-    const campos: (keyof ParametrosAdaptacao)[] = ["maxLinhasPorBloco", "formatoEnunciado", "nivelVocabulario", "blocosPorMaterial", "contrasteMinimo", "interesseAncora"];
-    const diff: DiffParametro[] = campos.map((campo) => ({
-      campo,
-      antes: formatarValor(base[campo]),
-      depois: formatarValor(proposta[campo]),
-      mudou: base[campo] !== proposta[campo],
-      aguardandoSegundoCiclo: aguardando.has(campo),
-    }));
-    return { proposta, diff, base };
+    return calcularFechamento(ciclo.numero, vigente?.parametros ?? null, historico(ciclo.estudanteId, ciclo.numero));
   }
 
   /** D-35: uma única VIGENTE por estudante — a anterior vira SUBSTITUIDA (corrige M-01). */
