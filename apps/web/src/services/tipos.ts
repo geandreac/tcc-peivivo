@@ -20,14 +20,38 @@ export type StatusCiclo = "ABERTO" | "FECHADO";
 /** D-24/D-36: profissional proposto pela coordenação aguarda a família. */
 export type StatusVinculo = "PENDENTE_RESPONSAVEL" | "ATIVO" | "RECUSADO" | "ENCERRADO";
 export type ResultadoDesfecho = "ALCANCADO" | "PARCIAL" | "NAO_ALCANCADO";
-export type EscopoConsentimento = "observacao_pedagogica" | "observacao_domiciliar" | "geracao_material";
+/** D-27: escopos com efeito real (validacao_clinica habilita profissional e IA, RN06). */
+export type EscopoConsentimento = "observacao_pedagogica" | "observacao_domiciliar" | "validacao_clinica" | "geracao_material";
 
 export interface Usuario {
   id: string;
   nome: string;
   email: string;
-  /** D-08: só COORDENACAO usa. */
+  /** D-08/D-23: COORDENACAO quando a pessoa coordena alguma escola. */
   papelInstitucional: Papel | null;
+  /** D-23: escola que a pessoa coordena (usada no cadastro de estudante). */
+  escolaId?: string | null;
+  /** D-32: profissional de saúde e coordenação só operam com segundo fator (aal2). */
+  exigeSegundoFator?: boolean;
+}
+
+/** D-32: nível de garantia da sessão (Supabase Auth). */
+export type NivelSessao = "aal1" | "aal2";
+
+export interface ResultadoEntrada {
+  usuario: Usuario;
+  /** Precisa do código do aplicativo autenticador antes de continuar. */
+  exigeSegundoFator: boolean;
+  /** Já tem um fator cadastrado (só verificar) ou precisa cadastrar o primeiro. */
+  temFatorCadastrado: boolean;
+}
+
+export interface CadastroSegundoFator {
+  fatorId: string;
+  /** Imagem do QR code (data URL SVG) para o aplicativo autenticador. */
+  qrCode: string;
+  /** Mesmo segredo em texto, para quem não consegue usar a câmera (alternativa acessível). */
+  segredo: string;
 }
 
 export interface Estudante {
@@ -148,7 +172,12 @@ export type EventoAuditoria =
   | "NOTA_CLINICA_REGISTRADA"
   | "VINCULO_PROPOSTO"
   | "VINCULO_CONFIRMADO"
-  | "VINCULO_RECUSADO";
+  | "VINCULO_RECUSADO"
+  | "VERSAO_PROPOSTA"
+  | "VERSAO_AJUSTADA"
+  | "VERSAO_VIGENTE_SEM_VALIDACAO"
+  | "VERSAO_EXPIRADA"
+  | "REGISTRO_VERIFICADO";
 
 /**
  * R4.5 — painel da escola (coordenação): só contagens e motivos de pendência.

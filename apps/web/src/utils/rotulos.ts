@@ -84,6 +84,7 @@ export const DESFECHO: Record<ResultadoDesfecho, { texto: string; descricao: str
 export const ESCOPO: Record<EscopoConsentimento, { titulo: string; descricao: string }> = {
   observacao_pedagogica: { titulo: "Observações da escola", descricao: "A professora registra, a cada 15 dias, como o estudante lida com leitura e tarefas. Nunca diagnóstico." },
   observacao_domiciliar: { titulo: "Observações da família", descricao: "Você registra o que percebe em casa: o que ajuda, o que atrapalha, o que interessa." },
+  validacao_clinica: { titulo: "Validação pelo profissional de saúde", descricao: "Um profissional de saúde que você confirmar pode conferir os ajustes do material. Sem isso, só a escola e a família ajustam." },
   geracao_material: { titulo: "Geração de material adaptado", descricao: "A professora recebe textos adaptados ao perfil do estudante. Ela revisa tudo antes de usar." },
 };
 
@@ -105,6 +106,11 @@ export const EVENTO: Record<EventoAuditoria, string> = {
   VINCULO_PROPOSTO: "Profissional de saúde proposto",
   VINCULO_CONFIRMADO: "Profissional de saúde confirmado pela família",
   VINCULO_RECUSADO: "Profissional de saúde recusado pela família",
+  VERSAO_PROPOSTA: "Nova proposta de perfil enviada para validação",
+  VERSAO_AJUSTADA: "Perfil ajustado pelo profissional de saúde",
+  VERSAO_VIGENTE_SEM_VALIDACAO: "Perfil atualizado pela escola (sem profissional de saúde)",
+  VERSAO_EXPIRADA: "Proposta de perfil expirou sem validação",
+  REGISTRO_VERIFICADO: "Registro profissional conferido pela escola",
 };
 
 /** Frases das notificações (D-28). Revogação nunca expõe motivo (F10). */

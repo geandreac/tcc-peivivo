@@ -43,7 +43,7 @@ export function mensagemAmigavel(e: unknown): string {
       case "NEGADO":
         return e.message || "Você não tem permissão para esta ação.";
       case "NAO_AUTENTICADO":
-        return "Sua sessão expirou. Entre novamente.";
+        return e.message || "Sua sessão expirou. Entre novamente.";
       case "NAO_ENCONTRADO":
         return "Não encontramos o que você procurava.";
       case "CONFLITO":

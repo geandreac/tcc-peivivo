@@ -249,7 +249,22 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
   }
 
   // ---------------------------------------------------------------- API
+  const soNoModoReal = () =>
+    chamada<never>(() => {
+      throw new ErroApi("VALIDACAO", "Disponível só com o Supabase (modo real). Na demonstração, entre escolhendo um perfil fictício.");
+    });
+
   const api: PeiVivoApi = {
+    modo: "demonstracao",
+    carregarSessao: () => chamada(() => (sessaoId ? (estado.usuarios.find((x) => x.id === sessaoId) ?? null) : null)),
+    entrarComSenha: () => soNoModoReal(),
+    nivelSessao: () => chamada(() => ({ atual: "aal2" as const, temFatorCadastrado: true })),
+    iniciarCadastroSegundoFator: () => soNoModoReal(),
+    verificarSegundoFator: () => soNoModoReal(),
+    pedirRecuperacaoSenha: () => soNoModoReal(),
+    definirSenha: () => soNoModoReal(),
+    sairDeTodos: () => api.sair(),
+
     // ---- sessão
     listarPerfisDemo: () => chamada(() => estado.usuarios),
     entrar: (usuarioId) =>
@@ -329,6 +344,9 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         if (meu === "RESPONSAVEL" && dados.papel !== "PROFISSIONAL_SAUDE") throw new ErroApi("NEGADO", "A família só propõe profissionais de saúde.");
         if (dados.usuarioId === eu().id) throw new ErroApi("NEGADO", "Ninguém pode criar vínculo para si mesmo.");
         if (!estado.usuarios.some((x) => x.id === dados.usuarioId)) throw new ErroApi("NAO_ENCONTRADO", "Usuário não encontrado.");
+        if (dados.papel === "RESPONSAVEL" && !dados.conferidoPresencialmente) {
+          throw new ErroApi("VALIDACAO", "Confirme que o vínculo legal foi conferido presencialmente, com documento.");
+        }
         if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim()) {
           throw new ErroApi("VALIDACAO", "Profissional de saúde precisa do registro no conselho.");
         }

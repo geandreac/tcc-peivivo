@@ -25,6 +25,9 @@ import type {
   ResultadoDesfecho,
   ResultadoFechamento,
   Usuario,
+  CadastroSegundoFator,
+  NivelSessao,
+  ResultadoEntrada,
   VersaoPerfil,
   Vinculo,
 } from "./tipos";
@@ -47,14 +50,36 @@ export interface NovoVinculo {
   estudanteId: string;
   papel: Papel;
   registroConselho?: string | null;
+  /** D-25: vínculo de responsável só com conferência presencial declarada pela coordenação. */
+  conferidoPresencialmente?: boolean;
 }
 
 export interface PeiVivoApi {
-  // sessão (D-16: modo demonstração)
+  /** "demonstracao" = mock (D-16/D-17); "real" = Supabase Auth + PostgREST (D-32). */
+  readonly modo: "demonstracao" | "real";
+
+  // sessão — modo demonstração (D-16)
   listarPerfisDemo(): Promise<Usuario[]>;
   entrar(usuarioId: string): Promise<Usuario>;
   sair(): Promise<void>;
   usuarioAtual(): Usuario | null;
+
+  // sessão — modo real (D-32): convite, senha, segundo fator, recuperação
+  /** Restaura a sessão salva pelo Auth (ao abrir o app ou voltar de um link de e-mail). */
+  carregarSessao(): Promise<Usuario | null>;
+  entrarComSenha(email: string, senha: string): Promise<ResultadoEntrada>;
+  nivelSessao(): Promise<{ atual: NivelSessao; temFatorCadastrado: boolean }>;
+  iniciarCadastroSegundoFator(): Promise<CadastroSegundoFator>;
+  /** Verifica o código de 6 dígitos: conclui o cadastro (fatorId) ou o desafio do fator existente. */
+  verificarSegundoFator(codigo: string, fatorId?: string): Promise<void>;
+  pedirRecuperacaoSenha(email: string): Promise<void>;
+  /**
+   * Define a nova senha da sessão atual (link de convite ou de recuperação). No
+   * convite, `versaoTermosAceita` registra o aceite dos termos (D-27).
+   */
+  definirSenha(novaSenha: string, versaoTermosAceita?: string): Promise<void>;
+  /** "Sair de todos os dispositivos" (F13). */
+  sairDeTodos(): Promise<void>;
 
   // estudantes e vínculos
   listarEstudantes(): Promise<Estudante[]>;

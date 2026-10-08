@@ -3,7 +3,8 @@ import { useSessao } from "../hooks/useSessao";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { Toasts } from "../components/Toasts";
 import { PAPEL } from "../utils/rotulos";
-import { Accessibility, Bell, CircleHelp, ClipboardCheck, LogOut, UsersRound, type LucideIcon } from "lucide-react";
+import { Accessibility, Bell, CircleHelp, ClipboardCheck, LogOut, UserRound, UsersRound, type LucideIcon } from "lucide-react";
+import { useInatividade } from "../hooks/useInatividade";
 import { api } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
 
@@ -42,6 +43,13 @@ export function Layout() {
   );
   const contagem = naoLidas.dados ?? 0;
 
+  // D-32: 30 min sem interação encerram a sessão de quem vê dado de saúde ou administra.
+  useInatividade(api.modo === "real" && Boolean(usuario?.exigeSegundoFator), 30, async () => {
+    await sair();
+    anunciar("Sua sessão foi encerrada após 30 minutos sem uso, para proteger os dados. Entre novamente.", "neutro");
+    navigate("/entrar");
+  });
+
   async function aoSair() {
     await sair();
     anunciar("Você saiu da sua conta.", "neutro");
@@ -68,6 +76,9 @@ export function Layout() {
                     {contagem > 9 ? "9+" : contagem}
                   </span>
                 )}
+              </NavLink>
+              <NavLink to="/conta" className="sino" aria-label="Conta e segurança">
+                <UserRound aria-hidden="true" size={22} />
               </NavLink>
               <span className="sessao__nome">
                 <strong>{usuario.nome}</strong>

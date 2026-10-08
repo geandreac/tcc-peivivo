@@ -11,7 +11,7 @@ import { Modal } from "../components/Modal";
 import { ESCOPO, EVENTO, PAPEL } from "../utils/rotulos";
 import { formatarDataHora } from "../utils/datas";
 
-const TODOS: EscopoConsentimento[] = ["observacao_pedagogica", "observacao_domiciliar", "geracao_material"];
+const TODOS: EscopoConsentimento[] = ["observacao_pedagogica", "observacao_domiciliar", "validacao_clinica", "geracao_material"];
 
 /** HU-R.01 / HU-R.02 — termo em linguagem simples, escopos, um botão; revogação com dupla confirmação; trilha de auditoria. */
 export function Consentimento() {
