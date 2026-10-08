@@ -49,10 +49,13 @@ jobs:
           version: latest
       - run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,storage-api
       - run: supabase db reset
-      - name: Políticas no Postgres do Supabase (caminho negado primeiro)
+      - name: Políticas no Supabase real — SQL (Postgres) e HTTP (Auth + PostgREST + TOTP)
         run: |
-          export DATABASE_URL="$(supabase status -o env | grep '^DB_URL=' | cut -d= -f2- | tr -d '"')"
-          test -n "$DATABASE_URL" || { echo "DB_URL vazio: a suíte cairia no PGlite"; exit 1; }
+          eval "$(supabase status -o env | grep -E '^(DB_URL|API_URL|ANON_KEY|SERVICE_ROLE_KEY)=' | sed 's/^/export /')"
+          export DATABASE_URL="$DB_URL" SUPABASE_URL="$API_URL" SUPABASE_ANON_KEY="$ANON_KEY" SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          for v in DATABASE_URL SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
+            test -n "${!v}" || { echo "$v vazio: parte da suíte seria pulada"; exit 1; }
+          done
           npm test -w packages/politicas
       - name: Linter de segurança do Supabase
         run: supabase db lint --level warning --fail-on warning
