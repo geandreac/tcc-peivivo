@@ -65,6 +65,28 @@ jobs:
       - if: always()
         run: supabase stop
 
+  funcoes:
+    # Edge Functions (R3): casos de uso em TS puro + cópia Deno sempre em dia + deno check.
+    name: edge functions (Vitest + cópia Deno + deno check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck -w packages/contratos -w packages/funcoes
+      - run: npm run test:coverage -w packages/funcoes
+      - name: Cópia para Deno em dia (scripts/sincronizar-funcoes.mjs)
+        run: node scripts/sincronizar-funcoes.mjs --verificar
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.1.4
+      - name: Tipos das Edge Functions
+        working-directory: supabase/functions
+        run: deno check gerar-material/index.ts fechar-ciclo/index.ts
+
   web:
     name: apps/web (typecheck + Vitest/axe + build + contraste)
     runs-on: ubuntu-latest
