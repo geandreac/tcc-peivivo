@@ -102,7 +102,7 @@ Provas: 34 testes negativos (`mockApi.test.ts`), 4 caminhos negados na interface
 | P-01 | Rotulação do estudante por exposição do diagnóstico à escola | Laudo/diagnóstico não existem no sistema (D-01) | Baixo — o texto livre de observação pode conter menção; orientação na dica do campo ("descreva o que aconteceu, não o diagnóstico") a acrescentar (P4.8) |
 | P-02 | Profissional de outra área lendo nota clínica | Policy exclusiva por vínculo PROFISSIONAL_SAUDE do **mesmo** estudante | Baixo |
 | P-03 | Família não compreender o que autoriza | Termo em linguagem simples em 5 perguntas; escopos granulares; teste de compreensão H5 no piloto | Médio até o piloto |
-| P-04 | Texto da aula com nome do estudante enviado a provedor de IA (Fase 5) | IA desligada por padrão; quando ligada: só vocabulário/exemplos; pseudonimizar nome antes do envio; fornecedor com DPA; cota | Médio — decisão D-nn a registrar na Fase 5 |
+| P-04 | Texto da aula com nome do estudante enviado a provedor de IA (Fase 5) | IA desligada por padrão; quando ligada: só vocabulário/exemplos; pseudonimizar nome antes do envio; fornecedor com DPA; cota | Médio — regras em §13 (D-39); pseudonimização do texto colado ainda **não implementada**: pré-requisito para ligar a IA |
 | P-05 | Dado real usado em desenvolvimento | Regra do CLAUDE.md: nunca; seed e mocks fictícios com cabeçalho; revisão de PR | Baixo |
 | P-06 | Exportação JSON acessada por terceiro no dispositivo | Responsabilidade do titular; aviso na tela; sem notas clínicas no export | Baixo |
 | P-07 | Sessão persistente em dispositivo compartilhado (demo) | Botão "Sair" visível; dados fictícios | Aceito na demo; real: expiração |
@@ -145,3 +145,19 @@ Provas: 34 testes negativos (`mockApi.test.ts`), 4 caminhos negados na interface
 | Responsabilização e prestação de contas | Auditoria append-only; este documento; registro de incidentes | 🟡 (trigger de auditoria na `0004`) |
 | Direitos do titular (art. 18) | Exportar, excluir, revogar pela interface | ✅ (protótipo) |
 | Consentimento de criança (art. 14) | Específico, em destaque, pelo responsável; revogável | ✅ (protótipo) |
+
+## 13. Camada de IA e prompt injection (D-39, reformulação R3)
+
+Estado: **desligada** (`IA_HABILITADA` ausente → `iaDesligada`). As regras abaixo já estão no código e nos testes (`packages/funcoes/src/gerarMaterial.test.ts`) para quando for ligada:
+
+| Regra | Onde é garantida | Teste |
+|---|---|---|
+| A IA só roda com profissional de saúde ativo **e** escopo `validacao_clinica` (RN06) | banco: `fn_preparar_geracao.iaPermitida` e revalidação em `fn_registrar_material` | "RN06: sem permissão do banco, a IA nem é chamada" · `funcoes-banco.test.ts` "não grava 'IA aplicada' sem profissional ativo" |
+| O texto colado é **dado**, não instrução; o provedor recebe só `{ texto, parametros }`, nunca id, nome, turma ou título | `aplicarIA` monta a entrada explicitamente | "minimização: a IA recebe só texto e parâmetros" |
+| A saída é **não confiável**: só vale se passar em `SaidaIASchema` (objeto estrito, tamanhos máximos); campos extras, como uma "ação" injetada, invalidam a saída | `packages/contratos` | "saída fora do contrato (ex.: instrução injetada)" |
+| Falha, demora (> 30 s) ou saída inválida → só a camada de regras, com aviso, nunca erro (RNF08) | `aplicarIA` com `AbortController` | "IA que não responde é abandonada no tempo limite" |
+| Nada gerado chega ao estudante sem aprovação do docente (RN04) | banco: material nasce `RASCUNHO`; `fn_decidir_material` só pelo autor | `politicas.test.ts` bloco RN04 |
+| Chave do provedor só em `supabase secrets` da Edge Function; nunca no bundle | `supabase/functions/_shared/http.ts` | revisão de código |
+| Logs da Edge Function sem corpo nem usuário (só função, status e código) | `servir()` em `http.ts` | revisão de código |
+
+**Pendente antes de ligar a IA:** pseudonimizar nomes próprios no texto colado (P-04) e escolher um fornecedor com acordo de tratamento de dados (DPA).

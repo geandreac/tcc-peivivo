@@ -98,8 +98,10 @@ pei-vivo/
 │       ├── assets/                # (vazio — logo em public/, ícone em SVG inline)
 │       └── test/                  # setup do Vitest e utilitários (renderizarApp, semViolacoesAxe)
 ├── packages/motor-adaptacao/      # regras, ciclos, âncora, adaptador + testes (README próprio)
-├── packages/politicas/            # 71 testes de RLS/RPC (caminho negado primeiro) — PGlite local, Supabase no CI
-├── supabase/                      # migrations 0001–0005 (schema, RLS v3, auditoria), seed fictício, config
+├── packages/politicas/            # 88 testes de RLS/RPC (caminho negado primeiro) — PGlite local, Supabase no CI
+├── packages/contratos/            # schemas Zod compartilhados app ↔ Edge Functions
+├── packages/funcoes/              # casos de uso das Edge Functions (TS puro, 24 testes)
+├── supabase/                      # migrations 0001–0006, functions/ (gerar-material, fechar-ciclo), seed fictício, config
 ├── scripts/                       # validar-migrations.mjs (PGlite), contraste.mjs, criar-kanban.sh
 ├── docs/                          # documentação do projeto (ver §13)
 │   └── tcc/                       # fontes do TCC: pré-projeto, diagramas, orientação

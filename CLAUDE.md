@@ -23,11 +23,12 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (30) + políticas RLS (71, PGlite) + web (72, axe-core) — 100%
+npm test                                    # motor (30) + funções (24) + políticas RLS (88, PGlite) + web (72, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173
 npm run contraste                           # tokens de cor ≥ 4,5:1 / 3:1
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
 node scripts/sondar-rls.mjs                 # evidência histórica: 25/31 ataques passavam em 0002
+node scripts/sincronizar-funcoes.mjs        # copia motor/contratos/funcoes p/ supabase/functions/_shared/gerado (Deno)
 npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
 ```
 
@@ -107,8 +108,10 @@ permissões (22 telas, 72 testes com axe-core). Documentação de UX/acessibilid
 **Reformulação (desde 07/10/2026)** — fonte de verdade: `docs/reformulacao/`
 (AUDITORIA, FLUXOS, DECISOES = ADR-00…20 = D-19…D-39, PLANO R0–R5, marcos/).
 Trilha mínima aprovada até o congelamento de 26/11. **R1 (banco que nega) feito:**
-migrations `0003`–`0005`, 71 testes de política verdes no PGlite, mock alinhado;
-falta o CI rodar contra o Supabase real. Próximos: R2 (identidade real: EF
-`convidar`, telas de auth, `supabaseApi`, TOTP), R3 (EFs `fechar-ciclo` /
-`gerar-material`), R4 (UX), R5 (E2E e provas). O diagrama de classes do artigo
+migrations `0003`–`0005`, políticas verdes no PGlite **e no Supabase real (CI)**.
+**R3 (ciclo no servidor) feito, antecipado:** `0006` (portas das EFs), `packages/
+contratos` (Zod), `packages/funcoes` (casos de uso puros), Edge Functions
+`gerar-material` e `fechar-ciclo` (camada HTTP fina; nunca edite
+`_shared/gerado/`, rode o script). Bloqueado: R2 (login real) precisa de projeto
+Supabase na nuvem. Depois: R4 (UX), R5 (E2E e provas). O diagrama de classes do artigo
 está desatualizado → `docs/reformulacao/DIAGRAMA-CLASSES.md`.
