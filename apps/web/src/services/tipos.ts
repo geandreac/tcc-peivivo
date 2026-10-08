@@ -153,14 +153,9 @@ export interface Auditoria {
 }
 
 /** Diferença vigente → proposta, mostrada ao fechar o ciclo (HU-D.02). */
-export interface DiffParametro {
-  campo: keyof ParametrosAdaptacao;
-  antes: string;
-  depois: string;
-  mudou: boolean;
-  /** RN03: dimensão AMPLIADA há 1 ciclo só — aguarda o 2º para elevar. */
-  aguardandoSegundoCiclo: boolean;
-}
+/** Contrato único com a Edge Function fechar-ciclo (D-31). */
+export type { DiffParametro } from "@pei-vivo/contratos";
+import type { DiffParametro } from "@pei-vivo/contratos";
 
 export interface ResultadoFechamento {
   versao: VersaoPerfil;
