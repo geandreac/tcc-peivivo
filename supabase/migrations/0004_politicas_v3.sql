@@ -441,7 +441,7 @@ begin
     if char_length(trim(coalesce(p_registro_conselho, ''))) = 0 then
       raise exception 'Informe o registro no conselho profissional.' using errcode = '22023';
     end if;
-    v_status := case when v_resp then 'ATIVO' else 'PENDENTE_RESPONSAVEL' end;
+    v_status := (case when v_resp then 'ATIVO' else 'PENDENTE_RESPONSAVEL' end)::public.status_vinculo;
   else
     raise exception 'Papel inválido para vínculo com estudante.' using errcode = '22023';
   end if;

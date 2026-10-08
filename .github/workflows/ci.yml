@@ -51,9 +51,10 @@ jobs:
       - name: Políticas no Postgres do Supabase (caminho negado primeiro)
         run: |
           export DATABASE_URL="$(supabase status -o env | grep '^DB_URL=' | cut -d= -f2- | tr -d '"')"
+          test -n "$DATABASE_URL" || { echo "DB_URL vazio: a suíte cairia no PGlite"; exit 1; }
           npm test -w packages/politicas
       - name: Linter de segurança do Supabase
-        run: supabase db lint --level warning
+        run: supabase db lint --level warning --fail-on warning
       - name: Sanidade do seed (cenário A)
         run: |
           psql "$(supabase status -o env | grep DB_URL | cut -d= -f2- | tr -d '"')" -v ON_ERROR_STOP=1 -c "

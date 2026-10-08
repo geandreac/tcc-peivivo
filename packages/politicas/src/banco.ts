@@ -42,7 +42,7 @@ const STUB_SUPABASE = `
   create role anon nologin; create role authenticated nologin; create role service_role nologin;
   grant usage on schema auth to anon, authenticated;
   grant execute on all functions in schema auth to anon, authenticated;
-  grant usage on schema public to anon, authenticated;
+  grant usage on schema public to anon, authenticated, service_role;
   alter default privileges in schema public grant all on tables to anon, authenticated;
   alter default privileges in schema public grant execute on functions to anon, authenticated;
 `;
@@ -163,7 +163,7 @@ const FIXTURE = `
 `;
 
 // ------------------------------------------------------------------ API dos testes
-export type Ator = Pessoa | "anon" | "sistema";
+export type Ator = Pessoa | "anon" | "sistema" | "servico";
 export interface Passo {
   ator: Ator;
   /** Uma instrução, ou várias: o resultado é o da última. */
@@ -188,6 +188,8 @@ const AAL2_PADRAO: Pessoa[] = ["saude", "saude2", "coordenacao", "coordOutraEsco
 function preparo(ator: Ator, aal?: "aal1" | "aal2"): string {
   if (ator === "sistema") return "reset role; select set_config('request.jwt.claims', '', true);";
   if (ator === "anon") return "set local role anon; select set_config('request.jwt.claims', '', true);";
+  // Edge Function com service role: JWT sem `sub` (auth.uid() nulo).
+  if (ator === "servico") return "reset role; select set_config('request.jwt.claims', '{\"role\":\"service_role\"}', true); set local role service_role;";
   const nivel = aal ?? (AAL2_PADRAO.includes(ator) ? "aal2" : "aal1");
   const claims = JSON.stringify({ sub: a(PESSOAS[ator]), role: "authenticated", aal: nivel });
   return `reset role; select set_config('request.jwt.claims', '${claims}', true); set local role authenticated;`;
@@ -196,6 +198,8 @@ function preparo(ator: Ator, aal?: "aal1" | "aal2"): string {
 export async function abrirBanco(): Promise<Banco> {
   const url = process.env.DATABASE_URL;
   const c = url ? await conectarPostgres(url) : await conectarPglite();
+  const [versao] = await c.query("select version() as v");
+  console.info(`[politicas] banco: ${String(versao?.v).split(",")[0]}`);
   await c.exec("begin");
   await c.exec(FIXTURE);
   let n = 0;
