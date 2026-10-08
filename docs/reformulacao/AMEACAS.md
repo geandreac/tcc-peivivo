@@ -2,7 +2,7 @@
 
 **Data:** 08/10/2026 · **Escopo:** banco v3 (`0003`–`0006`), Edge Functions (R3), protótipo (R4).
 **Leitura:** cada linha é uma ameaça plausível. "Teste" aponta onde ela é **provada negada**, não só "tratada".
-Suítes: **P** = `packages/politicas` (PGlite local + Postgres do Supabase no CI) · **F** = `packages/funcoes` · **M** = `apps/web/src/services/mockApi.test.ts` · **T** = testes de tela (jsdom + axe) · **E** = E2E Playwright.
+Suítes: **H** = `packages/politicas/src/http.test.ts` (Supabase Auth + PostgREST reais, JWT e TOTP de verdade, no CI) · **P** = `packages/politicas` (PGlite local + Postgres do Supabase no CI) · **F** = `packages/funcoes` · **M** = `apps/web/src/services/mockApi.test.ts` · **T** = testes de tela (jsdom + axe) · **E** = E2E Playwright.
 
 STRIDE: **S**poofing (falsificar identidade) · **T**ampering (adulterar dado) · **R**epudiation (negar autoria) · **I**nformation disclosure (vazar dado) · **D**enial of service (indisponibilidade) · **E**levation of privilege (ganhar poder indevido).
 
@@ -27,8 +27,8 @@ STRIDE: **S**poofing (falsificar identidade) · **T**ampering (adulterar dado) �
 ## Nota clínica (RN02, D-30)
 | # | STRIDE | Ameaça | Controle | Teste |
 |---|---|---|---|---|
-| A-11 | I | Docente/família/coordenação leem nota clínica pela API | `revoke all` na tabela; leitura só por `fn_ler_notas_clinicas` (profissional ativo + aal2 + consentimento) | P "S-01", "S-13" · E "docente abrindo a nota clínica" |
-| A-12 | S | Sessão roubada de profissional (sem segundo fator) lê nota | Exige `aal2` (TOTP) no banco | P "profissional sem segundo fator (aal1) não lê" |
+| A-11 | I | Docente/família/coordenação leem nota clínica pela API | `revoke all` na tabela; leitura só por `fn_ler_notas_clinicas` (profissional ativo + aal2 + consentimento) | P "S-01", "S-13" · **H "Exemplo 3: docente com token VÁLIDO lendo notas_clinicas"** · E "docente abrindo a nota clínica" |
+| A-12 | S | Sessão roubada de profissional (sem segundo fator) lê nota | Exige `aal2` (TOTP) no banco | P "profissional sem segundo fator (aal1) não lê" · **H "D-32: profissional SEM segundo fator é negado; com TOTP verificado (aal2)…"** |
 | A-13 | T | Profissional altera ou apaga nota de outro profissional | Sem acesso direto à tabela; só inserção por RPC | P "S-16/S-16b/S-17" |
 | A-14 | R | Profissional nega ter lido a nota | Toda leitura grava `LEITURA_NOTA_CLINICA`; responsável vê quem leu e quando | P "PERMITIDO: profissional lê; responsável vê QUE leu…" · M "leitura de nota clínica entra na trilha" · T "UX-09" |
 
