@@ -3,3 +3,4 @@ export * from "./erros.ts";
 export * from "./ia.ts";
 export * from "./fecharCiclo.ts";
 export * from "./gerarMaterial.ts";
+export * from "./convidar.ts";

@@ -14,7 +14,7 @@
  */
 import { adaptar, type ObservacaoHistorica, type ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 import { calcularFechamento } from "@pei-vivo/funcoes";
-import type { NovaObservacao, NovoEstudante, NovoVinculo, PeiVivoApi } from "./api";
+import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, PeiVivoApi } from "./api";
 import { ErroApi } from "./erros";
 import type {
   Auditoria,
@@ -249,7 +249,22 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
   }
 
   // ---------------------------------------------------------------- API
+  const soNoModoReal = () =>
+    chamada<never>(() => {
+      throw new ErroApi("VALIDACAO", "Disponível só com o Supabase (modo real). Na demonstração, entre escolhendo um perfil fictício.");
+    });
+
   const api: PeiVivoApi = {
+    modo: "demonstracao",
+    carregarSessao: () => chamada(() => (sessaoId ? (estado.usuarios.find((x) => x.id === sessaoId) ?? null) : null)),
+    entrarComSenha: () => soNoModoReal(),
+    nivelSessao: () => chamada(() => ({ atual: "aal2" as const, temFatorCadastrado: true })),
+    iniciarCadastroSegundoFator: () => soNoModoReal(),
+    verificarSegundoFator: () => soNoModoReal(),
+    pedirRecuperacaoSenha: () => soNoModoReal(),
+    definirSenha: () => soNoModoReal(),
+    sairDeTodos: () => api.sair(),
+
     // ---- sessão
     listarPerfisDemo: () => chamada(() => estado.usuarios),
     entrar: (usuarioId) =>
@@ -329,6 +344,9 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         if (meu === "RESPONSAVEL" && dados.papel !== "PROFISSIONAL_SAUDE") throw new ErroApi("NEGADO", "A família só propõe profissionais de saúde.");
         if (dados.usuarioId === eu().id) throw new ErroApi("NEGADO", "Ninguém pode criar vínculo para si mesmo.");
         if (!estado.usuarios.some((x) => x.id === dados.usuarioId)) throw new ErroApi("NAO_ENCONTRADO", "Usuário não encontrado.");
+        if (dados.papel === "RESPONSAVEL" && !dados.conferidoPresencialmente) {
+          throw new ErroApi("VALIDACAO", "Confirme que o vínculo legal foi conferido presencialmente, com documento.");
+        }
         if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim()) {
           throw new ErroApi("VALIDACAO", "Profissional de saúde precisa do registro no conselho.");
         }
@@ -378,6 +396,48 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         if (aceitar) notificarUsuario(v.usuarioId, "VINCULO_ATIVADO", v.estudanteId);
         salvar();
         return v;
+      }),
+
+    convidar: (dados: NovoConvite) =>
+      chamada(() => {
+        const u = eu();
+        if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "Só a coordenação da escola convida pessoas.");
+        const email = dados.email.trim().toLowerCase();
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/u.test(email)) throw new ErroApi("VALIDACAO", "Informe um e-mail válido.");
+        if (email === u.email) throw new ErroApi("NEGADO", "Ninguém pode convidar a si mesmo.");
+        if (dados.papel !== "DOCENTE") {
+          if (!dados.estudanteId) throw new ErroApi("VALIDACAO", "Escolha um estudante.");
+          exigirPapel(dados.estudanteId, "COORDENACAO");
+        }
+        if (dados.papel === "RESPONSAVEL" && !dados.conferidoPresencialmente) {
+          throw new ErroApi("VALIDACAO", "Confirme que o vínculo legal foi conferido presencialmente, com documento.");
+        }
+        if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim()) throw new ErroApi("VALIDACAO", "Informe o registro no conselho profissional.");
+        let pessoa = estado.usuarios.find((x) => x.email === email);
+        if (!pessoa) {
+          pessoa = { id: uuid(), nome: dados.nome?.trim() || email.split("@")[0]!, email, papelInstitucional: null };
+          estado.usuarios.push(pessoa);
+        }
+        if (dados.papel !== "DOCENTE" && dados.estudanteId) {
+          const ja = estado.vinculos.some((v) => v.usuarioId === pessoa!.id && v.estudanteId === dados.estudanteId && (v.status === "ATIVO" || v.status === "PENDENTE_RESPONSAVEL"));
+          if (!ja) {
+            const pendente = dados.papel === "PROFISSIONAL_SAUDE";
+            const v: Vinculo = {
+              id: uuid(),
+              usuarioId: pessoa.id,
+              estudanteId: dados.estudanteId,
+              papel: dados.papel,
+              dataVinculo: agora(),
+              status: pendente ? "PENDENTE_RESPONSAVEL" : "ATIVO",
+              registroConselho: pendente ? dados.registroConselho!.trim() : null,
+            };
+            estado.vinculos.push(v);
+            registrarAuditoria("vinculos_usuario_estudante", v.id, pendente ? "VINCULO_PROPOSTO" : "VINCULO_CRIADO", { papel: v.papel });
+            if (pendente) notificar(v.estudanteId, "PROFISSIONAL_AGUARDANDO_CONFIRMACAO", ["RESPONSAVEL"]);
+          }
+        }
+        salvar();
+        return { emailEnviado: true, avisos: ["Demonstração: nenhum e-mail é enviado de verdade."] };
       }),
 
     // ---- notificações (D-28)

@@ -496,3 +496,24 @@ hr {
 .bloco-destaque h2 {
   margin-top: 0;
 }
+
+/* telas de autenticação e leitura (R2.2) */
+.pagina-estreita {
+  max-width: 28rem;
+  margin-inline: auto;
+}
+.pagina-leitura {
+  max-width: var(--largura-leitura);
+}
+.qr-code {
+  display: block;
+  background: #ffffff; /* QR precisa de fundo claro também no tema escuro */
+  padding: var(--esp-2);
+  border-radius: var(--raio-md);
+  margin-block: var(--esp-3);
+}
+.segredo {
+  overflow-wrap: anywhere;
+  font-size: var(--tamanho-md);
+  letter-spacing: 0.08em;
+}

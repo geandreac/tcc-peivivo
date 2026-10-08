@@ -92,3 +92,23 @@ export type CodigoErro = "NEGADO" | "CONFLITO" | "VALIDACAO" | "NAO_AUTENTICADO"
 export interface CorpoErro {
   erro: { codigo: CodigoErro; mensagem: string };
 }
+
+// ------------------------------------------------------------------ convidar (F1/F2/F4/F5, D-32)
+export const EntradaConviteSchema = z
+  .object({
+    escolaId: z.string().uuid("Escola inválida."),
+    email: z.string().trim().toLowerCase().email("Informe um e-mail válido."),
+    nome: z.string().trim().max(120).default(""),
+    papel: z.enum(["DOCENTE", "RESPONSAVEL", "PROFISSIONAL_SAUDE"]),
+    estudanteId: z.string().uuid().nullable().default(null),
+    registroConselho: z.string().trim().max(60).nullable().default(null),
+    conferidoPresencialmente: z.boolean().default(false),
+  })
+  .strict();
+export type EntradaConvite = z.infer<typeof EntradaConviteSchema>;
+
+export interface RespostaConvite {
+  /** false quando a pessoa já tinha conta: o acesso novo vale sem e-mail. */
+  emailEnviado: boolean;
+  avisos: string[];
+}
