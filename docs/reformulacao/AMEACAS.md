@@ -36,7 +36,7 @@ STRIDE: **S**poofing (falsificar identidade) · **T**ampering (adulterar dado) �
 | # | STRIDE | Ameaça | Controle | Teste |
 |---|---|---|---|---|
 | A-15 | T | Profissional reescreve os parâmetros (não só aprova) | Parâmetros imutáveis por trigger; ajuste = nova versão com justificativa | P "S-24", "ajuste cria nova versão" |
-| A-16 | T | Duas versões vigentes / aprovar versão antiga por cima da nova | Índice único de uma `VIGENTE`; RPC recusa versão ≤ vigente e expirada | P "S-25", "RN05: … a expirada não volta" · M "M-01/S-25" |
+| A-16 | T | Duas versões vigentes / aprovar versão antiga por cima da nova | Índice único de uma `VIGENTE`; RPC recusa versão ≤ vigente e expirada | P "S-25", "RN05: o sistema expira após 7 dias, a vigente anterior permanece e a expirada não volta" · M "M-01/S-25" |
 | A-17 | T | Cliente grava versão de perfil inventada (sem o motor) | `fn_registrar_fechamento` só para service role; revalida | P "docente não chama a porta de gravação direto (não inventa versão de perfil)" |
 | A-18 | E | Usuário força a expiração/execução da tarefa agendada | `fn_expirar_validacoes` sem `execute` para `authenticated` | P "authenticated não executa…", "RN05: o sistema expira…" |
 | A-19 | T | Observação gravada em nome de outro / em ciclo fechado | `autor_id` e `papel_autor` definidos pelo servidor; coluna não gravável | P "cliente não escolhe a autoria", "ninguém observa em ciclo fechado" |
@@ -77,7 +77,7 @@ STRIDE: **S**poofing (falsificar identidade) · **T**ampering (adulterar dado) �
 ## Identidade e convites (R2)
 | # | STRIDE | Ameaça | Controle | Teste |
 |---|---|---|---|---|
-| A-41 | E | Docente (ou coordenação sem TOTP) convida pessoas e cria vínculos | `fn_preparar_convite` exige coordenação da escola com aal2; a EF não envia e-mail se o banco negar | P (identidade) "docente, responsável e coordenação sem segundo fator não convidam" · F "banco nega o preparo… NENHUM e-mail é enviado" · **C** "coordenação: sem aal2 nada…" |
+| A-41 | E | Docente (ou coordenação sem TOTP) convida pessoas e cria vínculos | `fn_preparar_convite` exige coordenação da escola com aal2; a EF não envia e-mail se o banco negar | P (identidade) "docente, responsável e coordenação sem segundo fator não convidam" · F "banco nega o preparo (não é coordenação / sem aal2) → 403 e NENHUM e-mail é enviado" · **C** "coordenação: sem aal2 nada…" |
 | A-42 | S | Convite cria "responsável" sem conferência do documento | Preparo **e** gravação exigem a conferência presencial (achado do lint) | P "D-25: service role também recusa responsável sem conferência presencial" |
 | A-43 | T | Corpo do convite com autor forjado | Schema estrito; o autor vem de `auth.uid()` | F "corpo inválido ou com campo extra → 400…" |
 | A-44 | I | Login revela se um e-mail tem conta | Mensagem genérica no login e na recuperação | T "negado: credenciais erradas → mensagem genérica" · **C** "login: senha errada é genérica…" |
