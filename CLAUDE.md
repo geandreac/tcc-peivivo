@@ -114,7 +114,8 @@ migrations `0003`–`0005`, políticas verdes no PGlite **e no Supabase real (CI
 contratos` (Zod), `packages/funcoes` (casos de uso puros), Edge Functions
 `gerar-material` e `fechar-ciclo` (camada HTTP fina; nunca edite
 `_shared/gerado/`, rode o script). Bloqueado: R2 (login real) precisa de projeto
-Supabase na nuvem. **R4 (UX) em andamento:** navegação inferior/lateral, linguagem
+Supabase na nuvem. **R2 parcial:** `packages/politicas/src/http.test.ts` prova no CI, com
+Auth + PostgREST reais, o 403 com token válido e o TOTP (aal2). **R4 (UX) feito:** navegação inferior/lateral, linguagem
 leiga (nunca sigla RN/D na tela), Privacidade (família confirma profissional), painel
 da escola (só contagens), notificações tipadas, tema escuro e leitura facilitada
 (pares em `scripts/contraste.mjs`). Depois: R5 (E2E e provas). O diagrama de classes do artigo

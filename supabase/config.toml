@@ -218,7 +218,10 @@ web3 = 30
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.
-enable_signup = false
+# ATENÇÃO (achado no CI em 08/10/2026): no GoTrue, `false` aqui DESLIGA O PROVEDOR
+# de e-mail inteiro ("Email logins are disabled"). O bloqueio de autocadastro
+# (D-32: só convite) é o `[auth] enable_signup = false` acima.
+enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
