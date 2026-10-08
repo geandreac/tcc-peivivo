@@ -81,7 +81,7 @@ export function Observar() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Registrar observação" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhuma observação pode ser registrada até o responsável autorizar (RN01).</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhuma observação pode ser registrada até o responsável autorizar.</Alerta>
       </>
     );
   }

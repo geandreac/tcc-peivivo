@@ -47,6 +47,8 @@ export interface Vinculo {
   dataVinculo: string;
   status: StatusVinculo;
   registroConselho: string | null;
+  /** Nome da pessoa vinculada (D-34: o responsável vê quem tem acesso ao filho). */
+  nomeUsuario?: string;
 }
 
 export interface Consentimento {
@@ -140,7 +142,9 @@ export type EventoAuditoria =
   | "CICLO_FECHADO"
   | "EXPORTACAO"
   | "EXCLUSAO"
-  | "CADASTRO";
+  | "CADASTRO"
+  | "LEITURA_NOTA_CLINICA"
+  | "NOTA_CLINICA_REGISTRADA";
 
 export interface Auditoria {
   id: string;
@@ -148,6 +152,8 @@ export interface Auditoria {
   entidadeId: string;
   evento: EventoAuditoria;
   autorId: string | null;
+  /** Nome de quem fez (a RPC fn_listar_auditoria já devolve; "Sistema" quando automático). */
+  autorNome?: string;
   data: string;
   detalhes: Record<string, unknown>;
 }

@@ -305,3 +305,23 @@ describe("Reformulação R1 — regras alinhadas às políticas v3 (packages/pol
     await esperaNegado(api.validarVersao(versao.id, "APROVAR"), "CONFLITO");
   });
 });
+
+describe("Reformulação R4 — privacidade (D-30/D-34)", () => {
+  it("docente vê só o próprio vínculo; responsável vê todos, com nome", async () => {
+    await api.entrar(ID.docente);
+    expect(await api.listarVinculos(ID.estudanteA)).toHaveLength(1);
+    await api.entrar(ID.responsavel);
+    const todos = await api.listarVinculos(ID.estudanteA);
+    expect(todos.length).toBeGreaterThan(1);
+    expect(todos.every((v) => typeof v.nomeUsuario === "string")).toBe(true);
+  });
+  it("leitura de nota clínica entra na trilha: responsável vê quem leu; coordenação não vê o evento clínico", async () => {
+    await api.entrar(ID.profissional);
+    await api.listarNotasClinicas(ID.estudanteA);
+    await api.entrar(ID.responsavel);
+    const daFamilia = await api.listarAuditoria(ID.estudanteA);
+    expect(daFamilia.find((e) => e.evento === "LEITURA_NOTA_CLINICA")?.autorNome).toBe("Camila (fictícia)");
+    await api.entrar(ID.coordenacao);
+    expect((await api.listarAuditoria(ID.estudanteA)).some((e) => e.evento === "LEITURA_NOTA_CLINICA")).toBe(false);
+  });
+});

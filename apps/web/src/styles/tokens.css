@@ -11,6 +11,9 @@
   --cor-primaria-escura: #163b68;   /* 11,29:1 */
   --cor-primaria-tint: #e8eff8;     /* fundo suave; texto primário 7,24:1 */
   --cor-secundaria: #0f6e56;        /* 6,20:1 */
+  --cor-sobre-primaria: #ffffff;    /* texto sobre fundo primário */
+  --cor-sobre-erro: #ffffff;        /* texto sobre botão de perigo (6,57:1) */
+  --cor-erro-forte: #8b1a10;        /* hover do botão de perigo */
 
   /* --- neutros --- */
   --cor-texto: #1b1b1b;             /* 17,2:1 */
@@ -111,6 +114,83 @@
   --material-texto: #000000;
   --sombra-1: none;
   --sombra-2: none;
+}
+
+/* Tema escuro (R4.6): segue o sistema, a menos que a pessoa escolha "claro"
+   ou o alto contraste. Pares verificados em scripts/contraste.mjs. O material
+   adaptado continua claro: é a "folha" que o estudante lê (D-10). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]):not([data-contraste="alto"]) {
+    color-scheme: dark;
+    --cor-primaria: #9ec5ff;
+    --cor-primaria-escura: #c4dcff;
+    --cor-primaria-tint: #1c2a3d;
+    --cor-sobre-primaria: #0b1a2e;
+    --cor-secundaria: #6fd3b6;
+    --cor-texto: #eceff3;
+    --cor-texto-secundario: #b8c0cc;
+    --cor-fundo: #111418;
+    --cor-superficie: #1a1e24;
+    --cor-superficie-2: #252b34;
+    --cor-borda: #8a94a3;
+    --cor-borda-suave: #343b46;
+    --cor-desabilitado-texto: #9aa3ae;
+    --cor-desabilitado-fundo: #2a2f37;
+    --cor-sucesso: #7fd69a;
+    --cor-sucesso-fundo: #13261b;
+    --cor-aviso: #f2c46b;
+    --cor-aviso-fundo: #2b2210;
+    --cor-erro: #ff9b8f;
+    --cor-erro-fundo: #2d1614;
+    --cor-sobre-erro: #2d0b07;
+    --cor-erro-forte: #ffc2ba;
+    --cor-info: #9ec5ff;
+    --cor-info-fundo: #1c2a3d;
+    --cor-foco: #9ec5ff;
+    --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --sombra-2: 0 4px 12px rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-tema="escuro"]:not([data-contraste="alto"]) {
+  color-scheme: dark;
+  --cor-primaria: #9ec5ff;
+  --cor-primaria-escura: #c4dcff;
+  --cor-primaria-tint: #1c2a3d;
+  --cor-sobre-primaria: #0b1a2e;
+  --cor-secundaria: #6fd3b6;
+  --cor-texto: #eceff3;
+  --cor-texto-secundario: #b8c0cc;
+  --cor-fundo: #111418;
+  --cor-superficie: #1a1e24;
+  --cor-superficie-2: #252b34;
+  --cor-borda: #8a94a3;
+  --cor-borda-suave: #343b46;
+  --cor-desabilitado-texto: #9aa3ae;
+  --cor-desabilitado-fundo: #2a2f37;
+  --cor-sucesso: #7fd69a;
+  --cor-sucesso-fundo: #13261b;
+  --cor-aviso: #f2c46b;
+  --cor-aviso-fundo: #2b2210;
+  --cor-erro: #ff9b8f;
+  --cor-erro-fundo: #2d1614;
+  --cor-sobre-erro: #2d0b07;
+  --cor-erro-forte: #ffc2ba;
+  --cor-info: #9ec5ff;
+  --cor-info-fundo: #1c2a3d;
+  --cor-foco: #9ec5ff;
+  --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --sombra-2: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Leitura facilitada (R4.6, prompt §7.1.3): fonte de alta legibilidade
+   instalada no sistema (sem web font), mais espaço entre letras, palavras e linhas. */
+:root[data-leitura="facilitada"] {
+  --fonte-base: var(--fonte-leitura);
+  --altura-linha: 1.8;
+}
+:root[data-leitura="facilitada"] body {
+  letter-spacing: 0.03em;
+  word-spacing: 0.1em;
 }
 
 /* Preferência de tamanho de fonte (1.4.4 — além do zoom do navegador). */

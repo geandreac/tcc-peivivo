@@ -16,7 +16,7 @@ interface Linha {
 
 const ACAO_PRINCIPAL: Record<Papel, { rotulo: string; rota: (id: string) => string }> = {
   DOCENTE: { rotulo: "Gerar material", rota: (id) => `/estudantes/${id}/gerar` },
-  RESPONSAVEL: { rotulo: "Ver consentimento", rota: (id) => `/estudantes/${id}/consentimento` },
+  RESPONSAVEL: { rotulo: "Privacidade e autorização", rota: (id) => `/estudantes/${id}/privacidade` },
   PROFISSIONAL_SAUDE: { rotulo: "Validar parâmetros", rota: (id) => `/estudantes/${id}/validar` },
   COORDENACAO: { rotulo: "Ver histórico do PEI", rota: (id) => `/estudantes/${id}/historico` },
 };
@@ -88,8 +88,8 @@ export function Painel() {
       {consulta.dados && consulta.dados.length > 0 && (
         <Card titulo="Como funciona o acesso" nivel={3} className="nao-imprimir">
           <p className="meta">
-            Sem consentimento ativo do responsável, docente e profissional de saúde não leem nem escrevem nada sobre o estudante (RN01). O
-            responsável e a coordenação continuam vendo o histórico. A nota clínica é exclusiva do profissional de saúde (RN02).
+            Sem consentimento ativo do responsável, docente e profissional de saúde não leem nem escrevem nada sobre o estudante. O
+            responsável e a coordenação continuam vendo o histórico. A nota clínica é exclusiva do profissional de saúde.
           </p>
         </Card>
       )}

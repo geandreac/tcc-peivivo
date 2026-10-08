@@ -6,7 +6,7 @@
 /* ----------------------------------------------------------- Botão */
 .botao {
   --botao-fundo: var(--cor-primaria);
-  --botao-texto: #fff;
+  --botao-texto: var(--cor-sobre-primaria);
   --botao-borda: var(--cor-primaria);
   display: inline-flex;
   align-items: center;
@@ -45,10 +45,11 @@
 .botao--perigo {
   --botao-fundo: var(--cor-erro);
   --botao-borda: var(--cor-erro);
+  --botao-texto: var(--cor-sobre-erro);
 }
 .botao--perigo:hover {
-  --botao-fundo: #8b1a10;
-  --botao-borda: #8b1a10;
+  --botao-fundo: var(--cor-erro-forte);
+  --botao-borda: var(--cor-erro-forte);
 }
 .botao--discreto {
   --botao-fundo: transparent;
@@ -446,7 +447,7 @@ legend {
 .toast {
   pointer-events: auto;
   background: var(--cor-texto);
-  color: #fff;
+  color: var(--cor-fundo);
   padding: var(--esp-3) var(--esp-4);
   border-radius: var(--raio-md);
   box-shadow: var(--sombra-2);
@@ -463,8 +464,8 @@ legend {
 }
 .toast .botao {
   --botao-fundo: transparent;
-  --botao-borda: #fff;
-  --botao-texto: #fff;
+  --botao-borda: var(--cor-fundo);
+  --botao-texto: var(--cor-fundo);
   min-height: 2.25rem;
   padding-inline: var(--esp-3);
 }
@@ -703,7 +704,7 @@ dl.dados dd {
   height: 2rem;
   border-radius: 50%;
   background: var(--cor-primaria);
-  color: #fff;
+  color: var(--cor-sobre-primaria);
   font-weight: var(--peso-negrito);
   margin-bottom: var(--esp-2);
 }
@@ -765,7 +766,7 @@ dl.dados dd {
   height: 2.25rem;
   border-radius: 50%;
   background: var(--cor-primaria);
-  color: #fff;
+  color: var(--cor-sobre-primaria);
   font-size: 1.1rem;
   flex: none;
   vertical-align: middle;
@@ -816,4 +817,82 @@ ul.perfis {
 }
 .preferencias legend {
   padding-inline: var(--esp-2);
+}
+
+/* ---------------------------------------------------------------- privacidade (R4.3)
+   Selo discreto e matriz "quem vê o quê": o estado vem do ícone + texto, nunca só da cor. */
+.selo-privado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--raio-pill);
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso);
+  font-size: var(--tamanho-xs);
+  font-weight: var(--peso-medio);
+}
+.tabela-acessos th[scope="row"] {
+  background: transparent;
+  font-weight: var(--peso-medio);
+  min-width: 12rem;
+}
+.tabela-acessos td {
+  white-space: nowrap;
+}
+.tabela-acessos svg {
+  vertical-align: -3px;
+}
+.acesso--registra {
+  color: var(--cor-primaria-escura);
+  font-weight: var(--peso-medio);
+}
+.acesso--ve {
+  color: var(--cor-texto);
+}
+.acesso--nao {
+  color: var(--cor-texto-secundario);
+}
+.acessos-lista {
+  display: grid;
+  gap: var(--esp-3);
+}
+.acessos-lista__item {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-suave);
+  border-radius: var(--raio-lg);
+  padding: var(--esp-3) var(--esp-4);
+}
+.acessos-lista__item h3 {
+  font-size: var(--tamanho-sm);
+  margin: 0 0 var(--esp-2);
+}
+.acessos-lista__item ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.acessos-lista__item li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding-block: var(--esp-1);
+  border-top: 1px solid var(--cor-borda-suave);
+}
+.acessos-lista__item li:first-child {
+  border-top: 0;
+}
+.acessos-lista__item svg {
+  vertical-align: -3px;
+}
+.acessos-tabela {
+  display: none;
+}
+@media (min-width: 48em) {
+  .acessos-lista {
+    display: none;
+  }
+  .acessos-tabela {
+    display: block;
+  }
 }

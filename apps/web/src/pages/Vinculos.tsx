@@ -141,7 +141,7 @@ export function Vinculos() {
               ))}
             </fieldset>
             {papel === "PROFISSIONAL_SAUDE" && (
-              <Campo id="registro" rotulo="Registro no conselho profissional" dica="Ex.: CREFITO, CRFa, CRP. Obrigatório para profissional de saúde (D-13)." required value={registro} onChange={(e) => setRegistro(e.target.value)} erro={erros.find((x) => x.campo === "registro")?.mensagem ?? null} />
+              <Campo id="registro" rotulo="Registro no conselho profissional" dica="Ex.: CREFITO, CRFa, CRP. Obrigatório para profissional de saúde." required value={registro} onChange={(e) => setRegistro(e.target.value)} erro={erros.find((x) => x.campo === "registro")?.mensagem ?? null} />
             )}
             <div className="grupo-botoes">
               <Botao type="submit" carregando={vincular.ocupado} textoCarregando="Vinculando…">

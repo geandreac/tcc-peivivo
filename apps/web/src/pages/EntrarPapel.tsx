@@ -116,7 +116,7 @@ export function EntrarPapel() {
             <li key={a}>{a}</li>
           ))}
         </ul>
-        <p className="meta">A autenticação por e-mail e senha (Supabase Auth) substitui esta tela sem alterar o restante do sistema (D-16).</p>
+        <p className="meta">A autenticação por e-mail e senha (Supabase Auth) substitui esta tela sem alterar o restante do sistema.</p>
       </Card>
 
       <div className="grupo-botoes">

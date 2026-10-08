@@ -100,4 +100,26 @@ export const EVENTO: Record<EventoAuditoria, string> = {
   EXPORTACAO: "Dados exportados",
   EXCLUSAO: "Dados excluídos",
   CADASTRO: "Estudante cadastrado",
+  LEITURA_NOTA_CLINICA: "Notas clínicas lidas pelo profissional",
+  NOTA_CLINICA_REGISTRADA: "Nota clínica registrada",
 };
+
+/**
+ * Perfil em linguagem leiga (prompt §7.2, UX-04): para família, docente e
+ * coordenação, os parâmetros viram frases sobre o material — nunca siglas
+ * nem números soltos. O profissional de saúde vê a forma técnica (PARAMETRO).
+ */
+export function descreverPerfil(p: ParametrosAdaptacao): string[] {
+  const frases = [
+    `Textos em trechos curtos, de até ${p.maxLinhasPorBloco} linhas.`,
+    p.formatoEnunciado === "ETAPA_UNICA" ? "Uma instrução por vez, em passos numerados." : "Instruções podem ter mais de uma etapa.",
+    { BASICO: "Palavras simples; termos difíceis vêm explicados.", INTERMEDIARIO: "Vocabulário do dia a dia, com poucas palavras difíceis.", ORIGINAL: "Vocabulário do texto original." }[p.nivelVocabulario],
+    `No máximo ${p.blocosPorMaterial} trechos por atividade, para não cansar.`,
+    p.contrasteMinimo === 7 ? "Letras bem escuras sobre fundo claro (contraste reforçado)." : "Contraste de leitura padrão.",
+  ];
+  if (p.interesseAncora) frases.push(`Exemplos ligados a um tema de interesse: ${p.interesseAncora}.`);
+  return frases;
+}
+
+export const EXPLICA_RITMO_PERFIL =
+  "O perfil descreve o que funciona, não um diagnóstico. Ele só fica mais exigente depois de duas quinzenas seguidas de melhora; quando há dificuldade, se ajusta na hora.";

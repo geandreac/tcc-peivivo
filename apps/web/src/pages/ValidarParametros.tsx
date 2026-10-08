@@ -65,7 +65,7 @@ export function ValidarParametros() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Validar parâmetros" />
-        <Alerta tom="info" titulo="Só o profissional de saúde valida">A validação clínica incide sobre o conjunto de parâmetros do ciclo (RF06, RN07).</Alerta>
+        <Alerta tom="info" titulo="Só o profissional de saúde valida">A validação clínica incide sobre o conjunto de parâmetros do ciclo.</Alerta>
       </>
     );
   }
@@ -73,7 +73,7 @@ export function ValidarParametros() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Validar parâmetros" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Os dados deste estudante não estão disponíveis (RN01/RN08).</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">Os dados deste estudante não estão disponíveis.</Alerta>
       </>
     );
   }

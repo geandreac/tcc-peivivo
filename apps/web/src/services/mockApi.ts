@@ -153,7 +153,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
   /** D-11: escrita exige consentimento ATIVO (RN01/RN08). */
   function exigirConsentimento(estudanteId: string) {
     if (!temConsentimento(estudanteId)) {
-      throw new ErroApi("NEGADO", "Sem consentimento ativo do responsável, nenhuma escrita nem geração é permitida (RN01).");
+      throw new ErroApi("NEGADO", "Sem consentimento ativo do responsável, nenhuma escrita nem geração é permitida.");
     }
   }
 
@@ -272,8 +272,11 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const p = meuPapel(estudanteId);
         if (!p) throw new ErroApi("NEGADO", "Você não está vinculado a este estudante.");
         const u = eu();
-        // coordenação vê todos; demais só os próprios (matriz v2)
-        return estado.vinculos.filter((v) => v.estudanteId === estudanteId && (p === "COORDENACAO" || v.usuarioId === u.id));
+        // D-34: coordenação e responsável veem todos (quem tem acesso); demais só o próprio
+        const nome = (id: string) => estado.usuarios.find((x) => x.id === id)?.nome ?? "Pessoa vinculada";
+        return estado.vinculos
+          .filter((v) => v.estudanteId === estudanteId && (p === "COORDENACAO" || p === "RESPONSAVEL" || v.usuarioId === u.id))
+          .map((v) => ({ ...v, nomeUsuario: nome(v.usuarioId) }));
       }),
     listarUsuarios: () =>
       chamada(() => {
@@ -283,7 +286,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
     cadastrarEstudante: (dados) =>
       chamada(() => {
         const u = eu();
-        if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "Só a coordenação cadastra estudantes (D-08).");
+        if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "Só a coordenação cadastra estudantes.");
         validarEstudante(dados);
         const novo: Estudante = {
           id: uuid(),
@@ -304,10 +307,10 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         exigirPapel(dados.estudanteId, "COORDENACAO");
         if (!estado.usuarios.some((x) => x.id === dados.usuarioId)) throw new ErroApi("NAO_ENCONTRADO", "Usuário não encontrado.");
         if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim()) {
-          throw new ErroApi("VALIDACAO", "Profissional de saúde precisa do registro no conselho (D-13).");
+          throw new ErroApi("VALIDACAO", "Profissional de saúde precisa do registro no conselho.");
         }
         if (estado.vinculos.some((v) => v.usuarioId === dados.usuarioId && v.estudanteId === dados.estudanteId && v.status === "ATIVO")) {
-          throw new ErroApi("CONFLITO", "Esta pessoa já tem um vínculo ativo com o estudante (D-14).");
+          throw new ErroApi("CONFLITO", "Esta pessoa já tem um vínculo ativo com o estudante.");
         }
         const v: Vinculo = { id: uuid(), usuarioId: dados.usuarioId, estudanteId: dados.estudanteId, papel: dados.papel, dataVinculo: agora(), status: "ATIVO", registroConselho: dados.registroConselho?.trim() || null };
         estado.vinculos.push(v);
@@ -618,8 +621,10 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       chamada(() => {
         const p = meuPapel(estudanteId);
         if (p !== "PROFISSIONAL_SAUDE") {
-          throw new ErroApi("NEGADO", "Nota clínica reservada: acesso exclusivo do profissional de saúde vinculado (RN02).");
+          throw new ErroApi("NEGADO", "Nota clínica reservada: acesso exclusivo do profissional de saúde vinculado.");
         }
+        registrarAuditoria("notas_clinicas", estudanteId, "LEITURA_NOTA_CLINICA"); // D-30: toda leitura vira evento
+        salvar();
         return estado.notas.filter((n) => n.estudanteId === estudanteId).sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro));
       }),
     registrarNotaClinica: (estudanteId, conteudo) =>
@@ -628,6 +633,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         if (!conteudo.trim()) throw new ErroApi("VALIDACAO", "Escreva o conteúdo da nota.");
         const n: NotaClinica = { id: uuid(), estudanteId, profissionalId: eu().id, conteudo: conteudo.trim(), dataRegistro: agora() };
         estado.notas.push(n);
+        registrarAuditoria("notas_clinicas", estudanteId, "NOTA_CLINICA_REGISTRADA");
         salvar();
         return n;
       }),
@@ -644,7 +650,12 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
           ...estado.vinculos.filter((v) => v.estudanteId === estudanteId).map((v) => v.id),
           ...estado.ciclos.filter((c) => c.estudanteId === estudanteId).map((c) => c.id),
         ]);
-        return estado.auditoria.filter((a) => idsFilhos.has(a.entidadeId)).sort((a, b) => b.data.localeCompare(a.data));
+        const papel = meuPapel(estudanteId);
+        const CLINICOS: EventoAuditoria[] = ["LEITURA_NOTA_CLINICA", "NOTA_CLINICA_REGISTRADA"];
+        return estado.auditoria
+          .filter((a) => idsFilhos.has(a.entidadeId) && (papel === "RESPONSAVEL" || !CLINICOS.includes(a.evento)))
+          .map((a) => ({ ...a, autorNome: estado.usuarios.find((x) => x.id === a.autorId)?.nome ?? "Sistema" }))
+          .sort((a, b) => b.data.localeCompare(a.data));
       }),
     exportarDados: (estudanteId) =>
       chamada(() => {
