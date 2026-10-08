@@ -88,6 +88,29 @@ jobs:
         working-directory: supabase/functions
         run: deno check gerar-material/index.ts fechar-ciclo/index.ts
 
+  e2e:
+    # R5.1: navegador real (Chromium) em 390 e 1280 px; axe com contraste renderizado;
+    # acesso indevido por URL; medição do fluxo de observação (R4.8).
+    name: e2e (Playwright + axe com contraste real)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run test:e2e
+        env:
+          CI: "true"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: relatorio-e2e
+          path: apps/web/playwright-report
+
   web:
     name: apps/web (typecheck + Vitest/axe + build + contraste)
     runs-on: ubuntu-latest

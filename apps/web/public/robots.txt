@@ -1,0 +1,3 @@
+# PEI Vivo: sistema com dados de estudantes. Nenhuma página deve ser indexada.
+User-agent: *
+Disallow: /

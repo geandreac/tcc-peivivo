@@ -24,7 +24,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
-    "db:validar": "node scripts/validar-migrations.mjs"
+    "db:validar": "node scripts/validar-migrations.mjs",
+    "test:e2e": "npm run test:e2e -w apps/web"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
