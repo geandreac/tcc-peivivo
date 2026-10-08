@@ -1,6 +1,6 @@
 # PEI Vivo — Análise de requisitos por perfil de usuário
 
-**Versão:** 1.1 — 14/09/2026 (v1.0 em 10/09; D-14…D-18 e §11 adicionados)
+**Versão:** 1.2 — 07/10/2026 (D-19…D-39 da reformulação; v1.1 em 14/09; v1.0 em 10/09)
 **Fontes:** pré-projeto (`docs/tcc/TCC - Geandre & Jean.md`), mapeamento dos slides
 (`docs/tcc/PEI_Vivo_Slides_Mapeamento.md`), diagramas de casos de uso, classes e
 sequência (`docs/tcc/*.svg`), foto do quadro com o formato de rastreabilidade
@@ -335,6 +335,39 @@ foram implementados agora porque a tela de geração precisa da camada
 determinística real para ser um protótipo funcional (e não uma tela com texto
 falso). O motor continua puro e isomórfico; `gerar-material` (P3.4–P3.8) vai
 importá-lo sem alteração.
+
+### D-19…D-39 · Reformulação (07/10/2026)
+
+Decisões da reformulação, detalhadas como ADR em `docs/reformulacao/DECISOES.md`
+(evidência em `docs/reformulacao/AUDITORIA.md`: 25 de 31 ataques passavam nas
+policies `0002`). Aprovadas pela dupla em 07/10/2026.
+
+| D | ADR | Decisão (resumo) | Substitui/ajusta |
+|---|---|---|---|
+| D-19 | ADR-00 | Trilha mínima defensável até 26/11 (banco que nega → auth real → EFs → UX alta → E2E) | plano §2–§8 |
+| D-20 | ADR-01 | Tabelas que definem acesso de outra pessoa (`consentimentos`, `vinculos`, `versoes_perfil`, `estudantes`, `auditoria`, `convites`) só são escritas por RPC/EF; nenhuma policy `for all` | — |
+| D-21 | ADR-02 | Um papel por pessoa por estudante em vínculo não encerrado; `fn_meu_papel` sem `limit 1`, com `search_path` fixo; `fn_tem_papel` | confirma D-14 |
+| D-22 | ADR-03 | Sem seletor global de contexto; início agrupado por papel; rotas por estudante + `/escola` | — |
+| D-23 | ADR-04 | Escola mínima: `escolas`, `estudantes.escola_id`, `membros_escola` (COORDENACAO/DOCENTE); 1º coordenador por script | substitui D-08 (`papel_institucional`) |
+| D-24 | ADR-05 | Profissional: proposta (coordenação/responsável) → **confirmação do responsável**; registro de conselho com verificação manual; ninguém vincula a si mesmo | — |
+| D-25 | ADR-06 | Vários responsáveis: qualquer um revoga; reconcessão notifica os demais; exclusão exige todos; vínculo conferido presencialmente antes do convite | — |
+| D-26 | ADR-07 | Laudo continua fora do sistema | confirma D-01 |
+| D-27 | ADR-08 | Consentimento com escopos efetivos, versão do termo, só via RPC, sem `delete`; oráculo de consentimento fechado | ajusta D-06/D-11 |
+| D-28 | ADR-09 | Notificações no app (tipadas, sem texto livre); e-mail só convite/recuperação | ajusta D-07 |
+| D-29 | ADR-10 | Estudante sem conta; service worker só do shell; nenhum dado de estudante em cache/armazenamento do navegador | — |
+| D-30 | ADR-11 | `auditoria` append-only; leitura de nota clínica só via RPC auditada; responsável vê quem leu | ajusta D-06 |
+| D-31 | ADR-12 | Frontend evolui (tokens, Lucide, tema escuro, nav inferior, Zod compartilhado); sem reescrita de stack | confirma D-15 |
+| D-32 | ADR-13 | Só convite; senha ≥ 10; TOTP obrigatório (aal2 no banco) para saúde e coordenação; papel nunca no JWT | substitui D-16 ao fim do R2 |
+| D-33 | ADR-14 | Colunas sensíveis por GRANT de coluna + RPC (`laudo_apresentado_em`, `registro_conselho`) | — |
+| D-34 | ADR-15 | Matriz de permissões v3 (rascunho só do autor; confirmação do responsável; auditoria administrativa) | substitui matriz v2 (§6) |
+| D-35 | ADR-16 | Uma versão `VIGENTE` por estudante; `SUBSTITUIDA`; parâmetros imutáveis; ajuste = nova versão | ajusta D-07/D-09 |
+| D-36 | ADR-17 | Vínculos `ENCERRADO` por data; transferência entre escolas fora do escopo | — |
+| D-37 | ADR-18 | `gerar-material` e `fechar-ciclo` como únicas escritas de material/versão; decisão de material via RPC | ajusta D-09 |
+| D-38 | ADR-19 | RN05 por `fn_expirar_validacoes(agora)` + `pg_cron` (condicional) | ajusta D-07 |
+| D-39 | ADR-20 | IA desligada na trilha mínima; regras de prompt injection documentadas | — |
+
+**Restrição de ambiente (07/10/2026):** a máquina de desenvolvimento não roda
+Docker. Banco validado localmente em PGlite; Supabase real só no CI.
 
 ---
 
