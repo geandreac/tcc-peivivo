@@ -211,7 +211,7 @@ export function Consentimento() {
       </Modal>
 
       <p className="meta">
-        Quem escreve aqui: {PAPEL.RESPONSAVEL}. Quem lê: todos os vinculados (para saber se podem operar).
+        Só o {PAPEL.RESPONSAVEL.toLowerCase()} autoriza ou retira a autorização. A trilha acima só você e a coordenação veem; os demais vinculados sabem apenas se a autorização está ativa.
       </p>
     </>
   );

@@ -52,6 +52,29 @@ export function Acessibilidade() {
 
       <div className="preferencias">
         <Opcoes
+          chave="tema"
+          legenda="Aparência"
+          descricao="O tema escuro cansa menos a vista à noite. Todos os textos mantêm contraste acima de 7:1."
+          opcoes={[
+            { valor: "sistema", rotulo: "Igual ao meu dispositivo" },
+            { valor: "claro", rotulo: "Claro" },
+            { valor: "escuro", rotulo: "Escuro" },
+          ]}
+          prefs={prefs}
+          definir={definir}
+        />
+        <Opcoes
+          chave="leitura"
+          legenda="Leitura"
+          descricao="Para quem prefere letras mais abertas e mais espaço entre letras, palavras e linhas — útil, por exemplo, com dislexia."
+          opcoes={[
+            { valor: "padrao", rotulo: "Padrão" },
+            { valor: "facilitada", rotulo: "Leitura facilitada", descricao: "Fonte de alta legibilidade e espaçamento maior" },
+          ]}
+          prefs={prefs}
+          definir={definir}
+        />
+        <Opcoes
           chave="contraste"
           legenda="Contraste"
           descricao="O padrão já atende 4,5:1 (WCAG AA). O alto contraste leva todos os textos acima de 9:1."

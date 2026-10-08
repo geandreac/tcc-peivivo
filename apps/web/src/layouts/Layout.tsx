@@ -3,6 +3,16 @@ import { useSessao } from "../hooks/useSessao";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { Toasts } from "../components/Toasts";
 import { PAPEL } from "../utils/rotulos";
+import { Accessibility, Bell, CircleHelp, ClipboardCheck, LogOut, UsersRound, type LucideIcon } from "lucide-react";
+import { api } from "../services";
+import { useConsulta } from "../hooks/useConsulta";
+
+const ITENS_NAV: { rota: string; rotulo: string; Icone: LucideIcon }[] = [
+  { rota: "/painel", rotulo: "Estudantes", Icone: UsersRound },
+  { rota: "/pendencias", rotulo: "Pendências", Icone: ClipboardCheck },
+  { rota: "/ajuda", rotulo: "Ajuda", Icone: CircleHelp },
+  { rota: "/acessibilidade", rotulo: "Acessibilidade", Icone: Accessibility },
+];
 
 function Logo() {
   return (
@@ -25,13 +35,18 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Contagem de não lidas: recarrega a cada troca de tela (sem polling, sem push).
+  const naoLidas = useConsulta<number>(
+    async () => (usuario ? (await api.listarNotificacoes()).filter((n) => !n.lidaEm).length : 0),
+    [usuario?.id, location.pathname]
+  );
+  const contagem = naoLidas.dados ?? 0;
+
   async function aoSair() {
     await sair();
     anunciar("Você saiu da sua conta.", "neutro");
     navigate("/");
   }
-
-  const papelInstitucional = usuario?.papelInstitucional === "COORDENACAO";
 
   return (
     <>
@@ -44,63 +59,72 @@ export function Layout() {
             <Logo />
             <span>PEI Vivo</span>
           </NavLink>
-          <nav className="nav-principal" aria-label="Principal">
-            <ul>
-              {usuario ? (
-                <>
-                  <li>
-                    <NavLink to="/painel">Meus estudantes</NavLink>
-                  </li>
-                  {papelInstitucional && (
-                    <li>
-                      <NavLink to="/coordenacao/cadastrar">Cadastrar estudante</NavLink>
-                    </li>
-                  )}
-                  <li>
-                    <NavLink to="/pendencias">Pendências</NavLink>
-                  </li>
-                </>
-              ) : (
+          {usuario ? (
+            <div className="sessao">
+              <NavLink to="/notificacoes" className="sino" aria-label={contagem > 0 ? `Notificações, ${contagem} não lida${contagem > 1 ? "s" : ""}` : "Notificações"}>
+                <Bell aria-hidden="true" size={22} />
+                {contagem > 0 && (
+                  <span className="sino__contagem" aria-hidden="true">
+                    {contagem > 9 ? "9+" : contagem}
+                  </span>
+                )}
+              </NavLink>
+              <span className="sessao__nome">
+                <strong>{usuario.nome}</strong>
+                {usuario.papelInstitucional && <span className="sessao__papel">{PAPEL[usuario.papelInstitucional]}</span>}
+              </span>
+              <button type="button" className="botao botao--discreto botao--pequeno" onClick={aoSair}>
+                <LogOut aria-hidden="true" size={18} />
+                Sair
+              </button>
+            </div>
+          ) : (
+            <nav className="nav-publica" aria-label="Principal">
+              <ul>
                 <li>
                   <NavLink to="/" end>
                     Início
                   </NavLink>
                 </li>
-              )}
-              <li>
-                <NavLink to="/ajuda">Ajuda</NavLink>
-              </li>
-              <li>
-                <NavLink to="/acessibilidade">Acessibilidade</NavLink>
-              </li>
-              {!usuario && (
+                <li>
+                  <NavLink to="/ajuda">Ajuda</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/acessibilidade">Acessibilidade</NavLink>
+                </li>
                 <li>
                   <NavLink to="/entrar" state={{ de: location.pathname }}>
                     Entrar
                   </NavLink>
                 </li>
-              )}
-            </ul>
-          </nav>
-          {usuario && (
-            <div className="sessao">
-              <span>
-                <strong>{usuario.nome}</strong>
-                {usuario.papelInstitucional && <> · {PAPEL[usuario.papelInstitucional]}</>}
-              </span>
-              <button type="button" className="botao botao--discreto botao--pequeno" onClick={aoSair}>
-                Sair
-              </button>
-            </div>
+              </ul>
+            </nav>
           )}
         </div>
       </header>
 
-      <main id="conteudo" tabIndex={-1}>
-        <div className="container">
-          <Outlet />
-        </div>
-      </main>
+      <div className={usuario ? "app app--com-nav" : "app"}>
+        {usuario && (
+          /* Um único <nav>: lateral no desktop, barra inferior no celular (prompt §7.1). Só o CSS muda. */
+          <nav className="nav-app" aria-label="Principal">
+            <ul>
+              {ITENS_NAV.map(({ rota, rotulo, Icone }) => (
+                <li key={rota}>
+                  <NavLink to={rota}>
+                    <Icone aria-hidden="true" size={22} strokeWidth={2} />
+                    <span>{rotulo}</span>
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+        <main id="conteudo" tabIndex={-1}>
+          <div className="container">
+            <Outlet />
+          </div>
+        </main>
+      </div>
 
       <footer className="rodape">
         <div className="container">

@@ -268,7 +268,7 @@ begin
      or new.estudante_id is distinct from old.estudante_id
      or new.numero_ciclo is distinct from old.numero_ciclo
      or new.origem is distinct from old.origem then
-    raise exception 'Parâmetros de uma versão de perfil são imutáveis; um ajuste cria nova versão (D-35).'
+    raise exception 'Parâmetros de uma versão de perfil são imutáveis; um ajuste cria nova versão.'
       using errcode = 'PT409';
   end if;
   return new;
@@ -294,10 +294,10 @@ begin
   end if;
   if tg_op = 'INSERT' then
     if v.status_validacao <> 'VIGENTE' then
-      raise exception 'Material só é gerado com a versão de perfil VIGENTE (RN05).' using errcode = 'PT409'; -- S-21
+      raise exception 'Material só é gerado com a versão de perfil VIGENTE.' using errcode = 'PT409'; -- S-21
     end if;
     if new.status_aprovacao <> 'RASCUNHO' then
-      raise exception 'Material nasce como rascunho (RN04).' using errcode = '22023';
+      raise exception 'Material nasce como rascunho.' using errcode = '22023';
     end if;
   else
     if new.texto_original is distinct from old.texto_original
@@ -373,7 +373,7 @@ language plpgsql stable security definer set search_path = '' as $$
 begin
   if not (privado.tem_papel(p_estudante, 'RESPONSAVEL', 'PROFISSIONAL_SAUDE')
           or privado.coordena_estudante(p_estudante)) then
-    raise exception 'Informação não disponível para o seu papel (D-01).' using errcode = '42501';
+    raise exception 'Informação não disponível para o seu papel.' using errcode = '42501';
   end if;
   return (select e.laudo_apresentado_em from public.estudantes e where e.id = p_estudante);
 end $$;
@@ -431,7 +431,7 @@ begin
   elsif p_papel = 'RESPONSAVEL' then
     if not v_coord then raise exception 'Só a coordenação vincula responsáveis.' using errcode = '42501'; end if;
     if not p_conferido_presencialmente then
-      raise exception 'Confirme que o vínculo legal foi conferido presencialmente com documento (D-25).' using errcode = '22023';
+      raise exception 'Confirme que o vínculo legal foi conferido presencialmente com documento.' using errcode = '22023';
     end if;
     v_status := 'ATIVO';
   elsif p_papel = 'PROFISSIONAL_SAUDE' then
@@ -461,7 +461,7 @@ begin
        case when p_papel = 'RESPONSAVEL' then now() end)
     returning id into v_id;
   exception when unique_violation then
-    raise exception 'Esta pessoa já tem um vínculo com o estudante (D-21).' using errcode = 'PT409';
+    raise exception 'Esta pessoa já tem um vínculo com o estudante.' using errcode = 'PT409';
   end;
   return v_id;
 end $$;
@@ -534,7 +534,7 @@ declare
   v_id uuid;
 begin
   if not privado.tem_papel(p_estudante, 'RESPONSAVEL') then
-    raise exception 'Só o responsável legal do estudante concede o consentimento (RN01).' using errcode = '42501';
+    raise exception 'Só o responsável legal do estudante concede o consentimento.' using errcode = '42501';
   end if;
   if coalesce(cardinality(p_escopos), 0) = 0 then
     raise exception 'Escolha ao menos um escopo.' using errcode = '22023';
@@ -560,7 +560,7 @@ declare
   v_id uuid;
 begin
   if not privado.tem_papel(p_estudante, 'RESPONSAVEL') then
-    raise exception 'Só o responsável legal revoga o consentimento (RN08).' using errcode = '42501';
+    raise exception 'Só o responsável legal revoga o consentimento.' using errcode = '42501';
   end if;
   update public.consentimentos
      set status = 'REVOGADO', data_revogacao = now(), revogado_por = privado.usuario_atual()
@@ -589,7 +589,7 @@ begin
     raise exception 'Só o profissional de saúde vinculado, com verificação em duas etapas, valida parâmetros.' using errcode = '42501';
   end if;
   if not privado.tem_escopo(v.estudante_id, 'validacao_clinica') then
-    raise exception 'Sem consentimento ativo para validação clínica (RN01/RN08).' using errcode = '42501';
+    raise exception 'Sem consentimento ativo para validação clínica.' using errcode = '42501';
   end if;
   if v.status_validacao <> 'PENDENTE' then
     raise exception 'Só versões pendentes podem ser decididas (expiradas não voltam, RN05).' using errcode = 'PT409';
@@ -650,7 +650,7 @@ begin
   end if;
   if p_decisao = 'APROVAR' then
     if not privado.tem_escopo(m.estudante_id, 'geracao_material') then
-      raise exception 'A família retirou a autorização; este rascunho não pode ser usado (RN08).' using errcode = '42501'; -- S-28
+      raise exception 'A família retirou a autorização; este rascunho não pode ser usado.' using errcode = '42501'; -- S-28
     end if;
     update public.materiais_adaptados
        set status_aprovacao = 'APROVADO', texto_revisado = nullif(trim(p_texto_revisado), ''), decidido_em = now()

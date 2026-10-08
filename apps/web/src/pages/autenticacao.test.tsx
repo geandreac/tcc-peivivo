@@ -13,14 +13,14 @@ import { ID } from "../mocks/dados";
 import { api } from "../services";
 
 describe("Login por perfil (TF-41…TF-43)", () => {
-  it("família: entra por /entrar/familia e o painel oferece 'Ver consentimento'", async () => {
+  it("família: entra por /entrar/familia e o painel oferece 'Privacidade e autorização'", async () => {
     const { container } = await renderizarApp("/entrar/familia");
     expect(await screen.findByRole("heading", { level: 1, name: /Entrar como família/ })).toBeInTheDocument();
     await semViolacoesAxe(container);
     await userEvent.click(await screen.findByRole("button", { name: /Rosa/ }));
     expect(await screen.findByRole("heading", { level: 1, name: "Meus estudantes" })).toBeInTheDocument();
     const lista = await screen.findByRole("list", { name: "Estudantes" });
-    expect(within(lista).getAllByRole("link", { name: "Ver consentimento" }).length).toBeGreaterThan(0);
+    expect(within(lista).getAllByRole("link", { name: "Privacidade e autorização" }).length).toBeGreaterThan(0);
     expect(within(lista).queryByRole("link", { name: "Gerar material" })).not.toBeInTheDocument();
     expect(api.usuarioAtual()?.id).toBe(ID.responsavel);
     await semViolacoesAxe(container);
@@ -35,19 +35,20 @@ describe("Login por perfil (TF-41…TF-43)", () => {
     await semViolacoesAxe(container);
   });
 
-  it("coordenação: entra por /entrar/coordenacao; só ela vê 'Cadastrar estudante' no menu", async () => {
+  it("coordenação: entra por /entrar/coordenacao; só ela recebe a ação 'Cadastrar estudante'", async () => {
     const { container } = await renderizarApp("/entrar/coordenacao");
     await userEvent.click(await screen.findByRole("button", { name: /Coordenação/ }));
     expect(await screen.findByRole("heading", { level: 1, name: "Meus estudantes" })).toBeInTheDocument();
-    const nav = screen.getByRole("navigation", { name: "Principal" });
-    expect(within(nav).getByRole("link", { name: "Cadastrar estudante" })).toBeInTheDocument();
+    // ADR-03: ação da coordenação fica na tela de estudantes, não na navegação global
+    expect(within(screen.getByRole("main")).getByRole("link", { name: "Cadastrar estudante" })).toBeInTheDocument();
     await semViolacoesAxe(container);
   });
 
-  it("docente não vê 'Cadastrar estudante' no menu e, pela URL direta, recebe o motivo da negação", async () => {
+  it("docente não recebe 'Cadastrar estudante' e, pela URL direta, recebe o motivo da negação", async () => {
+    await renderizarApp("/painel", ID.docente);
+    expect(await screen.findByRole("heading", { level: 1, name: "Meus estudantes" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Cadastrar estudante" })).not.toBeInTheDocument();
     await renderizarApp("/coordenacao/cadastrar", ID.docente);
-    const nav = screen.getByRole("navigation", { name: "Principal" });
-    expect(within(nav).queryByRole("link", { name: "Cadastrar estudante" })).not.toBeInTheDocument();
     expect(await screen.findByText("Só a coordenação pedagógica cadastra estudantes")).toBeInTheDocument();
   });
 });

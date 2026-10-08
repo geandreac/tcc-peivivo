@@ -43,7 +43,7 @@ begin
     raise exception 'Só o docente vinculado fecha o ciclo.' using errcode = '42501';
   end if;
   if not privado.tem_escopo(c.estudante_id, 'observacao_pedagogica') then
-    raise exception 'Sem consentimento ativo para observação pedagógica (RN01/RN08).' using errcode = '42501';
+    raise exception 'Sem consentimento ativo para observação pedagógica.' using errcode = '42501';
   end if;
   if c.status <> 'ABERTO' then
     raise exception 'Este ciclo já foi fechado.' using errcode = 'PT409';
@@ -129,10 +129,10 @@ declare
   v public.versoes_perfil;
 begin
   if not privado.tem_papel(p_estudante, 'DOCENTE') then
-    raise exception 'Só o docente vinculado gera material (D-02).' using errcode = '42501';
+    raise exception 'Só o docente vinculado gera material.' using errcode = '42501';
   end if;
   if not privado.tem_escopo(p_estudante, 'geracao_material') then
-    raise exception 'A família não autorizou a geração de material (RN01/RN08).' using errcode = '42501';
+    raise exception 'A família não autorizou a geração de material.' using errcode = '42501';
   end if;
   select * into v from public.versoes_perfil where estudante_id = p_estudante and status_validacao = 'VIGENTE';
   if v.id is null then
@@ -157,14 +157,14 @@ declare
   v_id uuid;
 begin
   if not privado.docente_ativo(p_docente, p_estudante) or not privado.tem_escopo(p_estudante, 'geracao_material') then
-    raise exception 'Geração negada: docente sem vínculo ativo ou sem consentimento (RN01/RN08).' using errcode = '42501';
+    raise exception 'Geração negada: docente sem vínculo ativo ou sem consentimento.' using errcode = '42501';
   end if;
   if not exists (select 1 from public.versoes_perfil v
                   where v.id = p_versao and v.estudante_id = p_estudante and v.status_validacao = 'VIGENTE') then
-    raise exception 'A versão de perfil não é mais a vigente; gere de novo (RN05).' using errcode = 'PT409';
+    raise exception 'A versão de perfil não é mais a vigente; gere de novo.' using errcode = 'PT409';
   end if;
   if p_ia_aplicada and not privado.validacao_clinica_ativa(p_estudante) then
-    raise exception 'IA só com profissional de saúde vinculado e autorizado (RN06).' using errcode = '42501';
+    raise exception 'IA só com profissional de saúde vinculado e autorizado.' using errcode = '42501';
   end if;
   -- Cache (P3.5): mesmo docente + estudante + versão + texto → mesmo rascunho.
   select m.id into v_id from public.materiais_adaptados m

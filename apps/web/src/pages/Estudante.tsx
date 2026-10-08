@@ -5,7 +5,7 @@ import { useConsulta } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";
 import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
 import { LinkBotao } from "../components/Botao";
-import { PARAMETRO, STATUS_APROVACAO, STATUS_VALIDACAO } from "../utils/rotulos";
+import { EXPLICA_RITMO_PERFIL, PARAMETRO, STATUS_APROVACAO, STATUS_VALIDACAO, descreverPerfil } from "../utils/rotulos";
 import { formatarData, formatarDataHora, idade } from "../utils/datas";
 import type { ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 
@@ -16,7 +16,16 @@ interface Dados {
   materiais: Material[];
 }
 
-export function ParametrosLista({ parametros }: { parametros: ParametrosAdaptacao }) {
+export function ParametrosLista({ parametros, tecnico = true }: { parametros: ParametrosAdaptacao; tecnico?: boolean }) {
+  if (!tecnico) {
+    return (
+      <ul className="lista-perfil">
+        {descreverPerfil(parametros).map((f) => (
+          <li key={f}>{f}</li>
+        ))}
+      </ul>
+    );
+  }
   const campos = Object.keys(PARAMETRO) as (keyof ParametrosAdaptacao)[];
   return (
     <dl className="dados">
@@ -92,8 +101,8 @@ export function Estudante() {
             {papel === "RESPONSAVEL"
               ? "Nenhum perfil é criado e nenhum material é gerado sem a sua autorização. Leia o termo e decida."
               : consentimento?.status === "REVOGADO"
-                ? `O responsável revogou o consentimento em ${formatarData(consentimento.dataRevogacao)}. Nada pode ser lido ou escrito até uma nova autorização (RN08).`
-                : "Nada pode ser lido ou escrito sobre este estudante até o responsável autorizar (RN01)."}
+                ? `O responsável revogou o consentimento em ${formatarData(consentimento.dataRevogacao)}. Nada pode ser lido ou escrito até uma nova autorização.`
+                : "Nada pode ser lido ou escrito sobre este estudante até o responsável autorizar."}
           </p>
           {papel === "RESPONSAVEL" && (
             <div className="grupo-botoes">
@@ -108,6 +117,12 @@ export function Estudante() {
       <div className="grade-cards grade-cards--3">
         {papel === "RESPONSAVEL" && (
           <>
+            <Card titulo="Privacidade" nivel={3} className="card--acao">
+              <p>Quem tem acesso, o que cada pessoa vê e quem acessou o quê. Você controla isso.</p>
+              <LinkBotao to={`/estudantes/${estudante.id}/privacidade`} pequeno>
+                Abrir privacidade
+              </LinkBotao>
+            </Card>
             <Card titulo="Consentimento" nivel={3} className="card--acao">
               <p>Veja o termo, o que está autorizado e a trilha de auditoria. Você pode revogar quando quiser.</p>
               <LinkBotao to={`/estudantes/${estudante.id}/consentimento`} variante="secundario" pequeno>
@@ -225,9 +240,9 @@ export function Estudante() {
                 </span>
                 {pendente && <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>Ciclo {pendente.numeroCiclo}: {STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>}
               </div>
-              <ParametrosLista parametros={dados.dados.vigente.parametros} />
+              <ParametrosLista parametros={dados.dados.vigente.parametros} tecnico={papel === "PROFISSIONAL_SAUDE"} />
               <p className="meta" style={{ marginTop: "var(--esp-3)" }}>
-                Parâmetros não são diagnóstico: descrevem o que funciona com o estudante. Elevar um parâmetro exige 2 ciclos de melhora; reduzir é imediato (RN03).
+                {EXPLICA_RITMO_PERFIL}
               </p>
             </Card>
           )}

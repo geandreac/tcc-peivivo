@@ -77,7 +77,7 @@ export function RevisarMaterial() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo={`Revisar: ${m.titulo}`} descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar (RN04)." />
+      <CabecalhoEstudante contexto={ctx.dados} titulo={`Revisar: ${m.titulo}`} descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar." />
 
       <div className="chips" style={{ marginBottom: "var(--esp-4)" }}>
         <Badge tom="aviso">{STATUS_APROVACAO.RASCUNHO.texto}</Badge>

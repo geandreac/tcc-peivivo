@@ -23,7 +23,7 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (30) + funções (24) + políticas RLS (88, PGlite) + web (72, axe) — 100%
+npm test                                    # motor (30) + funções (24) + políticas RLS (88, PGlite) + web (91, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173
 npm run contraste                           # tokens de cor ≥ 4,5:1 / 3:1
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
@@ -113,5 +113,8 @@ migrations `0003`–`0005`, políticas verdes no PGlite **e no Supabase real (CI
 contratos` (Zod), `packages/funcoes` (casos de uso puros), Edge Functions
 `gerar-material` e `fechar-ciclo` (camada HTTP fina; nunca edite
 `_shared/gerado/`, rode o script). Bloqueado: R2 (login real) precisa de projeto
-Supabase na nuvem. Depois: R4 (UX), R5 (E2E e provas). O diagrama de classes do artigo
+Supabase na nuvem. **R4 (UX) em andamento:** navegação inferior/lateral, linguagem
+leiga (nunca sigla RN/D na tela), Privacidade (família confirma profissional), painel
+da escola (só contagens), notificações tipadas, tema escuro e leitura facilitada
+(pares em `scripts/contraste.mjs`). Depois: R5 (E2E e provas). O diagrama de classes do artigo
 está desatualizado → `docs/reformulacao/DIAGRAMA-CLASSES.md`.

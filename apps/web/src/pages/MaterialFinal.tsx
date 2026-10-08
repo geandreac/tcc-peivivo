@@ -27,7 +27,7 @@ export function MaterialFinal() {
       <>
         <h1>Material não encontrado</h1>
         <ErroCarregamento erro={dados.erro} />
-        <p className="meta">Rascunhos só aparecem para a docente que os criou (D-12).</p>
+        <p className="meta">Rascunhos só aparecem para a docente que os criou.</p>
         <LinkBotao to="/painel" variante="secundario">
           Voltar
         </LinkBotao>

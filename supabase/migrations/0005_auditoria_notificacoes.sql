@@ -217,7 +217,7 @@ declare
   v_id uuid;
 begin
   if not privado.tem_papel(p_estudante, 'PROFISSIONAL_SAUDE') or not privado.consentimento_ativo(p_estudante) then
-    raise exception 'Nota clínica reservada: acesso exclusivo do profissional de saúde vinculado (RN02).' using errcode = '42501';
+    raise exception 'Nota clínica reservada: acesso exclusivo do profissional de saúde vinculado.' using errcode = '42501';
   end if;
   if char_length(trim(coalesce(p_conteudo, ''))) = 0 then
     raise exception 'Escreva o conteúdo da nota.' using errcode = '22023';
@@ -235,7 +235,7 @@ returns table (id uuid, conteudo text, data_registro timestamptz, profissional_n
 language plpgsql security definer set search_path = '' as $$
 begin
   if not privado.tem_papel(p_estudante, 'PROFISSIONAL_SAUDE') or not privado.consentimento_ativo(p_estudante) then
-    raise exception 'Nota clínica reservada: acesso exclusivo do profissional de saúde vinculado (RN02).' using errcode = '42501';
+    raise exception 'Nota clínica reservada: acesso exclusivo do profissional de saúde vinculado.' using errcode = '42501';
   end if;
   perform privado.auditar(p_estudante, 'LEITURA_NOTA_CLINICA', 'notas_clinicas', null);
   return query

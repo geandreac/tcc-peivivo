@@ -19,7 +19,7 @@ export function Pendencias() {
       <div className="cabecalho-pagina">
         <div>
           <h1>Pendências de validação</h1>
-          <p>Versões de perfil aguardando o profissional de saúde. Sem resposta em 7 dias, a versão anterior permanece vigente (RN05).</p>
+          <p>Versões de perfil aguardando o profissional de saúde. Sem resposta em 7 dias, a versão anterior permanece vigente.</p>
         </div>
       </div>
 

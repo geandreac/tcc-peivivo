@@ -48,7 +48,7 @@ export function Historico() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Histórico" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">O histórico só fica disponível a docente e profissional com consentimento ativo (D-11).</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">O histórico só fica disponível a docente e profissional com consentimento ativo.</Alerta>
       </>
     );
   }

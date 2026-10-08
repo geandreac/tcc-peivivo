@@ -39,7 +39,7 @@ export function CadastrarEstudante() {
       <>
         <h1>Cadastrar estudante</h1>
         <Alerta tom="erro" titulo="Só a coordenação pedagógica cadastra estudantes">
-          <p>O cadastro é a única porta de entrada de um estudante e exige o papel institucional de coordenação (D-08).</p>
+          <p>O cadastro é a única porta de entrada de um estudante e exige o papel institucional de coordenação.</p>
           <div className="grupo-botoes">
             <LinkBotao to="/painel" variante="secundario">
               Voltar
@@ -75,7 +75,7 @@ export function CadastrarEstudante() {
         <Campo id="nome" rotulo="Nome do estudante" dica="Use dados fictícios neste protótipo." required autoComplete="off" value={nome} onChange={(e) => setNome(e.target.value)} erro={erros.find((x) => x.campo === "nome")?.mensagem ?? null} />
         <Campo id="nascimento" type="date" rotulo="Data de nascimento" dica="Formato: dia/mês/ano." required value={nascimento} onChange={(e) => setNascimento(e.target.value)} erro={erros.find((x) => x.campo === "nascimento")?.mensagem ?? null} max={new Date().toISOString().slice(0, 10)} />
         <Campo id="turma" rotulo="Turma" opcional dica="Ex.: 4º ano B." value={turma} onChange={(e) => setTurma(e.target.value)} />
-        <Campo id="laudo" type="date" rotulo="Data em que o laudo foi apresentado à escola" opcional dica="Só a data (D-01). Visível à coordenação, ao responsável e ao profissional — nunca à docente." value={laudo} onChange={(e) => setLaudo(e.target.value)} erro={erros.find((x) => x.campo === "laudo")?.mensagem ?? null} max={new Date().toISOString().slice(0, 10)} />
+        <Campo id="laudo" type="date" rotulo="Data em que o laudo foi apresentado à escola" opcional dica="Só a data. Visível à coordenação, ao responsável e ao profissional — nunca à docente." value={laudo} onChange={(e) => setLaudo(e.target.value)} erro={erros.find((x) => x.campo === "laudo")?.mensagem ?? null} max={new Date().toISOString().slice(0, 10)} />
         <div className="grupo-botoes grupo-botoes--empilhado">
           <Botao type="submit" carregando={cadastrar.ocupado} textoCarregando="Cadastrando…">
             Cadastrar e vincular pessoas

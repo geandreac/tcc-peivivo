@@ -60,7 +60,7 @@ export function DadosLgpd() {
       <Card titulo="Exportar">
         <p>
           Gera um arquivo com estudante, vínculos, consentimentos, ciclos, observações, versões de perfil, materiais aprovados, desfechos e
-          auditoria. <strong>Não inclui</strong> notas clínicas — elas não pertencem ao responsável (D-05).
+          auditoria. <strong>Não inclui</strong> notas clínicas — elas não pertencem ao responsável.
         </p>
         {exportar.erro && (
           <Alerta tom="erro" vivo>

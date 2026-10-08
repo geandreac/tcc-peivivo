@@ -49,13 +49,13 @@ export function NotasClinicas() {
       <Alerta tom="aviso" titulo="Só profissionais de saúde veem este conteúdo">
         <p>
           O que a escola precisa saber vai como <strong>observação</strong> (todos os vinculados leem). O raciocínio clínico fica aqui. Se o
-          responsável excluir os dados do estudante, estas notas também são apagadas — mantenha seu prontuário fora do sistema (D-05).
+          responsável excluir os dados do estudante, estas notas também são apagadas — mantenha seu prontuário fora do sistema.
         </p>
       </Alerta>
 
       {notas.carregando && <Carregando />}
       {negado && (
-        <Alerta tom="erro" titulo="Acesso negado (RN02)" vivo>
+        <Alerta tom="erro" titulo="Acesso negado" vivo>
           <p>{mensagemAmigavel(notas.erro)}</p>
           <div className="grupo-botoes">
             <LinkBotao to={`/estudantes/${id}`} variante="secundario">

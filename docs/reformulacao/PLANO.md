@@ -21,9 +21,10 @@ Branches: `feature/geandre-…` e `feature/jean-…` a partir de `development`; 
 |---|---|---|
 | R0 | ✅ decisões aprovadas | ADR-00/04/05/06 em `DECISOES.md` |
 | R1 | ✅ verde (local + CI no Supabase real, PR #98) | `marcos/R1.md` |
-| R3 | ✅ verde local (antecipado; R2 bloqueado por falta de projeto Supabase na nuvem) | `marcos/R3.md` |
+| R3 | ✅ verde (local + CI, PR #99; antecipado porque o R2 está bloqueado) | `marcos/R3.md` |
 | R2 | ⏳ bloqueado: precisa de projeto Supabase na nuvem (sem Docker local) | — |
-| R4, R5 | ⬜ | — |
+| R4 | 🟡 7/8 cards (falta só R4.8, medição dos 60 s) | `marcos/R4.md` |
+| R5 | ⬜ | — |
 
 ## R0 · Aprovação (esta semana, até 14/10)
 | Item | Aceite |

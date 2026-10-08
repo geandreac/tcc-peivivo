@@ -9,12 +9,16 @@ export interface Preferencias {
   contraste: "padrao" | "alto";
   fonte: "padrao" | "grande" | "maior";
   movimento: "padrao" | "reduzido";
+  /** R4.6: "sistema" segue prefers-color-scheme. */
+  tema: "sistema" | "claro" | "escuro";
+  /** R4.6: fonte de alta legibilidade e mais espaçamento (preferência, nunca rótulo). */
+  leitura: "padrao" | "facilitada";
 }
 
 const CHAVE = "pei-vivo:preferencias";
-const PADRAO: Preferencias = { contraste: "padrao", fonte: "padrao", movimento: "padrao" };
+const PADRAO: Preferencias = { contraste: "padrao", fonte: "padrao", movimento: "padrao", tema: "sistema", leitura: "padrao" };
 
-function ler(): Preferencias {
+export function lerPreferencias(): Preferencias {
   try {
     const bruto = localStorage.getItem(CHAVE);
     return bruto ? { ...PADRAO, ...(JSON.parse(bruto) as Partial<Preferencias>) } : PADRAO;
@@ -31,10 +35,14 @@ export function aplicarPreferencias(p: Preferencias) {
   else raiz.removeAttribute("data-fonte");
   if (p.movimento === "reduzido") raiz.setAttribute("data-movimento", "reduzido");
   else raiz.removeAttribute("data-movimento");
+  if (p.tema !== "sistema") raiz.setAttribute("data-tema", p.tema);
+  else raiz.removeAttribute("data-tema");
+  if (p.leitura === "facilitada") raiz.setAttribute("data-leitura", "facilitada");
+  else raiz.removeAttribute("data-leitura");
 }
 
 export function usePreferencias() {
-  const [prefs, setPrefs] = useState<Preferencias>(ler);
+  const [prefs, setPrefs] = useState<Preferencias>(lerPreferencias);
 
   useEffect(() => {
     aplicarPreferencias(prefs);

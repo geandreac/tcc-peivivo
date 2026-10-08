@@ -52,7 +52,7 @@ export function GerarMaterial() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Gerar material" />
-        <Alerta tom="info" titulo="Só a docente gera material">Profissional de saúde, família e coordenação leem os materiais aprovados (D-02).</Alerta>
+        <Alerta tom="info" titulo="Só a docente gera material">Profissional de saúde, família e coordenação leem os materiais aprovados.</Alerta>
       </>
     );
   }
@@ -60,7 +60,7 @@ export function GerarMaterial() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Gerar material" />
-        <Alerta tom="erro" titulo="Geração bloqueada">Sem consentimento ativo do responsável, nenhum material é gerado (RN01/RN08).</Alerta>
+        <Alerta tom="erro" titulo="Geração bloqueada">Sem consentimento ativo do responsável, nenhum material é gerado.</Alerta>
       </>
     );
   }
