@@ -27,10 +27,13 @@ import type {
   EventoAuditoria,
   ExportacaoEstudante,
   Material,
+  Notificacao,
   NotaClinica,
   ObservacaoRegistro,
   Papel,
   Pendencia,
+  ResumoEscola,
+  TipoNotificacao,
   ResultadoDesfecho,
   ResultadoFechamento,
   Usuario,
@@ -51,9 +54,10 @@ interface Estado {
   desfechos: Desfecho[];
   notas: NotaClinica[];
   auditoria: Auditoria[];
+  notificacoes: Notificacao[];
 }
 
-const CHAVE_ESTADO = "pei-vivo:demo:v1";
+const CHAVE_ESTADO = "pei-vivo:demo:v2"; // v2: vínculos com ciclo de vida e notificações (R4)
 const CHAVE_SESSAO = "pei-vivo:sessao";
 const DIAS_EXPIRACAO = 7; // RN05
 
@@ -72,6 +76,7 @@ function estadoInicial(): Estado {
     desfechos: semente.DESFECHOS,
     notas: semente.NOTAS_CLINICAS,
     auditoria: semente.AUDITORIA,
+    notificacoes: [],
   });
 }
 
@@ -112,6 +117,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
   const persistir = opcoes.persistir ?? true;
 
   let estado: Estado = (persistir && lerStorage<Estado>(CHAVE_ESTADO)) || estadoInicial();
+  estado.notificacoes ??= [];
   let sessaoId: string | null = persistir ? lerStorage<string>(CHAVE_SESSAO) : null;
   let falhaAtiva = false;
 
@@ -167,6 +173,19 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
     return p;
   }
 
+  /** D-28: espelha privado.notificar — vínculos ATIVOS com os papéis dados, menos quem causou. */
+  function notificar(estudanteId: string, tipo: TipoNotificacao, papeis: Papel[]) {
+    const destinatarios = new Set(
+      estado.vinculos.filter((v) => v.estudanteId === estudanteId && v.status === "ATIVO" && papeis.includes(v.papel)).map((v) => v.usuarioId)
+    );
+    destinatarios.delete(sessaoId ?? "");
+    for (const usuarioId of destinatarios) notificarUsuario(usuarioId, tipo, estudanteId);
+  }
+  function notificarUsuario(usuarioId: string, tipo: TipoNotificacao, estudanteId: string) {
+    estado.notificacoes.push({ id: uuid(), usuarioId, tipo, estudanteId, criadaEm: agora(), lidaEm: null });
+  }
+  const TODOS: Papel[] = ["RESPONSAVEL", "DOCENTE", "PROFISSIONAL_SAUDE", "COORDENACAO"];
+
   /** D-34 / S-19: só o docente que gerou decide sobre o material. */
   function exigirAutor(m: Material) {
     if (m.docenteId !== eu().id) throw new ErroApi("NEGADO", "Só o docente que gerou o material decide sobre ele.");
@@ -197,6 +216,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
     for (const v of estado.versoes) {
       if (v.statusValidacao === "PENDENTE" && new Date(v.createdAt).getTime() < limite) {
         v.statusValidacao = "EXPIRADA";
+        notificar(v.estudanteId, "VALIDACAO_EXPIRADA", ["PROFISSIONAL_SAUDE", "COORDENACAO"]);
         mudou = true;
       }
     }
@@ -304,17 +324,31 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       }),
     vincular: (dados) =>
       chamada(() => {
-        exigirPapel(dados.estudanteId, "COORDENACAO");
+        // D-24: coordenação vincula; o responsável só propõe profissional de saúde (e já confirma).
+        const meu = exigirPapel(dados.estudanteId, "COORDENACAO", "RESPONSAVEL");
+        if (meu === "RESPONSAVEL" && dados.papel !== "PROFISSIONAL_SAUDE") throw new ErroApi("NEGADO", "A família só propõe profissionais de saúde.");
+        if (dados.usuarioId === eu().id) throw new ErroApi("NEGADO", "Ninguém pode criar vínculo para si mesmo.");
         if (!estado.usuarios.some((x) => x.id === dados.usuarioId)) throw new ErroApi("NAO_ENCONTRADO", "Usuário não encontrado.");
         if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim()) {
           throw new ErroApi("VALIDACAO", "Profissional de saúde precisa do registro no conselho.");
         }
-        if (estado.vinculos.some((v) => v.usuarioId === dados.usuarioId && v.estudanteId === dados.estudanteId && v.status === "ATIVO")) {
+        if (estado.vinculos.some((v) => v.usuarioId === dados.usuarioId && v.estudanteId === dados.estudanteId && (v.status === "ATIVO" || v.status === "PENDENTE_RESPONSAVEL"))) {
           throw new ErroApi("CONFLITO", "Esta pessoa já tem um vínculo ativo com o estudante.");
         }
-        const v: Vinculo = { id: uuid(), usuarioId: dados.usuarioId, estudanteId: dados.estudanteId, papel: dados.papel, dataVinculo: agora(), status: "ATIVO", registroConselho: dados.registroConselho?.trim() || null };
+        const pendente = dados.papel === "PROFISSIONAL_SAUDE" && meu === "COORDENACAO";
+        const v: Vinculo = {
+          id: uuid(),
+          usuarioId: dados.usuarioId,
+          estudanteId: dados.estudanteId,
+          papel: dados.papel,
+          dataVinculo: agora(),
+          status: pendente ? "PENDENTE_RESPONSAVEL" : "ATIVO",
+          registroConselho: dados.registroConselho?.trim() || null,
+        };
         estado.vinculos.push(v);
-        registrarAuditoria("vinculos_usuario_estudante", v.id, "VINCULO_CRIADO", { papel: v.papel });
+        registrarAuditoria("vinculos_usuario_estudante", v.id, pendente ? "VINCULO_PROPOSTO" : "VINCULO_CRIADO", { papel: v.papel });
+        if (pendente) notificar(v.estudanteId, "PROFISSIONAL_AGUARDANDO_CONFIRMACAO", ["RESPONSAVEL"]);
+        else notificarUsuario(v.usuarioId, "VINCULO_ATIVADO", v.estudanteId);
         salvar();
         return v;
       }),
@@ -322,9 +356,42 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       chamada(() => {
         const v = estado.vinculos.find((x) => x.id === vinculoId);
         if (!v) throw new ErroApi("NAO_ENCONTRADO", "Vínculo não encontrado.");
-        exigirPapel(v.estudanteId, "COORDENACAO");
-        v.status = "INATIVO";
+        const meu = exigirPapel(v.estudanteId, "COORDENACAO", "RESPONSAVEL");
+        // S-14: a coordenação nunca encerra o responsável; a família só remove profissional de saúde.
+        if (v.papel === "RESPONSAVEL" || (meu === "RESPONSAVEL" && v.papel !== "PROFISSIONAL_SAUDE")) {
+          throw new ErroApi("NEGADO", "Seu papel não permite encerrar este vínculo.");
+        }
+        if (v.status === "ENCERRADO" || v.status === "RECUSADO") throw new ErroApi("CONFLITO", "Este vínculo já está encerrado.");
+        v.status = "ENCERRADO";
         registrarAuditoria("vinculos_usuario_estudante", v.id, "VINCULO_DESATIVADO", { papel: v.papel });
+        salvar();
+      }),
+
+    confirmarVinculo: (vinculoId, aceitar) =>
+      chamada(() => {
+        const v = estado.vinculos.find((x) => x.id === vinculoId);
+        if (!v) throw new ErroApi("NAO_ENCONTRADO", "Vínculo não encontrado.");
+        exigirPapel(v.estudanteId, "RESPONSAVEL");
+        if (v.status !== "PENDENTE_RESPONSAVEL") throw new ErroApi("CONFLITO", "Este vínculo não está aguardando confirmação.");
+        v.status = aceitar ? "ATIVO" : "RECUSADO";
+        registrarAuditoria("vinculos_usuario_estudante", v.id, aceitar ? "VINCULO_CONFIRMADO" : "VINCULO_RECUSADO", { papel: v.papel });
+        if (aceitar) notificarUsuario(v.usuarioId, "VINCULO_ATIVADO", v.estudanteId);
+        salvar();
+        return v;
+      }),
+
+    // ---- notificações (D-28)
+    listarNotificacoes: () =>
+      chamada(() => {
+        const u = eu();
+        return estado.notificacoes.filter((n) => n.usuarioId === u.id).sort((a, b) => b.criadaEm.localeCompare(a.criadaEm));
+      }),
+    marcarNotificacoesLidas: (ids) =>
+      chamada(() => {
+        const u = eu();
+        for (const n of estado.notificacoes) {
+          if (n.usuarioId === u.id && !n.lidaEm && (!ids || ids.includes(n.id))) n.lidaEm = agora();
+        }
         salvar();
       }),
 
@@ -346,6 +413,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const c: Consentimento = { id: uuid(), estudanteId, responsavelId: eu().id, dataConcessao: agora(), escopo: [...escopo], status: "ATIVO", dataRevogacao: null };
         estado.consentimentos.push(c);
         registrarAuditoria("consentimentos", c.id, "CONCESSAO", { escopo: escopo.length });
+        notificar(estudanteId, "CONSENTIMENTO_CONCEDIDO", TODOS);
         salvar();
         return c;
       }),
@@ -357,6 +425,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         c.status = "REVOGADO";
         c.dataRevogacao = agora();
         registrarAuditoria("consentimentos", c.id, "REVOGACAO");
+        notificar(estudanteId, "CONSENTIMENTO_REVOGADO", TODOS); // F10: sem motivo
         salvar();
         return c;
       }),
@@ -478,6 +547,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         // abre o próximo ciclo (HU-D.01: "o sistema abre ao fechar o N-1")
         estado.ciclos.push({ id: uuid(), estudanteId: ciclo.estudanteId, numero: ciclo.numero + 1, dataInicio: agora().slice(0, 10), dataFim: null, status: "ABERTO" });
         registrarAuditoria("ciclos_observacao", ciclo.id, "CICLO_FECHADO", { numero: ciclo.numero, status: versao.statusValidacao });
+        if (versao.statusValidacao === "PENDENTE") notificar(ciclo.estudanteId, "VALIDACAO_PENDENTE", ["PROFISSIONAL_SAUDE"]);
         salvar();
         return { versao, diff, modoPedagogico };
       }),
@@ -501,6 +571,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
           v.statusValidacao = "EM_REVISAO";
           v.justificativaRevisao = justificativa.trim();
           registrarAuditoria("versoes_perfil", v.id, "REVISAO_SOLICITADA", { numeroCiclo: v.numeroCiclo });
+          notificar(v.estudanteId, "REVISAO_SOLICITADA", ["DOCENTE"]);
         }
         salvar();
         return v;
@@ -517,6 +588,43 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
           lista.push({ versao: v, estudante: estudante(v.estudanteId), diasEmAberto: Math.floor((Date.now() - new Date(v.createdAt).getTime()) / 86_400_000) });
         }
         return lista.sort((a, b) => b.diasEmAberto - a.diasEmAberto);
+      }),
+
+    resumoEscola: () =>
+      chamada(() => {
+        const u = eu();
+        aplicarExpiracao();
+        const ids = estado.vinculos.filter((v) => v.usuarioId === u.id && v.status === "ATIVO" && v.papel === "COORDENACAO").map((v) => v.estudanteId);
+        if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "O painel da escola é da coordenação pedagógica.");
+        const resumo: ResumoEscola = { totalEstudantes: ids.length, comConsentimento: 0, semConsentimento: 0, semProfissional: 0, validacoesAtrasadas: 0, ciclosParados: 0, pendencias: [] };
+        const dia = 86_400_000;
+        for (const id of ids) {
+          const e = estudante(id);
+          const add = (motivo: ResumoEscola["pendencias"][number]["motivo"], desde: string | null) => resumo.pendencias.push({ estudanteId: id, nome: e.nome, motivo, desde });
+          if (temConsentimento(id)) resumo.comConsentimento++;
+          else {
+            resumo.semConsentimento++;
+            add("SEM_CONSENTIMENTO", e.createdAt);
+            continue; // sem autorização, o resto não se aplica
+          }
+          if (!temProfissional(id)) {
+            resumo.semProfissional++;
+            add("SEM_PROFISSIONAL", null);
+          }
+          const atrasada = estado.versoes.find(
+            (v) => v.estudanteId === id && (v.statusValidacao === "EXPIRADA" || (v.statusValidacao === "PENDENTE" && Date.now() - new Date(v.createdAt).getTime() >= 5 * dia))
+          );
+          if (atrasada) {
+            resumo.validacoesAtrasadas++;
+            add("VALIDACAO_ATRASADA", atrasada.createdAt);
+          }
+          const aberto = estado.ciclos.find((c) => c.estudanteId === id && c.status === "ABERTO");
+          if (aberto && Date.now() - new Date(aberto.dataInicio).getTime() > 15 * dia && !estado.observacoes.some((o) => o.cicloId === aberto.id)) {
+            resumo.ciclosParados++;
+            add("CICLO_PARADO", aberto.dataInicio);
+          }
+        }
+        return resumo;
       }),
 
     // ---- materiais

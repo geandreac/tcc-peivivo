@@ -23,6 +23,7 @@ import { Historico } from "../pages/Historico";
 import { Vinculos } from "../pages/Vinculos";
 import { DadosLgpd } from "../pages/DadosLgpd";
 import { Privacidade } from "../pages/Privacidade";
+import { Notificacoes } from "../pages/Notificacoes";
 import { NaoEncontrada } from "../pages/NaoEncontrada";
 
 /**
@@ -43,6 +44,7 @@ export const rotas = [
         children: [
           { path: "/painel", element: <Painel /> },
           { path: "/pendencias", element: <Pendencias /> },
+          { path: "/notificacoes", element: <Notificacoes /> },
           { path: "/coordenacao/cadastrar", element: <CadastrarEstudante /> },
           { path: "/estudantes/:id", element: <Estudante /> },
           { path: "/estudantes/:id/consentimento", element: <Consentimento /> },

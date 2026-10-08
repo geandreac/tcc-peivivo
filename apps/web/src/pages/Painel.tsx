@@ -7,6 +7,7 @@ import { Badge, Card, Carregando, EstadoVazio, ErroCarregamento } from "../compo
 import { LinkBotao } from "../components/Botao";
 import { PAPEL } from "../utils/rotulos";
 import { idade } from "../utils/datas";
+import { ResumoEscola } from "../components/ResumoEscola";
 
 interface Linha {
   estudante: Estudante;
@@ -44,6 +45,9 @@ export function Painel() {
         </div>
         {usuario?.papelInstitucional === "COORDENACAO" && <LinkBotao to="/coordenacao/cadastrar">Cadastrar estudante</LinkBotao>}
       </div>
+
+      {usuario?.papelInstitucional === "COORDENACAO" && <ResumoEscola />}
+      {usuario?.papelInstitucional === "COORDENACAO" && <h2>Estudantes</h2>}
 
       {consulta.carregando && <Carregando texto="Carregando seus estudantes…" />}
       {consulta.erro && <ErroCarregamento erro={consulta.erro} tentarNovamente={consulta.recarregar} />}

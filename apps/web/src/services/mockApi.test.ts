@@ -325,3 +325,71 @@ describe("Reformulação R4 — privacidade (D-30/D-34)", () => {
     expect((await api.listarAuditoria(ID.estudanteA)).some((e) => e.evento === "LEITURA_NOTA_CLINICA")).toBe(false);
   });
 });
+
+describe("Reformulação R4.4/R4.7 — profissional confirmado pela família; notificações (D-24, D-28)", () => {
+  it("S-11 negado: ninguém vincula a si mesmo; família só propõe profissional de saúde", async () => {
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.vincular({ usuarioId: ID.coordenacao, estudanteId: ID.estudanteA, papel: "DOCENTE" }));
+    await api.entrar(ID.responsavel);
+    await esperaNegado(api.vincular({ usuarioId: ID.docente2, estudanteId: ID.estudanteA, papel: "DOCENTE" }));
+  });
+  it("S-14 negado: coordenação não encerra o vínculo do responsável", async () => {
+    await api.entrar(ID.coordenacao);
+    const resp = (await api.listarVinculos(ID.estudanteA)).find((v) => v.papel === "RESPONSAVEL")!;
+    await esperaNegado(api.desativarVinculo(resp.id));
+  });
+  it("proposta da coordenação fica pendente, sem acesso, até a família confirmar; a família é notificada", async () => {
+    await api.entrar(ID.coordenacao);
+    const v = await api.vincular({ usuarioId: ID.fono, estudanteId: ID.estudanteA, papel: "PROFISSIONAL_SAUDE", registroConselho: "CRFa-DEV-2" });
+    expect(v.status).toBe("PENDENTE_RESPONSAVEL");
+    await esperaNegado(api.confirmarVinculo(v.id, true)); // coordenação não confirma
+    await api.entrar(ID.fono);
+    await esperaNegado(api.obterEstudante(ID.estudanteA)); // pendente não vê nada
+    await api.entrar(ID.responsavel);
+    expect((await api.listarNotificacoes()).map((n) => n.tipo)).toContain("PROFISSIONAL_AGUARDANDO_CONFIRMACAO");
+    await api.confirmarVinculo(v.id, true);
+    await esperaNegado(api.confirmarVinculo(v.id, true), "CONFLITO");
+    await api.entrar(ID.fono);
+    expect((await api.obterEstudante(ID.estudanteA)).id).toBe(ID.estudanteA);
+    expect((await api.listarNotificacoes()).map((n) => n.tipo)).toContain("VINCULO_ATIVADO");
+  });
+  it("família recusa a proposta: ninguém ganha acesso; família pode remover profissional ativo", async () => {
+    await api.entrar(ID.coordenacao);
+    const v = await api.vincular({ usuarioId: ID.fono, estudanteId: ID.estudanteA, papel: "PROFISSIONAL_SAUDE", registroConselho: "CRFa-DEV-2" });
+    await api.entrar(ID.responsavel);
+    expect((await api.confirmarVinculo(v.id, false)).status).toBe("RECUSADO");
+    const camila = (await api.listarVinculos(ID.estudanteA)).find((x) => x.usuarioId === ID.profissional)!;
+    await api.desativarVinculo(camila.id);
+    await api.entrar(ID.profissional);
+    await esperaNegado(api.obterEstudante(ID.estudanteA));
+  });
+  it("F10: revogação avisa todos os vinculados, menos quem revogou; notificações são privadas e marcáveis", async () => {
+    await api.entrar(ID.responsavel);
+    await api.revogarConsentimento(ID.estudanteA);
+    expect((await api.listarNotificacoes()).some((n) => n.tipo === "CONSENTIMENTO_REVOGADO")).toBe(false);
+    await api.entrar(ID.docente);
+    const minhas = await api.listarNotificacoes();
+    expect(minhas.every((n) => n.usuarioId === ID.docente)).toBe(true);
+    expect(minhas.filter((n) => n.tipo === "CONSENTIMENTO_REVOGADO" && !n.lidaEm)).toHaveLength(1);
+    await api.marcarNotificacoesLidas();
+    expect((await api.listarNotificacoes()).every((n) => n.lidaEm)).toBe(true);
+  });
+});
+
+describe("Reformulação R4.5 — painel da escola (sem dado clínico)", () => {
+  it("negado a quem não é coordenação", async () => {
+    await api.entrar(ID.docente);
+    await esperaNegado(api.resumoEscola());
+    await api.entrar(ID.responsavel);
+    await esperaNegado(api.resumoEscola());
+  });
+  it("coordenação recebe só contagens e motivos — nenhum campo de conteúdo", async () => {
+    await api.entrar(ID.coordenacao);
+    const r = await api.resumoEscola();
+    expect(r.totalEstudantes).toBe(2);
+    expect(r.semConsentimento).toBe(1);
+    expect(r.pendencias.map((p) => p.motivo)).toContain("SEM_CONSENTIMENTO");
+    const texto = JSON.stringify(r);
+    for (const proibido of ["evidencia", "conteudo", "parametros", "textoOriginal", "laudo"]) expect(texto).not.toContain(proibido);
+  });
+});

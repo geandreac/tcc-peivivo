@@ -263,3 +263,49 @@ describe("Reformulação R4 — navegação, linguagem e privacidade", () => {
     expect(document.documentElement).not.toHaveAttribute("data-leitura");
   });
 });
+
+describe("Reformulação R4.4/R4.7 — confirmação do profissional e notificações", () => {
+  it("família vê a proposta pendente, permite, e o profissional passa a constar em 'Quem tem acesso'", async () => {
+    const { container } = await renderizarApp(`/estudantes/${ID.estudanteA}/privacidade`, ID.responsavel, async () => {
+      await api.entrar(ID.coordenacao);
+      await api.vincular({ usuarioId: ID.fono, estudanteId: ID.estudanteA, papel: "PROFISSIONAL_SAUDE", registroConselho: "CRFa-DEV-2" });
+    });
+    const pendentes = await screen.findByRole("list", { name: "Profissionais aguardando confirmação" });
+    await semViolacoesAxe(container);
+    await userEvent.click(within(pendentes).getByRole("button", { name: "Permitir acesso de Beatriz (fictícia)" }));
+    const pessoas = await screen.findByRole("list", { name: "Pessoas com acesso" });
+    await waitFor(() => expect(within(pessoas).getByText("Beatriz (fictícia)")).toBeInTheDocument());
+    expect(screen.queryByRole("list", { name: "Profissionais aguardando confirmação" })).not.toBeInTheDocument();
+  });
+
+  it("sino com contagem no nome acessível; página lista o aviso e marca como lido", async () => {
+    const { container } = await renderizarApp("/painel", ID.docente, async () => {
+      await api.entrar(ID.responsavel);
+      await api.revogarConsentimento(ID.estudanteA);
+    });
+    const sino = await screen.findByRole("link", { name: "Notificações, 1 não lida" });
+    await userEvent.click(sino);
+    expect(await screen.findByRole("heading", { level: 1, name: "Notificações" })).toBeInTheDocument();
+    const lista = await screen.findByRole("list", { name: "Notificações" });
+    expect(within(lista).getByRole("link", { name: /está pausado pela família/ })).toBeInTheDocument();
+    await semViolacoesAxe(container);
+    await userEvent.click(screen.getByRole("button", { name: "Marcar todas como lidas" }));
+    await waitFor(() => expect(within(screen.getByRole("list", { name: "Notificações" })).queryByText("Nova")).not.toBeInTheDocument());
+  });
+});
+
+describe("Reformulação R4.5 — painel da escola", () => {
+  it("coordenação vê números e pendências com ação", async () => {
+    const { container } = await renderizarApp("/painel", ID.coordenacao);
+    const resumo = await screen.findByRole("list", { name: "Resumo da escola" });
+    expect(within(resumo).getByText("Aguardando a família")).toBeInTheDocument();
+    const pend = screen.getByRole("list", { name: "O que precisa de você" });
+    expect(within(pend).getByRole("link", { name: /Ver estudante: Estudante fictício B/ })).toBeInTheDocument();
+    await semViolacoesAxe(container);
+  });
+  it("negado: docente não vê o painel da escola", async () => {
+    await renderizarApp("/painel", ID.docente);
+    await screen.findByRole("heading", { level: 1, name: "Meus estudantes" });
+    expect(screen.queryByRole("list", { name: "Resumo da escola" })).not.toBeInTheDocument();
+  });
+});

@@ -3,7 +3,9 @@ import { useSessao } from "../hooks/useSessao";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { Toasts } from "../components/Toasts";
 import { PAPEL } from "../utils/rotulos";
-import { Accessibility, CircleHelp, ClipboardCheck, LogOut, UsersRound, type LucideIcon } from "lucide-react";
+import { Accessibility, Bell, CircleHelp, ClipboardCheck, LogOut, UsersRound, type LucideIcon } from "lucide-react";
+import { api } from "../services";
+import { useConsulta } from "../hooks/useConsulta";
 
 const ITENS_NAV: { rota: string; rotulo: string; Icone: LucideIcon }[] = [
   { rota: "/painel", rotulo: "Estudantes", Icone: UsersRound },
@@ -33,6 +35,13 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Contagem de não lidas: recarrega a cada troca de tela (sem polling, sem push).
+  const naoLidas = useConsulta<number>(
+    async () => (usuario ? (await api.listarNotificacoes()).filter((n) => !n.lidaEm).length : 0),
+    [usuario?.id, location.pathname]
+  );
+  const contagem = naoLidas.dados ?? 0;
+
   async function aoSair() {
     await sair();
     anunciar("Você saiu da sua conta.", "neutro");
@@ -52,6 +61,14 @@ export function Layout() {
           </NavLink>
           {usuario ? (
             <div className="sessao">
+              <NavLink to="/notificacoes" className="sino" aria-label={contagem > 0 ? `Notificações, ${contagem} não lida${contagem > 1 ? "s" : ""}` : "Notificações"}>
+                <Bell aria-hidden="true" size={22} />
+                {contagem > 0 && (
+                  <span className="sino__contagem" aria-hidden="true">
+                    {contagem > 9 ? "9+" : contagem}
+                  </span>
+                )}
+              </NavLink>
               <span className="sessao__nome">
                 <strong>{usuario.nome}</strong>
                 {usuario.papelInstitucional && <span className="sessao__papel">{PAPEL[usuario.papelInstitucional]}</span>}

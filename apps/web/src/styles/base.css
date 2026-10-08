@@ -449,3 +449,50 @@ hr {
   border-top: 1px solid var(--cor-borda-suave);
   margin: var(--esp-5) 0;
 }
+
+/* sino de notificações (R4.7): alvo de 44 px; contagem também no nome acessível */
+.sino {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--alvo-minimo);
+  height: var(--alvo-minimo);
+  border-radius: var(--raio-md);
+  color: var(--cor-texto);
+}
+.sino:hover {
+  background: var(--cor-primaria-tint);
+}
+.sino[aria-current="page"] {
+  background: var(--cor-primaria-tint);
+  color: var(--cor-primaria-escura);
+}
+.sino__contagem {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 4px;
+  border-radius: var(--raio-pill);
+  background: var(--cor-erro);
+  color: var(--cor-sobre-erro);
+  font-size: 0.75rem;
+  font-weight: var(--peso-negrito);
+  line-height: 1.25rem;
+  text-align: center;
+}
+.notificacao--nova {
+  font-weight: var(--peso-medio);
+}
+.bloco-destaque {
+  background: var(--cor-aviso-fundo);
+  border: 1px solid var(--cor-aviso);
+  border-radius: var(--raio-lg);
+  padding: var(--esp-4);
+  margin-block: var(--esp-4);
+}
+.bloco-destaque h2 {
+  margin-top: 0;
+}

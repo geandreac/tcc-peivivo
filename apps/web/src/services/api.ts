@@ -16,10 +16,12 @@ import type {
   Estudante,
   ExportacaoEstudante,
   Material,
+  Notificacao,
   NotaClinica,
   ObservacaoRegistro,
   Papel,
   Pendencia,
+  ResumoEscola,
   ResultadoDesfecho,
   ResultadoFechamento,
   Usuario,
@@ -63,6 +65,12 @@ export interface PeiVivoApi {
   cadastrarEstudante(dados: NovoEstudante): Promise<Estudante>;
   vincular(dados: NovoVinculo): Promise<Vinculo>;
   desativarVinculo(vinculoId: string): Promise<void>;
+  /** D-24: o responsável confirma (ou recusa) o profissional proposto pela coordenação. */
+  confirmarVinculo(vinculoId: string, aceitar: boolean): Promise<Vinculo>;
+
+  // notificações (D-28)
+  listarNotificacoes(): Promise<Notificacao[]>;
+  marcarNotificacoesLidas(ids?: string[]): Promise<void>;
 
   // consentimento (RN01, RN08)
   obterConsentimento(estudanteId: string): Promise<Consentimento | null>;
@@ -83,6 +91,8 @@ export interface PeiVivoApi {
   fecharCiclo(cicloId: string): Promise<ResultadoFechamento>;
   validarVersao(versaoId: string, decisao: "APROVAR" | "AJUSTE", justificativa?: string): Promise<VersaoPerfil>;
   listarPendencias(): Promise<Pendencia[]>;
+  /** R4.5: só coordenação; só contagens e motivos, nunca conteúdo. */
+  resumoEscola(): Promise<ResumoEscola>;
 
   // materiais (RF08–RF13)
   listarMateriais(estudanteId: string): Promise<Material[]>;

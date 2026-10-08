@@ -17,7 +17,8 @@ export type StatusConsentimento = "ATIVO" | "REVOGADO" | "EXPIRADO";
 export type StatusValidacao = "PENDENTE" | "VIGENTE" | "EM_REVISAO" | "EXPIRADA" | "SUBSTITUIDA";
 export type StatusAprovacao = "RASCUNHO" | "APROVADO" | "DESCARTADO";
 export type StatusCiclo = "ABERTO" | "FECHADO";
-export type StatusVinculo = "ATIVO" | "INATIVO";
+/** D-24/D-36: profissional proposto pela coordenação aguarda a família. */
+export type StatusVinculo = "PENDENTE_RESPONSAVEL" | "ATIVO" | "RECUSADO" | "ENCERRADO";
 export type ResultadoDesfecho = "ALCANCADO" | "PARCIAL" | "NAO_ALCANCADO";
 export type EscopoConsentimento = "observacao_pedagogica" | "observacao_domiciliar" | "geracao_material";
 
@@ -144,7 +145,44 @@ export type EventoAuditoria =
   | "EXCLUSAO"
   | "CADASTRO"
   | "LEITURA_NOTA_CLINICA"
-  | "NOTA_CLINICA_REGISTRADA";
+  | "NOTA_CLINICA_REGISTRADA"
+  | "VINCULO_PROPOSTO"
+  | "VINCULO_CONFIRMADO"
+  | "VINCULO_RECUSADO";
+
+/**
+ * R4.5 — painel da escola (coordenação): só contagens e motivos de pendência.
+ * Nenhum conteúdo de observação, nota, perfil ou material (prompt §6.5).
+ */
+export type MotivoPendenciaEscola = "SEM_CONSENTIMENTO" | "SEM_PROFISSIONAL" | "VALIDACAO_ATRASADA" | "CICLO_PARADO";
+export interface ResumoEscola {
+  totalEstudantes: number;
+  comConsentimento: number;
+  semConsentimento: number;
+  semProfissional: number;
+  validacoesAtrasadas: number;
+  ciclosParados: number;
+  pendencias: { estudanteId: string; nome: string; motivo: MotivoPendenciaEscola; desde: string | null }[];
+}
+
+/** D-28: conteúdo tipado — a frase é montada pelo app (utils/rotulos), sem texto livre. */
+export type TipoNotificacao =
+  | "CONSENTIMENTO_CONCEDIDO"
+  | "CONSENTIMENTO_REVOGADO"
+  | "PROFISSIONAL_AGUARDANDO_CONFIRMACAO"
+  | "VINCULO_ATIVADO"
+  | "VALIDACAO_PENDENTE"
+  | "REVISAO_SOLICITADA"
+  | "VALIDACAO_EXPIRADA";
+
+export interface Notificacao {
+  id: string;
+  usuarioId: string;
+  tipo: TipoNotificacao;
+  estudanteId: string | null;
+  criadaEm: string;
+  lidaEm: string | null;
+}
 
 export interface Auditoria {
   id: string;

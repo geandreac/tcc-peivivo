@@ -1,11 +1,14 @@
 import { Eye, EyeOff, PenLine, ShieldCheck } from "lucide-react";
-import { api, type Auditoria, type Vinculo } from "../services";
+import { useState } from "react";
+import { api, mensagemAmigavel, type Auditoria, type Vinculo } from "../services";
 import { useEstudante } from "../hooks/useEstudante";
-import { useConsulta } from "../hooks/useConsulta";
+import { useConsulta, useMutacao } from "../hooks/useConsulta";
+import { useAnuncio } from "../hooks/useAnuncio";
+import { Modal } from "../components/Modal";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
 import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
-import { LinkBotao } from "../components/Botao";
+import { Botao, LinkBotao } from "../components/Botao";
 import { EVENTO, PAPEL } from "../utils/rotulos";
 import { formatarData, formatarDataHora } from "../utils/datas";
 
@@ -37,12 +40,26 @@ export function Privacidade() {
   useTitulo("Privacidade", !ctx.carregando);
   const id = ctx.dados?.estudante.id;
   const ehResponsavel = ctx.dados?.papel === "RESPONSAVEL";
+  const { anunciar } = useAnuncio();
+  const [removendo, setRemovendo] = useState<Vinculo | null>(null);
 
   const dados = useConsulta<{ vinculos: Vinculo[]; eventos: Auditoria[] } | null>(async () => {
     if (!id || !ehResponsavel) return null;
     const [vinculos, eventos] = await Promise.all([api.listarVinculos(id), api.listarAuditoria(id)]);
     return { vinculos, eventos };
   }, [id, ehResponsavel]);
+
+  const confirmar = useMutacao(async ({ v, aceitar }: { v: Vinculo; aceitar: boolean }) => {
+    await api.confirmarVinculo(v.id, aceitar);
+    anunciar(aceitar ? `${v.nomeUsuario ?? "O profissional"} agora tem acesso.` : "Proposta recusada. Ninguém ganhou acesso.", "sucesso");
+    dados.recarregar();
+  });
+  const remover = useMutacao(async () => {
+    await api.desativarVinculo(removendo!.id);
+    anunciar(`${removendo!.nomeUsuario ?? "O profissional"} não tem mais acesso. O que já foi registrado continua no histórico.`, "sucesso");
+    setRemovendo(null);
+    dados.recarregar();
+  });
 
   if (ctx.carregando) return <Carregando texto="Carregando…" />;
   if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
@@ -59,6 +76,7 @@ export function Privacidade() {
   }
 
   const ativos = dados.dados?.vinculos.filter((v) => v.status === "ATIVO") ?? [];
+  const pendentes = dados.dados?.vinculos.filter((v) => v.status === "PENDENTE_RESPONSAVEL") ?? [];
   const leiturasClinicas = dados.dados?.eventos.filter((e) => e.evento === "LEITURA_NOTA_CLINICA") ?? [];
 
   return (
@@ -77,6 +95,42 @@ export function Privacidade() {
 
       {dados.dados && (
         <>
+          {pendentes.length > 0 && (
+            <section aria-labelledby="titulo-pendentes" className="bloco-destaque">
+              <h2 id="titulo-pendentes">Aguardando a sua decisão</h2>
+              <p>
+                A escola propôs um profissional de saúde. Se você permitir, ele vê as observações e o perfil de aprendizagem e pode validar
+                os ajustes. Ele nunca vê rascunhos, e você pode remover o acesso quando quiser.
+              </p>
+              {confirmar.erro && (
+                <Alerta tom="erro" vivo>
+                  {mensagemAmigavel(confirmar.erro)}
+                </Alerta>
+              )}
+              <ul className="lista-simples" aria-label="Profissionais aguardando confirmação">
+                {pendentes.map((v) => (
+                  <li key={v.id}>
+                    <div>
+                      <strong>{v.nomeUsuario ?? "Profissional de saúde"}</strong>
+                      <div className="meta">
+                        {PAPEL[v.papel]}
+                        {v.registroConselho && ` · registro profissional ${v.registroConselho} (declarado)`}
+                      </div>
+                    </div>
+                    <div className="grupo-botoes">
+                      <Botao pequeno onClick={() => confirmar.executar({ v, aceitar: true })} disabled={confirmar.ocupado} aria-label={`Permitir acesso de ${v.nomeUsuario ?? "profissional"}`}>
+                        Permitir
+                      </Botao>
+                      <Botao pequeno variante="secundario" onClick={() => confirmar.executar({ v, aceitar: false })} disabled={confirmar.ocupado} aria-label={`Recusar ${v.nomeUsuario ?? "profissional"}`}>
+                        Recusar
+                      </Botao>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <h2>Quem tem acesso agora</h2>
           {ativos.length === 0 ? (
             <EstadoVazio titulo="Ninguém além de você">
@@ -93,7 +147,13 @@ export function Privacidade() {
                       {v.registroConselho && ` · registro profissional ${v.registroConselho}`}
                     </div>
                   </div>
-                  <Badge>{PAPEL[v.papel]}</Badge>
+                  {v.papel === "PROFISSIONAL_SAUDE" ? (
+                    <Botao pequeno variante="secundario" onClick={() => setRemovendo(v)} aria-label={`Remover acesso de ${v.nomeUsuario ?? "profissional"}`}>
+                      Remover acesso
+                    </Botao>
+                  ) : (
+                    <Badge>{PAPEL[v.papel]}</Badge>
+                  )}
                 </li>
               ))}
             </ul>
@@ -185,6 +245,27 @@ export function Privacidade() {
           )}
         </>
       )}
+
+      <Modal
+        aberto={!!removendo}
+        titulo="Remover o acesso deste profissional?"
+        onFechar={() => setRemovendo(null)}
+        acoes={
+          <Botao variante="perigo" onClick={() => remover.executar()} carregando={remover.ocupado} textoCarregando="Removendo…">
+            Remover acesso
+          </Botao>
+        }
+      >
+        <p>
+          {removendo?.nomeUsuario ?? "O profissional"} deixa de ver os dados agora. O que ele já registrou continua no histórico. Para voltar,
+          a escola ou você precisa propor de novo.
+        </p>
+        {remover.erro && (
+          <Alerta tom="erro" vivo>
+            {mensagemAmigavel(remover.erro)}
+          </Alerta>
+        )}
+      </Modal>
 
       <h2>Suas escolhas</h2>
       <div className="grade-cards grade-cards--3">

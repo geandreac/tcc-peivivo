@@ -896,3 +896,53 @@ ul.perfis {
     display: block;
   }
 }
+
+/* ---------------------------------------------------------------- painel da escola (R4.5)
+   Bloco de número: rótulo, valor em tinta de texto, nota. Sem cor de status no número. */
+.blocos-numero {
+  list-style: none;
+  margin: 0 0 var(--esp-5);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: var(--esp-3);
+}
+.bloco-numero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-suave);
+  border-radius: var(--raio-lg);
+  padding: var(--esp-3) var(--esp-4);
+}
+.bloco-numero__rotulo {
+  min-height: 2.6em; /* valores alinhados mesmo quando o rótulo quebra em duas linhas */
+  font-size: var(--tamanho-xs);
+  font-weight: var(--peso-medio);
+  color: var(--cor-texto-secundario);
+}
+.bloco-numero__valor {
+  font-size: var(--tamanho-2xl);
+  font-weight: var(--peso-negrito);
+  line-height: 1.1;
+  color: var(--cor-texto);
+  font-variant-numeric: tabular-nums;
+}
+.bloco-numero__nota {
+  font-size: var(--tamanho-xs);
+  color: var(--cor-texto-secundario);
+}
+.pendencia-escola {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+}
+.pendencia-escola svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--cor-aviso);
+}
+.resumo-escola {
+  margin-bottom: var(--esp-6);
+}

@@ -39,8 +39,13 @@ export function Vinculos() {
     if (papel === "PROFISSIONAL_SAUDE" && !registro.trim()) lista.push({ campo: "registro", mensagem: "Informe o registro no conselho profissional (obrigatório para profissional de saúde)." });
     setErros(lista);
     if (lista.length > 0) return;
-    await api.vincular({ usuarioId, estudanteId: id!, papel, registroConselho: registro });
-    anunciar("Vínculo criado.", "sucesso");
+    const v = await api.vincular({ usuarioId, estudanteId: id!, papel, registroConselho: registro });
+    anunciar(
+      v.status === "PENDENTE_RESPONSAVEL"
+        ? "Proposta enviada. O profissional só terá acesso depois que a família confirmar."
+        : "Vínculo criado.",
+      "sucesso"
+    );
     setUsuarioId("");
     setRegistro("");
     dados.recarregar();
@@ -66,8 +71,9 @@ export function Vinculos() {
 
   const nomeDe = (uid: string) => dados.dados?.usuarios.find((u) => u.id === uid)?.nome ?? uid;
   const ativos = dados.dados?.vinculos.filter((v) => v.status === "ATIVO") ?? [];
-  const inativos = dados.dados?.vinculos.filter((v) => v.status === "INATIVO") ?? [];
-  const jaVinculados = new Set(ativos.map((v) => v.usuarioId));
+  const pendentes = dados.dados?.vinculos.filter((v) => v.status === "PENDENTE_RESPONSAVEL") ?? [];
+  const inativos = dados.dados?.vinculos.filter((v) => v.status === "ENCERRADO" || v.status === "RECUSADO") ?? [];
+  const jaVinculados = new Set([...ativos, ...pendentes].map((v) => v.usuarioId));
 
   return (
     <>
@@ -92,7 +98,7 @@ export function Vinculos() {
                         {v.registroConselho && ` · ${v.registroConselho}`}
                       </div>
                     </div>
-                    {v.papel !== "COORDENACAO" && (
+                    {v.papel !== "COORDENACAO" && v.papel !== "RESPONSAVEL" && (
                       <Botao variante="secundario" pequeno onClick={() => setDesativando(v)}>
                         Desativar
                       </Botao>
@@ -102,6 +108,26 @@ export function Vinculos() {
               </ul>
             )}
           </Card>
+
+          {pendentes.length > 0 && (
+            <Card titulo="Aguardando a família">
+              <p className="meta">Profissionais de saúde só passam a ter acesso depois que o responsável confirma.</p>
+              <ul className="lista-simples" aria-label="Aguardando a família">
+                {pendentes.map((v) => (
+                  <li key={v.id}>
+                    <div>
+                      <strong>{nomeDe(v.usuarioId)}</strong>
+                      <div className="meta">
+                        {PAPEL[v.papel]}
+                        {v.registroConselho && ` · ${v.registroConselho}`}
+                      </div>
+                    </div>
+                    <Badge tom="aviso">Aguardando confirmação</Badge>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           <form
             noValidate
@@ -151,14 +177,14 @@ export function Vinculos() {
           </form>
 
           {inativos.length > 0 && (
-            <Card titulo="Vínculos desativados" nivel={3}>
+            <Card titulo="Vínculos encerrados" nivel={3}>
               <ul className="lista-simples">
                 {inativos.map((v) => (
                   <li key={v.id}>
                     <span>
                       {nomeDe(v.usuarioId)} · {PAPEL[v.papel]}
                     </span>
-                    <Badge>Inativo</Badge>
+                    <Badge>{v.status === "RECUSADO" ? "Recusado pela família" : "Encerrado"}</Badge>
                   </li>
                 ))}
               </ul>
