@@ -22,7 +22,7 @@ Branches: `feature/geandre-…` e `feature/jean-…` a partir de `development`; 
 | R0 | ✅ decisões aprovadas | ADR-00/04/05/06 em `DECISOES.md` |
 | R1 | ✅ verde (local + CI no Supabase real, PR #98) | `marcos/R1.md` |
 | R3 | ✅ verde (local + CI, PR #99; antecipado porque o R2 está bloqueado) | `marcos/R3.md` |
-| R2 | 🟡 prova HTTP real no CI feita (403 com token válido, TOTP real; PR #102); telas, convite e `supabaseApi` pendentes; demo ao vivo precisa de projeto na nuvem | `marcos/R2.md` |
+| R2 | ✅ verde no CI contra Supabase real (PRs #102, #103); falta só criar o projeto na nuvem (`IMPLANTACAO.md`) | `marcos/R2.md` |
 | R4 | ✅ 8/8 cards (PR #100) | `marcos/R4.md` |
 | R5 | 🟡 R5.1 (E2E) e axe com contraste real feitos; NVDA, Lighthouse, STRIDE pendentes | `marcos/R5.md` |
 

@@ -74,6 +74,17 @@ STRIDE: **S**poofing (falsificar identidade) · **T**ampering (adulterar dado) �
 | A-39 | I | Notificação de revogação expõe o motivo ou um dado da família | Notificações tipadas, sem texto livre | M "F10: revogação avisa todos os vinculados, menos quem revogou" · T "sino com contagem…" |
 | A-40 | E | Tela "esconde" um botão, mas a ação passa por URL direta | A tela nunca decide; serviço/banco negam | E bloco "Acesso indevido por URL" · T "caminhos negados" |
 
+## Identidade e convites (R2)
+| # | STRIDE | Ameaça | Controle | Teste |
+|---|---|---|---|---|
+| A-41 | E | Docente (ou coordenação sem TOTP) convida pessoas e cria vínculos | `fn_preparar_convite` exige coordenação da escola com aal2; a EF não envia e-mail se o banco negar | P (identidade) "docente, responsável e coordenação sem segundo fator não convidam" · F "banco nega o preparo… NENHUM e-mail é enviado" · **C** "coordenação: sem aal2 nada…" |
+| A-42 | S | Convite cria "responsável" sem conferência do documento | Preparo **e** gravação exigem a conferência presencial (achado do lint) | P "D-25: service role também recusa responsável sem conferência presencial" |
+| A-43 | T | Corpo do convite com autor forjado | Schema estrito; o autor vem de `auth.uid()` | F "corpo inválido ou com campo extra → 400…" |
+| A-44 | I | Login revela se um e-mail tem conta | Mensagem genérica no login e na recuperação | T "negado: credenciais erradas → mensagem genérica" · **C** "login: senha errada é genérica…" |
+| A-45 | S | Sessão esquecida aberta em computador da escola | Inatividade de 30 min (saúde/coordenação); "sair de todos os dispositivos" | revisão de código (`useInatividade`, `Conta`) |
+
+Suíte **C** = `packages/politicas/src/supabaseApi.test.ts` (contrato do app contra Supabase real com Edge Functions, no CI).
+
 ## Ameaças conhecidas **sem** teste automatizado (limitações declaradas)
 | # | Ameaça | Situação |
 |---|---|---|
@@ -82,4 +93,4 @@ STRIDE: **S**poofing (falsificar identidade) · **T**ampering (adulterar dado) �
 | L-03 | Leituras não clínicas (perfil, observações) não são auditadas | PostgREST não registra `select`; só a nota clínica passa por RPC auditada (ADR-11) |
 | L-04 | Verificação real do registro no conselho profissional | Manual, registrada (ADR-05); sem integração com conselhos |
 | L-05 | CSP e cabeçalhos de segurança no host | R5.5 — depende do provedor de hospedagem escolhido |
-| L-06 | Camada HTTP das Edge Functions contra o runtime real | Só `deno check` + revisão; teste com `supabase functions serve` no CI está no backlog do R5 |
+| ~~L-06~~ | ~~Camada HTTP das Edge Functions contra o runtime real~~ | **Resolvida em 08/10/2026:** o CI serve as Edge Functions e o contrato do `supabaseApi` as exercita (`supabaseApi.test.ts`) |
