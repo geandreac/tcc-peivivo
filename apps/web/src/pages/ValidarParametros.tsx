@@ -42,7 +42,8 @@ export function ValidarParametros() {
     return { versoes, vigente, observacoes };
   }, [id, podeLer]);
 
-  const pendente = dados.dados?.versoes.find((v) => v.statusValidacao === "PENDENTE" || v.statusValidacao === "EM_REVISAO" || v.statusValidacao === "EXPIRADA");
+  // D-35: só a proposta PENDENTE é decidida; expirada ou em revisão aparece no histórico.
+  const pendente = dados.dados?.versoes.find((v) => v.statusValidacao === "PENDENTE");
 
   const validar = useMutacao(async (decisao: "APROVAR" | "AJUSTE") => {
     if (decisao === "AJUSTE" && !justificativa.trim()) {
@@ -97,9 +98,6 @@ export function ValidarParametros() {
               <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>{STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>
               <span className="meta">Ciclo {pendente.numeroCiclo} · proposta gerada em {formatarDataHora(pendente.createdAt)}</span>
             </div>
-            {pendente.statusValidacao === "EXPIRADA" && (
-              <Alerta tom="aviso" titulo="Prazo de 7 dias vencido">Os parâmetros anteriores foram mantidos (RN05). Você ainda pode validar esta versão agora.</Alerta>
-            )}
             {pendente.justificativaRevisao && (
               <Alerta tom="info" titulo="Ajuste solicitado anteriormente">{pendente.justificativaRevisao}</Alerta>
             )}

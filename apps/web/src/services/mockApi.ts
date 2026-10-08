@@ -184,6 +184,11 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
     return p;
   }
 
+  /** D-34 / S-19: só o docente que gerou decide sobre o material. */
+  function exigirAutor(m: Material) {
+    if (m.docenteId !== eu().id) throw new ErroApi("NEGADO", "Só o docente que gerou o material decide sobre ele.");
+  }
+
   function registrarAuditoria(entidade: string, entidadeId: string, evento: EventoAuditoria, detalhes: Record<string, unknown> = {}) {
     estado.auditoria.push({ id: uuid(), entidade, entidadeId, evento, autorId: sessaoId, data: agora(), detalhes });
   }
@@ -250,6 +255,14 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       aguardandoSegundoCiclo: aguardando.has(campo),
     }));
     return { proposta, diff, base };
+  }
+
+  /** D-35: uma única VIGENTE por estudante — a anterior vira SUBSTITUIDA (corrige M-01). */
+  function tornarVigente(v: VersaoPerfil) {
+    const atual = versaoVigente(v.estudanteId);
+    if (atual && atual.id !== v.id) atual.statusValidacao = "SUBSTITUIDA";
+    v.statusValidacao = "VIGENTE";
+    v.dataVigencia = agora();
   }
 
   function temProfissional(estudanteId: string): boolean {
@@ -490,12 +503,13 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
           cicloOrigemId: ciclo.id,
           numeroCiclo: ciclo.numero,
           parametros: proposta,
-          statusValidacao: modoPedagogico ? "VIGENTE" : "PENDENTE",
+          statusValidacao: "PENDENTE",
           validadorId: null,
-          dataVigencia: modoPedagogico ? agora() : null,
+          dataVigencia: null,
           justificativaRevisao: null,
           createdAt: agora(),
         };
+        if (modoPedagogico) tornarVigente(versao); // RN06
         estado.versoes.push(versao);
         ciclo.status = "FECHADO";
         ciclo.dataFim = agora().slice(0, 10);
@@ -511,11 +525,13 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         if (!v) throw new ErroApi("NAO_ENCONTRADO", "Versão não encontrada.");
         exigirPapel(v.estudanteId, "PROFISSIONAL_SAUDE");
         exigirConsentimento(v.estudanteId);
-        if (v.statusValidacao === "VIGENTE") throw new ErroApi("CONFLITO", "Esta versão já está vigente.");
+        // D-35: só PENDENTE é decidida; expirada não volta (RN05); nunca por cima de vigente mais nova.
+        if (v.statusValidacao !== "PENDENTE") throw new ErroApi("CONFLITO", "Só propostas pendentes podem ser decididas.");
+        const vigente = versaoVigente(v.estudanteId);
+        if (vigente && vigente.numeroCiclo >= v.numeroCiclo) throw new ErroApi("CONFLITO", "Já há uma versão vigente de ciclo igual ou mais recente.");
         if (decisao === "APROVAR") {
-          v.statusValidacao = "VIGENTE";
+          tornarVigente(v);
           v.validadorId = eu().id;
-          v.dataVigencia = agora();
           v.justificativaRevisao = null;
           registrarAuditoria("versoes_perfil", v.id, "VALIDACAO", { numeroCiclo: v.numeroCiclo });
         } else {
@@ -546,7 +562,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       chamada(() => {
         const p = exigirLeitura(estudanteId);
         return estado.materiais
-          .filter((m) => m.estudanteId === estudanteId && (p === "DOCENTE" || m.statusAprovacao === "APROVADO")) // D-12
+          .filter((m) => m.estudanteId === estudanteId && (m.statusAprovacao === "APROVADO" || (p === "DOCENTE" && m.docenteId === eu().id))) // D-34: rascunho só do autor
           .sort((a, b) => b.dataGeracao.localeCompare(a.dataGeracao));
       }),
     obterMaterial: (id) =>
@@ -554,7 +570,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const m = estado.materiais.find((x) => x.id === id);
         if (!m) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado.");
         const p = exigirLeitura(m.estudanteId);
-        if (p !== "DOCENTE" && m.statusAprovacao !== "APROVADO") throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado."); // D-12: 0 linhas
+        if (m.statusAprovacao !== "APROVADO" && !(p === "DOCENTE" && m.docenteId === eu().id)) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado."); // D-34: 0 linhas
         return m;
       }),
     gerarMaterial: (estudanteId, titulo, texto) =>
@@ -594,6 +610,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const m = estado.materiais.find((x) => x.id === id);
         if (!m) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado.");
         exigirPapel(m.estudanteId, "DOCENTE");
+        exigirAutor(m);
         exigirConsentimento(m.estudanteId);
         if (m.statusAprovacao !== "RASCUNHO") throw new ErroApi("CONFLITO", "Só rascunhos podem ser aprovados.");
         m.statusAprovacao = "APROVADO";
@@ -607,6 +624,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const m = estado.materiais.find((x) => x.id === id);
         if (!m) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado.");
         exigirPapel(m.estudanteId, "DOCENTE");
+        exigirAutor(m);
         if (m.statusAprovacao !== "RASCUNHO") throw new ErroApi("CONFLITO", "Só rascunhos podem ser descartados.");
         m.statusAprovacao = "DESCARTADO";
         registrarAuditoria("materiais_adaptados", m.id, "DESCARTE_MATERIAL");
@@ -626,6 +644,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const m = estado.materiais.find((x) => x.id === materialId);
         if (!m) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado.");
         exigirPapel(m.estudanteId, "DOCENTE");
+        exigirAutor(m); // S-23
         exigirConsentimento(m.estudanteId);
         if (m.statusAprovacao !== "APROVADO") throw new ErroApi("CONFLITO", "Só materiais aprovados recebem desfecho.");
         if (estado.desfechos.some((d) => d.materialId === materialId)) throw new ErroApi("CONFLITO", "Este material já tem desfecho registrado.");
