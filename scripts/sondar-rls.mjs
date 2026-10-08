@@ -5,6 +5,8 @@
 // "PERMITIU" numa ação que deveria ser negada = falha confirmada.
 //
 // Uso: node scripts/sondar-rls.mjs        (sem Docker; PGlite = Postgres em WASM)
+// Aplica SÓ 0001 + 0002 (o estado auditado em 07/10/2026). As policies novas
+// (0003–0005) são provadas por packages/politicas (npm test).
 // Dados 100 % fictícios.
 import { PGlite } from "@electric-sql/pglite";
 import { readdir, readFile } from "node:fs/promises";
@@ -27,7 +29,7 @@ await db.exec(`
   grant usage on schema auth to anon, authenticated;
   grant execute on function auth.uid() to anon, authenticated;
 `);
-for (const f of (await readdir(dirMigrations)).filter((f) => f.endsWith(".sql")).sort()) {
+for (const f of (await readdir(dirMigrations)).filter((f) => /^000[12]_.*\.sql$/.test(f)).sort()) {
   await db.exec(await readFile(join(dirMigrations, f), "utf8"));
 }
 await db.exec(`
