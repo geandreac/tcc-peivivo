@@ -23,8 +23,8 @@ Branches: `feature/geandre-…` e `feature/jean-…` a partir de `development`; 
 | R1 | ✅ verde (local + CI no Supabase real, PR #98) | `marcos/R1.md` |
 | R3 | ✅ verde (local + CI, PR #99; antecipado porque o R2 está bloqueado) | `marcos/R3.md` |
 | R2 | ⏳ bloqueado: precisa de projeto Supabase na nuvem (sem Docker local) | — |
-| R4 | 🟡 7/8 cards (falta só R4.8, medição dos 60 s) | `marcos/R4.md` |
-| R5 | ⬜ | — |
+| R4 | ✅ 8/8 cards (PR #100) | `marcos/R4.md` |
+| R5 | 🟡 R5.1 (E2E) e axe com contraste real feitos; NVDA, Lighthouse, STRIDE pendentes | `marcos/R5.md` |
 
 ## R0 · Aprovação (esta semana, até 14/10)
 | Item | Aceite |

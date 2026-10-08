@@ -29,6 +29,7 @@ npm run contraste                           # tokens de cor ≥ 4,5:1 / 3:1
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
 node scripts/sondar-rls.mjs                 # evidência histórica: 25/31 ataques passavam em 0002
 node scripts/sincronizar-funcoes.mjs        # copia motor/contratos/funcoes p/ supabase/functions/_shared/gerado (Deno)
+npm run test:e2e                            # Playwright (Chrome local, porta 5179): 20 E2E em 390/1280 px + axe com contraste real
 npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
 ```
 
