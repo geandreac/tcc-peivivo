@@ -114,8 +114,8 @@
   --papel-familia-tint: #e3f2ea;
   --papel-saude: #a52a5c;          /* 6,6:1 */
   --papel-saude-tint: #f8e7ee;
-  --papel-coordenacao: #8a5300;    /* 6,3:1 */
-  --papel-coordenacao-tint: #fbf0dc;
+  --papel-coordenacao: #6a3d9a;    /* 7,6:1 — violeta do laço; âmbar fica só para aviso */
+  --papel-coordenacao-tint: #efeafa;
   --vidro: rgba(255, 255, 255, 0.78); /* cabeçalho translúcido */
 
   /* --- alvos de toque (2.5.8 exige 24px; adotamos 44px) --- */
@@ -172,7 +172,7 @@
   --papel-escola: #0b2a50;
   --papel-familia: #0f4a24;
   --papel-saude: #6b1238;
-  --papel-coordenacao: #5c3600;
+  --papel-coordenacao: #3f1f66;
   --vidro: #ffffff;
 }
 
@@ -217,8 +217,8 @@
     --papel-familia-tint: #13261b;
     --papel-saude: #f4a3c3;
     --papel-saude-tint: #33161f;
-    --papel-coordenacao: #f2c46b;
-    --papel-coordenacao-tint: #2b2210;
+    --papel-coordenacao: #c9b3f5;
+    --papel-coordenacao-tint: #241b33;
     --vidro: rgba(26, 30, 36, 0.78);
   }
 }
@@ -259,8 +259,8 @@
   --papel-familia-tint: #13261b;
   --papel-saude: #f4a3c3;
   --papel-saude-tint: #33161f;
-  --papel-coordenacao: #f2c46b;
-  --papel-coordenacao-tint: #2b2210;
+  --papel-coordenacao: #c9b3f5;
+  --papel-coordenacao-tint: #241b33;
   --vidro: rgba(26, 30, 36, 0.78);
 }
 

@@ -58,7 +58,7 @@ Impacto: **U** usabilidade · **V** consistência visual · **A** acessibilidade
 2. Componentes: `EstadoVazio compacto`, `Esqueleto`, toast, `.formulario`, `.grade-cards` (3, 4, 5, 7, 8).
 3. Telas, por impacto: Painel → Gerar material → Privacidade → Observar → Validar → Histórico → Consentimento → demais formulários (Cadastrar, Convidar, Vínculos) → limpeza dos estilos inline (11, 12).
 4. Escuro tonal (10) e `contraste.mjs` lendo `tokens.css` (16).
-5. Item 9 (cor da coordenação) só com a sua decisão.
+5. Item 9 (cor da coordenação) só com a sua decisão — aprovado em 12/10/2026 (D-45).
 
 Cada etapa termina com `npm test`, `npm run typecheck`, `npm run contraste` e `npm run test:e2e`, mais capturas antes/depois.
 
@@ -74,7 +74,7 @@ Cada etapa termina com `npm test`, `npm run typecheck`, `npm run contraste` e `n
 | 6 | Feito | Escala de títulos só em `base.css`; `telas.css` cuida só do espaçamento. |
 | 7 | Feito | `.grade-cards` com `auto-fit` (2 cartões ocupam a linha; 4 viram 2×2). |
 | 8 | Feito | `Esqueleto` no Painel, Estudante, Histórico, Notificações e Pendências. |
-| 9 | **Pendente** | Depende da sua decisão (muda a identidade D-41). |
+| 9 | Feito (D-45) | Coordenação em violeta (cor da faixa do logo) nos três temas; âmbar só para aviso. `contraste.mjs` falha se papel igualar aviso ou erro. |
 | 10 | Feito | `--cor-superficie-destaque` (tom mais claro no escuro) no hover/foco dos cartões. |
 | 11 | Feito | 22 estilos inline viraram classes; ficaram 2 dinâmicos (atraso da animação do início, fração da barra). |
 | 12 | Feito | Barra de progresso com `transform: scaleX()`. |

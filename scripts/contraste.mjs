@@ -144,6 +144,19 @@ for (const n of nomes) {
   }
 }
 
+// Cor de papel é identidade, cor de estado é significado: nunca a mesma cor (Apple HIG, Color; D-45).
+const ESTADOS = ["cor-aviso", "cor-erro"]; // estados que pedem atenção; escola/info e família/sucesso compartilham tom de propósito (marca)
+for (const [tema, valores] of Object.entries(TEMAS)) {
+  for (const papel of Object.keys(valores).filter((n) => /^papel-[a-z]+$/.test(n))) {
+    for (const estado of ESTADOS.filter((e) => e in valores)) {
+      if (resolver(valores, papel).toLowerCase() === resolver(valores, estado).toLowerCase()) {
+        falhas++;
+        console.log(`✗ ${tema}: --${papel} igual a --${estado} (mesma cor com dois significados)`);
+      }
+    }
+  }
+}
+
 for (const [tema, nome, frente, fundo, minimo] of PARES) {
   const a = resolver(TEMAS[tema], frente);
   const b = resolver(TEMAS[tema], fundo);
