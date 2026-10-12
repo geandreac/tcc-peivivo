@@ -1,6 +1,6 @@
 # PEI Vivo — Análise de requisitos por perfil de usuário
 
-**Versão:** 1.2 — 07/10/2026 (D-19…D-39 da reformulação; v1.1 em 14/09; v1.0 em 10/09)
+**Versão:** 1.3 — 12/10/2026 (D-40…D-45: fonte, cores por papel, RN03, apoios de leitura, padrões de interface; v1.2 em 07/10 com D-19…D-39; v1.1 em 14/09; v1.0 em 10/09)
 **Fontes:** pré-projeto (`docs/tcc/TCC - Geandre & Jean.md`), mapeamento dos slides
 (`docs/tcc/PEI_Vivo_Slides_Mapeamento.md`), diagramas de casos de uso, classes e
 sequência (`docs/tcc/*.svg`), foto do quadro com o formato de rastreabilidade

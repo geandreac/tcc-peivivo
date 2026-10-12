@@ -16,15 +16,15 @@ Branches: `feature/geandre-…` e `feature/jean-…` a partir de `development`; 
 
 ---
 
-## Estado (07/10/2026)
+## Estado (12/10/2026)
 | Marco | Estado | Resumo |
 |---|---|---|
 | R0 | ✅ decisões aprovadas | ADR-00/04/05/06 em `DECISOES.md` |
 | R1 | ✅ verde (local + CI no Supabase real, PR #98) | `marcos/R1.md` |
 | R3 | ✅ verde (local + CI, PR #99; antecipado porque o R2 está bloqueado) | `marcos/R3.md` |
-| R2 | ✅ verde no CI contra Supabase real (PRs #102, #103); falta só criar o projeto na nuvem (`IMPLANTACAO.md`) | `marcos/R2.md` |
-| R4 | ✅ 8/8 cards (PR #100) | `marcos/R4.md` |
-| R5 | 🟡 R5.1 (E2E) e axe com contraste real feitos; NVDA, Lighthouse, STRIDE pendentes | `marcos/R5.md` |
+| R2 | ✅ verde no CI contra Supabase real (PRs #102, #103). Projeto na nuvem criado e conferido em 12/10; faltam 3 ajustes de Auth no painel e a primeira escola (`IMPLANTACAO.md` §0) | `marcos/R2.md` |
+| R4 | ✅ 8/8 cards (PR #100) + refatoração de interface D-44/D-45 (PR #104) | `marcos/R4.md` |
+| R5 | 🟡 E2E, axe com contraste real, STRIDE e Lighthouse das páginas públicas feitos; NVDA, CSP/host e E2E contra a nuvem pendentes | `marcos/R5.md` |
 
 ## R0 · Aprovação (esta semana, até 14/10)
 | Item | Aceite |

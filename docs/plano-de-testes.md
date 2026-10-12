@@ -2,7 +2,7 @@
 
 **Versão:** 1.1 — 21/09/2026 (1.0 em 14/09/2026). Mudanças: §0 (estrutura formal do plano), TF-41…TF-47 (login por perfil, logout, origem, falha de autenticação), §1.1 (testes de integração), ferramentas e evidências.
 **Escopo:** protótipo `apps/web` + `packages/motor-adaptacao`. Testes de RLS/Edge Functions seguem em `docs/plano-desenvolvimento.md` (P1.11–P1.19, P3.x).
-**Automatizado hoje:** 30 testes do motor (`packages/motor-adaptacao/src/*.test.ts`) e 68 do app (`apps/web/src/**/*.test.tsx`, incluindo `autenticacao.test.tsx`), com axe-core em todas as telas. Comando: `npm test`.
+**Automatizado hoje (12/10/2026):** 42 testes do motor, 31 dos casos de uso das Edge Functions, 100 de políticas RLS (PGlite; +12 só no CI), 116 do app (`apps/web/src/**/*.test.tsx`), com axe-core em todas as telas, e 20 E2E (Playwright). Comando: `npm test`.
 
 ---
 

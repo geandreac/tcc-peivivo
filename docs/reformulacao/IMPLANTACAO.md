@@ -1,6 +1,22 @@
 # Implantação no Supabase (nuvem) — passo a passo, sem Docker
 
 **Para:** Geandre e Jean · **Data:** 08/10/2026 · **Pré-requisito:** R1–R3 e o R2 mesclados (PRs #98 → #103).
+## 0. Estado conferido em 12/10/2026 (projeto `tcc-peivivo`, ref `xjjuugpybbxifwfxjigu`, São Paulo, plano gratuito)
+| Passo | Situação |
+|---|---|
+| 1–2 Projeto e CLI ligada | ✅ |
+| 3 Migrations 0001–0007 | ✅ 15 tabelas, todas com RLS; 17 políticas (= o que as migrations criam); `privado` fora da API; anônimo recebe 42501 |
+| 3 cron RN05 | ✅ `pei-vivo-expirar-validacoes` às 3h |
+| 4 Email ligado, TOTP ligado, confirmar e-mail ligado | ✅ |
+| 4 **Allow new users to sign up** | ❌ ligado — **desligar** (D-32) |
+| 4 **Senha mínima** | ❌ 6 — **mudar para 10** |
+| 4 **Site URL / Redirect URLs** | ❌ `http://localhost:3000`, sem redirects — usar o endereço do app |
+| 4 Sessões 12 h / 8 h, senhas vazadas | ⚠️ só no plano Pro → limitação declarada; o app encerra saúde/coordenação em 30 min |
+| 4 SMTP próprio e modelo de convite em português | ⚠️ pendente (o modelo só é editável com SMTP próprio) |
+| 5 EFs `gerar-material`, `fechar-ciclo`, `convidar` + `ORIGEM_APP` | ✅ publicadas em 08/10 — **republicar** depois do merge do #104 (apoios de leitura, RN03) |
+| 6 Primeira escola | ⏳ 0 escolas, 0 contas |
+| 7 `apps/web/.env.local` | ✅ criado localmente (só a chave anon); login real abre em `/entrar` |
+
 Tudo aqui roda **sem Docker**. Onde a CLI normalmente usaria Docker (deploy das Edge Functions), usamos `--use-api`, que empacota no servidor (verificado na documentação da CLI em 08/10/2026).
 
 > **Segredos:** a `service_role` e a senha do banco **nunca** vão para o repositório, para o `.env` do app nem para o navegador. Use só no terminal, como variável de ambiente.

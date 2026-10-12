@@ -23,9 +23,9 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (30) + funções (24) + políticas RLS (88, PGlite) + web (91, axe) — 100%
-npm run dev                                 # protótipo em http://localhost:5173
-npm run contraste                           # tokens de cor ≥ 4,5:1 / 3:1
+npm test                                    # motor (42) + funções (31) + políticas RLS (100, PGlite) + web (116, axe) — 100%
+npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
+npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
 node scripts/sondar-rls.mjs                 # evidência histórica: 25/31 ataques passavam em 0002
 node scripts/sincronizar-funcoes.mjs        # copia motor/contratos/funcoes p/ supabase/functions/_shared/gerado (Deno)
@@ -74,7 +74,7 @@ banco e políticas são validados no PGlite; o Supabase real roda só no job `db
 
 A tabela completa de RF/RNF e o mapeamento para código está em `README.md`.
 A análise de requisitos por perfil, as decisões de projeto (`D-nn`, hoje até
-D-39) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
+D-45) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
 de implementar qualquer feature; toda decisão nova ganha um `D-nn` lá. Para
 telas: `docs/ux-ui.md` (arquitetura, telas, design system),
 `docs/acessibilidade.md`, `docs/wcag-2.2.md`, `docs/avaliacao-heuristica.md`,
@@ -102,8 +102,8 @@ topo do arquivo).
 
 ## Onde estamos
 
-Motor completo (30 testes, 97 %). Protótipo `apps/web` funcional sobre mock com
-permissões (22 telas, 72 testes com axe-core). Documentação de UX/acessibilidade
+Motor completo (42 testes, inclui apoios de leitura D-43 e RN03 em todas as dimensões D-42).
+Protótipo `apps/web` com 31 telas, 116 testes com axe-core e 20 E2E (Playwright). Documentação de UX/acessibilidade
 (14/09) e de governança/processos (21/09/2026).
 
 **Reformulação (desde 07/10/2026)** — fonte de verdade: `docs/reformulacao/`
@@ -113,12 +113,16 @@ migrations `0003`–`0005`, políticas verdes no PGlite **e no Supabase real (CI
 **R3 (ciclo no servidor) feito, antecipado:** `0006` (portas das EFs), `packages/
 contratos` (Zod), `packages/funcoes` (casos de uso puros), Edge Functions
 `gerar-material` e `fechar-ciclo` (camada HTTP fina; nunca edite
-`_shared/gerado/`, rode o script). Bloqueado: R2 (login real) precisa de projeto
-**R2 feito:** `supabaseApi` (modo real com `VITE_API=supabase`), login com senha/TOTP/convite,
+`_shared/gerado/`, rode o script). **R2 feito:** `supabaseApi` (modo real com `VITE_API=supabase`), login com senha/TOTP/convite,
 EF `convidar`, `scripts/implantar-escola.mjs`; contrato testado no CI contra Supabase real com
 Edge Functions. Implantação na nuvem sem Docker: `docs/reformulacao/IMPLANTACAO.md`
 (`functions deploy --use-api`). **R4 (UX) feito:** navegação inferior/lateral, linguagem
 leiga (nunca sigla RN/D na tela), Privacidade (família confirma profissional), painel
 da escola (só contagens), notificações tipadas, tema escuro e leitura facilitada
-(pares em `scripts/contraste.mjs`). Depois: R5 (E2E e provas). O diagrama de classes do artigo
+(pares em `scripts/contraste.mjs`). **Interface (12/10):** padrões Apple/Google/Microsoft
+(`docs/padroes-de-interface.md`, `docs/diagnostico-de-interface.md`, D-44), coordenação em violeta
+(D-45); PR #104 empilhado sobre o #103. **Nuvem (12/10):** projeto `tcc-peivivo` (sa-east-1)
+com 0001–0007, RLS em 15/15 tabelas, cron RN05 e 3 EFs (versão de 08/10 — republicar após
+o merge); faltam ajustes de Auth no painel e a primeira escola (`IMPLANTACAO.md` §0).
+**R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. O diagrama de classes do artigo
 está desatualizado → `docs/reformulacao/DIAGRAMA-CLASSES.md`.
