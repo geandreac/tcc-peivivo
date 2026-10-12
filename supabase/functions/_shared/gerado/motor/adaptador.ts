@@ -18,6 +18,7 @@
  * Tipografia e contraste são CSS no cliente (D-10).
  */
 import type { Bloco, Enunciado, ParametrosAdaptacao, TextoAdaptado } from "./tipos.ts";
+import { apoiosDeLeitura } from "./apoios.ts";
 
 /** Uma "linha" de leitura ≈ 60 caracteres (P2.4). */
 export const CARACTERES_POR_LINHA = 60;
@@ -39,8 +40,16 @@ const CONECTORES = [
   "então",
 ];
 
-const VERBOS =
-  "leia|escreva|circule|marque|pinte|responda|complete|copie|desenhe|observe|sublinhe|ligue|calcule|escolha|anote|recorte|cole|conte|explique|resuma|procure|compare|identifique|descreva|monte|separe|organize|assinale|numere|risque|encontre|preencha|grife|destaque|relacione|indique|justifique|cite|elabore|construa|classifique";
+/** Verbos de comando reconhecidos (imperativo, 3ª pessoa). Cada um tem pictograma (`apoios.ts`). */
+export const VERBOS_DE_COMANDO = [
+  "leia", "escreva", "circule", "marque", "pinte", "responda", "complete", "copie", "desenhe", "observe",
+  "sublinhe", "ligue", "calcule", "escolha", "anote", "recorte", "cole", "conte", "explique", "resuma",
+  "procure", "compare", "identifique", "descreva", "monte", "separe", "organize", "assinale", "numere", "risque",
+  "encontre", "preencha", "grife", "destaque", "relacione", "indique", "justifique", "cite", "elabore", "construa",
+  "classifique",
+] as const;
+
+const VERBOS = VERBOS_DE_COMANDO.join("|");
 
 const VERBO_INICIAL = new RegExp(`^(?:${VERBOS})m?\\b`, "iu");
 
@@ -136,6 +145,7 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
     blocosExcedentes: blocos.slice(maxBlocos),
     enunciados,
     parametros: p,
+    apoios: apoiosDeLeitura(texto, p),
   };
 }
 

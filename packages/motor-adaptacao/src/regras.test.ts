@@ -102,20 +102,32 @@ describe("Quadro 5 — demais regras de conversão", () => {
     expect(aposDois.formatoEnunciado).toBe("MULTIPLAS_ETAPAS");
   });
 
-  it("sensibilidade visual ampliada exige contraste 7; caso contrário 4.5", () => {
+  it("sensibilidade visual ampliada exige contraste 7 na hora (restringir é imediato)", () => {
     const ampliada: Observacao = { dimensao: "SENSIBILIDADE_VISUAL", valorEscala: "AMPLIADA", ciclosConsecutivos: 1 };
-    const estavel: Observacao = { dimensao: "SENSIBILIDADE_VISUAL", valorEscala: "ESTAVEL", ciclosConsecutivos: 1 };
     expect(aplicarObservacao(PARAMETROS_PADRAO, ampliada).contrasteMinimo).toBe(7);
-    expect(aplicarObservacao({ ...PARAMETROS_PADRAO, contrasteMinimo: 7 }, estavel).contrasteMinimo).toBe(4.5);
   });
 
-  it("fadiga ampliada reduz blocos por material (mín. 4); reduzida amplia (máx. 12)", () => {
+  it("RN03 (D-42): voltar do contraste 7 para 4.5 é flexibilizar — só com 2 ciclos", () => {
+    const comSete = { ...PARAMETROS_PADRAO, contrasteMinimo: 7 as const };
+    for (const valorEscala of ["ESTAVEL", "REDUZIDA"] as const) {
+      const umCiclo: Observacao = { dimensao: "SENSIBILIDADE_VISUAL", valorEscala, ciclosConsecutivos: 1 };
+      expect(aplicarObservacao(comSete, umCiclo).contrasteMinimo).toBe(7); // inalterado
+      expect(aplicarObservacao(comSete, { ...umCiclo, ciclosConsecutivos: 2 }).contrasteMinimo).toBe(4.5);
+    }
+  });
+
+  it("fadiga ampliada reduz blocos por material na hora (mín. 4)", () => {
     const ampliada: Observacao = { dimensao: "FADIGA_TAREFA", valorEscala: "AMPLIADA", ciclosConsecutivos: 1 };
-    const reduzida: Observacao = { dimensao: "FADIGA_TAREFA", valorEscala: "REDUZIDA", ciclosConsecutivos: 1 };
     expect(aplicarObservacao(PARAMETROS_PADRAO, ampliada).blocosPorMaterial).toBe(6); // 8 - 2
     expect(aplicarObservacao({ ...PARAMETROS_PADRAO, blocosPorMaterial: 4 }, ampliada).blocosPorMaterial).toBe(4);
-    expect(aplicarObservacao(PARAMETROS_PADRAO, reduzida).blocosPorMaterial).toBe(10); // 8 + 2
-    expect(aplicarObservacao({ ...PARAMETROS_PADRAO, blocosPorMaterial: 12 }, reduzida).blocosPorMaterial).toBe(12);
+  });
+
+  it("RN03 (D-42): fadiga reduzida só amplia blocos com 2 ciclos (máx. 12)", () => {
+    const reduzida: Observacao = { dimensao: "FADIGA_TAREFA", valorEscala: "REDUZIDA", ciclosConsecutivos: 1 };
+    expect(aplicarObservacao(PARAMETROS_PADRAO, reduzida).blocosPorMaterial).toBe(8); // inalterado
+    const doisCiclos = { ...reduzida, ciclosConsecutivos: 2 };
+    expect(aplicarObservacao(PARAMETROS_PADRAO, doisCiclos).blocosPorMaterial).toBe(10); // 8 + 2
+    expect(aplicarObservacao({ ...PARAMETROS_PADRAO, blocosPorMaterial: 12 }, doisCiclos).blocosPorMaterial).toBe(12);
   });
 
   it("não muta os parâmetros recebidos (snapshot seguro)", () => {

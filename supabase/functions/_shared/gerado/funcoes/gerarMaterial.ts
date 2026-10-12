@@ -14,7 +14,7 @@ import {
   type RespostaGerarMaterial,
   type SaidaIA,
 } from "../contratos/index.ts";
-import { adaptar, type ParametrosAdaptacao, type TextoAdaptado } from "../motor/index.ts";
+import { adaptar, juntarGlossarios, type ParametrosAdaptacao, type TextoAdaptado } from "../motor/index.ts";
 import { ErroFuncao, deErroBanco } from "./erros.ts";
 import { aplicarIA, iaDesligada, type ProvedorIA } from "./ia.ts";
 
@@ -95,7 +95,11 @@ export async function gerarMaterial(corpo: unknown, portas: PortasGerarMaterial)
     }
   }
 
-  const adaptado = adaptar(textoBase, parametros.data);
+  const regras = adaptar(textoBase, parametros.data);
+  // D-43: o glossário da IA só acrescenta termos ao das regras (curado).
+  const adaptado = regras.apoios && glossario
+    ? { ...regras, apoios: { ...regras.apoios, glossario: juntarGlossarios(regras.apoios.glossario, glossario) } }
+    : regras;
   try {
     const { materialId, emCache } = await portas.registrar({
       docenteId: preparo.docenteId, // do banco (auth.uid()), nunca do corpo

@@ -8,3 +8,5 @@ export * from "./regras.ts";
 export * from "./ciclos.ts";
 export * from "./ancora.ts";
 export * from "./adaptador.ts";
+export * from "./apoios.ts";
+export * from "./vocabulario.ts";

@@ -7,3 +7,5 @@ export * from "./regras";
 export * from "./ciclos";
 export * from "./ancora";
 export * from "./adaptador";
+export * from "./apoios";
+export * from "./vocabulario";

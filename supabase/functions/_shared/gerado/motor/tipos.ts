@@ -73,6 +73,47 @@ export interface TextoAdaptado {
   parametros: ParametrosAdaptacao;
   /** Blocos que ficaram de fora por exceder `blocosPorMaterial` — nada se perde. */
   blocosExcedentes: Bloco[];
+  /**
+   * D-43 — apoios de leitura derivados dos parâmetros já validados (RN07).
+   * Opcional: materiais gravados antes do D-43 não têm.
+   */
+  apoios?: ApoiosLeitura;
+}
+
+/** Mesmo formato do glossário da camada de IA (`SaidaIASchema`). */
+export interface ItemGlossario {
+  termo: string;
+  explicacao: string;
+}
+
+/** Ação de cada comando de enunciado, para o pictograma ao lado da etapa (D-43). */
+export type Pictograma =
+  | "LER"
+  | "ESCREVER"
+  | "CIRCULAR"
+  | "MARCAR"
+  | "PINTAR"
+  | "RESPONDER"
+  | "COMPLETAR"
+  | "COPIAR"
+  | "DESENHAR"
+  | "OBSERVAR"
+  | "SUBLINHAR"
+  | "LIGAR"
+  | "CALCULAR"
+  | "CONTAR"
+  | "RECORTAR"
+  | "COLAR"
+  | "ESCOLHER"
+  | "EXPLICAR"
+  | "ORGANIZAR"
+  | "PROCURAR";
+
+export interface ApoiosLeitura {
+  /** Pictograma ao lado de cada etapa — liga com `formatoEnunciado = ETAPA_UNICA`. */
+  pictogramas: boolean;
+  /** "Palavras para saber" — quantas entram depende de `nivelVocabulario`. */
+  glossario: ItemGlossario[];
 }
 
 export const PARAMETROS_PADRAO: ParametrosAdaptacao = {

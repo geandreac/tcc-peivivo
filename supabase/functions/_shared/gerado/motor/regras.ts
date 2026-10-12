@@ -78,13 +78,19 @@ export function aplicarObservacao(
       break;
 
     case "SENSIBILIDADE_VISUAL":
-      p.contrasteMinimo = obs.valorEscala === "AMPLIADA" ? 7 : 4.5;
+      // Subir para 7 protege (imediato); voltar a 4.5 flexibiliza (RN03, D-42: 2 ciclos).
+      if (obs.valorEscala === "AMPLIADA") {
+        p.contrasteMinimo = 7;
+      } else if (obs.ciclosConsecutivos >= 2) {
+        p.contrasteMinimo = 4.5;
+      }
       break;
 
     case "FADIGA_TAREFA":
       if (obs.valorEscala === "AMPLIADA") {
         p.blocosPorMaterial = Math.max(4, p.blocosPorMaterial - 2);
-      } else if (obs.valorEscala === "REDUZIDA") {
+      } else if (obs.valorEscala === "REDUZIDA" && obs.ciclosConsecutivos >= 2) {
+        // Mais blocos = flexibilizar (RN03, D-42: 2 ciclos).
         p.blocosPorMaterial = Math.min(12, p.blocosPorMaterial + 2);
       }
       break;
