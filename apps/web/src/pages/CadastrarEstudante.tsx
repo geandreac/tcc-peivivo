@@ -64,7 +64,7 @@ export function CadastrarEstudante() {
           e.preventDefault();
           cadastrar.executar();
         }}
-        style={{ maxWidth: "var(--largura-leitura)" }}
+        className="formulario"
       >
         <ResumoErros erros={erros} />
         {cadastrar.erro && (

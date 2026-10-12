@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { CircleAlert, Clock, ShieldQuestion, Stethoscope, type LucideIcon } from "lucide-react";
 import { api, type MotivoPendenciaEscola, type ResumoEscola as Resumo } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
-import { Carregando, ErroCarregamento } from "./Feedback";
+import { Carregando, ErroCarregamento, VazioSecao } from "./Feedback";
 import { formatarData } from "../utils/datas";
 
 const MOTIVO: Record<MotivoPendenciaEscola, { texto: string; acao: string; rota: (id: string) => string; Icone: LucideIcon }> = {
@@ -43,7 +43,7 @@ export function ResumoEscola() {
       </ul>
       <h3>O que precisa de você</h3>
       {r.pendencias.length === 0 ? (
-        <p className="meta">Nenhuma pendência. Tudo em dia.</p>
+        <VazioSecao>Nenhuma pendência. Tudo em dia.</VazioSecao>
       ) : (
         <ul className="lista-simples" aria-label="O que precisa de você">
           {r.pendencias.map((p) => {
@@ -68,7 +68,7 @@ export function ResumoEscola() {
           })}
         </ul>
       )}
-      <p className="meta">Este painel mostra só contagens e situações — nunca observações, perfis, notas ou materiais.</p>
+      <p className="texto-apoio">Este painel mostra só contagens e situações — nunca observações, perfis, notas ou materiais.</p>
     </section>
   );
 }

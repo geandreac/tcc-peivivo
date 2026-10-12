@@ -73,7 +73,7 @@ export function Conta() {
           </Botao>
         </Card>
       </div>
-      <p className="meta">
+      <p className="texto-apoio">
         <Link to="/termos">Termos de uso e privacidade</Link>
       </p>
     </>

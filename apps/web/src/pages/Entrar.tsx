@@ -46,7 +46,7 @@ function EntrarDemonstracao() {
         ))}
       </ul>
 
-      <p className="meta">
+      <p className="texto-apoio">
         Ainda não tem acesso? A coordenação da escola cadastra o estudante e convida a família, a docente e a equipe de saúde. Veja a{" "}
         <Link to="/ajuda">ajuda</Link>.
       </p>

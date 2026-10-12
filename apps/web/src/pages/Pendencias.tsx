@@ -3,7 +3,7 @@ import { api, type Pendencia } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
 import { useSessao } from "../hooks/useSessao";
 import { useTitulo } from "../hooks/useTitulo";
-import { Badge, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
+import { Badge, Esqueleto, ErroCarregamento, EstadoVazio } from "../components/Feedback";
 import { LinkBotao } from "../components/Botao";
 import { STATUS_VALIDACAO } from "../utils/rotulos";
 import { formatarDataHora } from "../utils/datas";
@@ -23,7 +23,7 @@ export function Pendencias() {
         </div>
       </div>
 
-      {pendencias.carregando && <Carregando />}
+      {pendencias.carregando && <Esqueleto texto="Carregando pendências…" />}
       {pendencias.erro && <ErroCarregamento erro={pendencias.erro} tentarNovamente={pendencias.recarregar} />}
       {pendencias.dados && pendencias.dados.length === 0 && (
         <EstadoVazio titulo="Nenhuma pendência">

@@ -6,7 +6,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPagina } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { TabelaDiff } from "./FecharCiclo";
@@ -59,7 +59,7 @@ export function ValidarParametros() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   if (ctx.dados.papel !== "PROFISSIONAL_SAUDE") {
     return (
@@ -94,7 +94,7 @@ export function ValidarParametros() {
       {dados.dados && pendente && (
         <>
           <Card>
-            <div className="chips" style={{ marginBottom: "var(--esp-3)" }}>
+            <div className="chips chips--secao">
               <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>{STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>
               <span className="meta">Ciclo {pendente.numeroCiclo} · proposta gerada em {formatarDataHora(pendente.createdAt)}</span>
             </div>
@@ -106,14 +106,14 @@ export function ValidarParametros() {
 
           <h2>Observações que geraram a proposta</h2>
           <ul className="lista-simples" aria-label="Observações do ciclo">
-            {dados.dados.observacoes.filter((o) => o.cicloId === pendente.cicloOrigemId).length === 0 && <li className="meta">Sem observações vinculadas a este ciclo.</li>}
+            {dados.dados.observacoes.filter((o) => o.cicloId === pendente.cicloOrigemId).length === 0 && <li className="texto-apoio">Sem observações vinculadas a este ciclo.</li>}
             {dados.dados.observacoes
               .filter((o) => o.cicloId === pendente.cicloOrigemId)
               .map((o) => (
                 <li key={o.id}>
                   <div>
                     <strong>{DIMENSAO[o.dimensao].titulo}</strong>: {ESCALA[o.valorEscala]}
-                    {o.evidencia && <div className="meta">“{o.evidencia}”</div>}
+                    {o.evidencia && <div className="texto-apoio">“{o.evidencia}”</div>}
                   </div>
                   <Badge>{PAPEL[o.papelAutor]}</Badge>
                 </li>

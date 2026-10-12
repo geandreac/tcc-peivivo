@@ -5,7 +5,7 @@ import { useTitulo } from "../hooks/useTitulo";
 import { useEstudante } from "../hooks/useEstudante";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
 import { MaterialAdaptado } from "../components/MaterialAdaptado";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { DESFECHO, STATUS_APROVACAO } from "../utils/rotulos";
 import { formatarDataHora } from "../utils/datas";
@@ -27,14 +27,14 @@ export function MaterialFinal() {
       <>
         <h1>Material não encontrado</h1>
         <ErroCarregamento erro={dados.erro} />
-        <p className="meta">Rascunhos só aparecem para a docente que os criou.</p>
+        <p className="texto-apoio">Rascunhos só aparecem para a docente que os criou.</p>
         <LinkBotao to="/painel" variante="secundario">
           Voltar
         </LinkBotao>
       </>
     );
   }
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const { material: m, desfecho } = dados.dados;
   const papel = ctx.dados.papel;
@@ -43,7 +43,7 @@ export function MaterialFinal() {
     <>
       <div className="nao-imprimir">
         <CabecalhoEstudante contexto={ctx.dados} titulo={m.titulo} />
-        <div className="chips" style={{ marginBottom: "var(--esp-4)" }}>
+        <div className="chips chips--secao">
           <Badge tom={STATUS_APROVACAO[m.statusAprovacao].tom}>{STATUS_APROVACAO[m.statusAprovacao].texto}</Badge>
           <span className="meta">Gerado em {formatarDataHora(m.dataGeracao)}</span>
           {desfecho && <Badge tom={DESFECHO[desfecho.resultado].tom}>Desfecho: {DESFECHO[desfecho.resultado].texto}</Badge>}
@@ -77,9 +77,9 @@ export function MaterialFinal() {
         </Card>
       )}
 
-      <details className="nao-imprimir" style={{ marginTop: "var(--esp-5)" }}>
+      <details className="nao-imprimir u-mt-5">
         <summary>Ver texto original</summary>
-        <pre style={{ whiteSpace: "pre-wrap" }}>{m.textoOriginal}</pre>
+        <pre className="texto-original">{m.textoOriginal}</pre>
       </details>
     </>
   );

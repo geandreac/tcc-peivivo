@@ -50,14 +50,20 @@ h4 {
   font-weight: var(--peso-negrito);
   overflow-wrap: anywhere;
 }
+/* Uma só escala de títulos, por papel (tokens.css). */
 h1 {
-  font-size: var(--tamanho-xl);
+  font-size: var(--texto-titulo-pagina);
+  letter-spacing: -0.01em;
 }
 h2 {
-  font-size: var(--tamanho-lg);
+  font-size: var(--texto-titulo-secao);
 }
 h3 {
-  font-size: var(--tamanho-md);
+  font-size: var(--texto-subtitulo);
+}
+/* telas de autenticação têm coluna estreita: título menor para não quebrar em 3 linhas */
+.pagina-estreita h1 {
+  font-size: var(--tamanho-xl);
 }
 h4 {
   font-size: var(--tamanho-sm);
@@ -116,7 +122,7 @@ textarea {
   position: absolute;
   left: var(--esp-4);
   top: -100%;
-  z-index: 1000;
+  z-index: var(--camada-pular);
   padding: var(--esp-3) var(--esp-4);
   background: var(--cor-primaria);
   color: var(--cor-sobre-primaria);
@@ -162,11 +168,14 @@ main > .container {
 
 /* cabeçalho */
 .cabecalho {
-  background: var(--cor-superficie);
+  /* D-41: vidro translúcido (o conteúdo passa por baixo, levemente desfocado) */
+  background: var(--vidro);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
   border-bottom: 1px solid var(--cor-borda-suave);
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: var(--camada-cabecalho);
 }
 .cabecalho__linha {
   display: flex;
@@ -221,7 +230,19 @@ main > .container {
   text-decoration: underline;
 }
 .nav-publica a[aria-current="page"] {
+  color: var(--cor-primaria);
+  font-weight: var(--peso-negrito);
+}
+/* "Entrar" é a ação da navegação pública: pílula preenchida */
+.nav-publica li:last-child a {
   background: var(--cor-primaria);
+  color: var(--cor-sobre-primaria);
+  border-radius: var(--raio-pill);
+  padding-inline: var(--esp-5);
+  font-weight: var(--peso-negrito);
+}
+.nav-publica li:last-child a:hover {
+  background: var(--cor-primaria-escura);
   color: var(--cor-sobre-primaria);
 }
 
@@ -282,7 +303,7 @@ main > .container {
   .nav-app {
     position: fixed;
     inset: auto 0 0 0;
-    z-index: 60;
+    z-index: var(--camada-navegacao);
     background: var(--cor-superficie);
     border-top: 1px solid var(--cor-borda-suave);
     padding: var(--esp-1) var(--esp-1) calc(var(--esp-1) + env(safe-area-inset-bottom, 0px));
@@ -507,7 +528,7 @@ hr {
 }
 .qr-code {
   display: block;
-  background: #ffffff; /* QR precisa de fundo claro também no tema escuro */
+  background: var(--material-claro); /* QR precisa de fundo claro também no tema escuro */
   padding: var(--esp-2);
   border-radius: var(--raio-md);
   margin-block: var(--esp-3);
@@ -516,4 +537,9 @@ hr {
   overflow-wrap: anywhere;
   font-size: var(--tamanho-md);
   letter-spacing: 0.08em;
+}
+
+/* página inicial: seções de largura total, sem o padding do container */
+main.main--inicio {
+  overflow-x: clip;
 }

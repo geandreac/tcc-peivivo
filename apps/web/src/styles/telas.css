@@ -1,0 +1,190 @@
+/* ==========================================================================
+   PEI Vivo — telas internas. Estende às telas logadas a linguagem da página
+   inicial (D-40/D-41): superfícies com raio grande, ritmo vertical generoso,
+   cor do papel só como identidade (nunca como único sinal de estado).
+   Só tokens de `tokens.css`; pares de cor verificados em `scripts/contraste.mjs`.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- ritmo */
+/* Seções da página respiram: nada de título colado no bloco anterior. */
+main > .container > h2:not(:first-child) {
+  margin-top: var(--esp-7);
+}
+main > .container > :is(.card, .estado-vazio, form, .lista-simples, .grade-cards) + :is(.card, .estado-vazio, .grade-cards) {
+  margin-top: var(--esp-4);
+}
+main > .container > .lista-estudantes + .card {
+  margin-top: var(--esp-6);
+}
+
+/* ---------------------------------------------------------------- cabeçalho de página */
+/* tamanho do h1 vem de base.css (--texto-titulo-pagina); aqui só a distância até o subtítulo */
+main > .container > h1,
+.cabecalho-pagina h1 {
+  margin-bottom: var(--esp-2);
+}
+
+/* ---------------------------------------------------------------- listas como superfície */
+main > .container > .lista-simples {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-suave);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-1);
+  padding: var(--esp-1) clamp(var(--esp-4), 2.5vw, var(--esp-6));
+}
+main > .container > .lista-simples li {
+  padding-block: var(--esp-4);
+}
+
+/* ---------------------------------------------------------------- grade de ações */
+/* colunas: .grade-cards (componentes.css); aqui só o retorno visual de cartão clicável */
+.grade-cards--acoes > .card {
+  margin-bottom: 0;
+  transition: box-shadow var(--duracao-curta) var(--curva-padrao), border-color var(--duracao-curta) var(--curva-padrao),
+    background-color var(--duracao-curta) var(--curva-padrao);
+}
+.grade-cards--acoes > .card:hover,
+.grade-cards--acoes > .card:focus-within {
+  box-shadow: var(--sombra-2);
+  border-color: var(--cor-borda);
+  background: var(--cor-superficie-destaque);
+}
+.grade-cards--acoes > .card .botao {
+  margin-top: auto;
+}
+
+/* ---------------------------------------------------------------- cartões de estudante (painel) */
+.lista-estudantes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--esp-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+.cartao-estudante {
+  --papel: var(--papel-escola);
+  --papel-tint: var(--papel-escola-tint);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "avatar corpo"
+    "acao acao";
+  gap: var(--esp-4);
+  align-items: start;
+  padding: clamp(var(--esp-4), 2.5vw, var(--esp-5));
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-suave);
+  border-left: 4px solid var(--papel);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-1);
+  transition: box-shadow var(--duracao-curta) var(--curva-padrao), background-color var(--duracao-curta) var(--curva-padrao);
+}
+.cartao-estudante:hover,
+.cartao-estudante:focus-within {
+  box-shadow: var(--sombra-2);
+  background: var(--cor-superficie-destaque);
+}
+.cartao-estudante[data-papel="RESPONSAVEL"] {
+  --papel: var(--papel-familia);
+  --papel-tint: var(--papel-familia-tint);
+}
+.cartao-estudante[data-papel="PROFISSIONAL_SAUDE"] {
+  --papel: var(--papel-saude);
+  --papel-tint: var(--papel-saude-tint);
+}
+.cartao-estudante[data-papel="COORDENACAO"] {
+  --papel: var(--papel-coordenacao);
+  --papel-tint: var(--papel-coordenacao-tint);
+}
+.cartao-estudante__avatar {
+  grid-area: avatar;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--raio-pill);
+  background: var(--papel-tint);
+  color: var(--papel);
+  font-size: var(--tamanho-lg);
+  font-weight: var(--peso-display);
+}
+.cartao-estudante__corpo {
+  grid-area: corpo;
+  min-width: 0;
+}
+.cartao-estudante__nome {
+  font-size: var(--tamanho-md);
+  margin-bottom: var(--esp-2);
+}
+.cartao-estudante > .botao {
+  grid-area: acao;
+  justify-self: start;
+}
+
+/* ---------------------------------------------------------------- observação: progresso e campos */
+.progresso-obs {
+  position: sticky;
+  top: calc(var(--esp-8) + var(--esp-2));
+  z-index: var(--camada-fixo);
+  margin-bottom: var(--esp-4);
+  padding: var(--esp-3) var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-suave);
+  border-radius: var(--raio-md);
+  box-shadow: var(--sombra-1);
+}
+.progresso-obs__texto {
+  margin: 0 0 var(--esp-2);
+  font-size: var(--tamanho-sm);
+}
+.progresso-obs__trilho {
+  height: 0.5rem;
+  border-radius: var(--raio-pill);
+  background: var(--cor-superficie-2);
+  overflow: hidden;
+}
+/* Anima transform, não width: não refaz o layout a cada quadro (web.dev, Animations guide).
+   A fração vem da tela em style={{ transform: scaleX(n) }}. */
+.progresso-obs__barra {
+  height: 100%; /* sem raio próprio: scaleX deformaria a curva; o trilho recorta */
+  background: var(--cor-primaria);
+  transform-origin: left center;
+  transition: transform var(--duracao-media) var(--curva-padrao);
+}
+.form-observacao textarea.campo__controle {
+  min-height: 4.5rem;
+}
+.form-observacao > .card {
+  margin-bottom: var(--esp-4);
+}
+@media (max-width: 47.99em) {
+  /* no celular a barra inferior já é fixa; o progresso não gruda */
+  .progresso-obs {
+    position: static;
+  }
+}
+
+/* ---------------------------------------------------------------- material: etapa com pictograma */
+.material__etapa--picto {
+  padding-left: 0.25em;
+}
+@media (max-width: 30em) {
+  .material__etapa--picto .pictograma {
+    float: left;
+    margin-bottom: var(--esp-1);
+  }
+  .material__etapa--picto::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao-estudante,
+  .grade-cards--acoes > .card,
+  .progresso-obs__barra {
+    transition: none;
+  }
+}

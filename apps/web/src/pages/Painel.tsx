@@ -3,7 +3,7 @@ import { api, type Estudante, type Papel, type Consentimento } from "../services
 import { useConsulta } from "../hooks/useConsulta";
 import { useSessao } from "../hooks/useSessao";
 import { useTitulo } from "../hooks/useTitulo";
-import { Badge, Card, Carregando, EstadoVazio, ErroCarregamento } from "../components/Feedback";
+import { Badge, Card, Esqueleto, EstadoVazio, ErroCarregamento } from "../components/Feedback";
 import { LinkBotao } from "../components/Botao";
 import { PAPEL } from "../utils/rotulos";
 import { idade } from "../utils/datas";
@@ -49,7 +49,7 @@ export function Painel() {
       {usuario?.papelInstitucional === "COORDENACAO" && <ResumoEscola />}
       {usuario?.papelInstitucional === "COORDENACAO" && <h2>Estudantes</h2>}
 
-      {consulta.carregando && <Carregando texto="Carregando seus estudantes…" />}
+      {consulta.carregando && <Esqueleto texto="Carregando seus estudantes…" forma="cartao" itens={2} />}
       {consulta.erro && <ErroCarregamento erro={consulta.erro} tentarNovamente={consulta.recarregar} />}
       {consulta.dados && consulta.dados.length === 0 && (
         <EstadoVazio titulo="Nenhum estudante vinculado a você">
@@ -60,14 +60,17 @@ export function Painel() {
         </EstadoVazio>
       )}
       {consulta.dados && consulta.dados.length > 0 && (
-        <ul className="lista-simples" aria-label="Estudantes">
+        <ul className="lista-estudantes" aria-label="Estudantes">
           {consulta.dados.map(({ estudante, papel, consentimento }) => {
             const ativo = consentimento?.status === "ATIVO";
             const acao = papel ? ACAO_PRINCIPAL[papel] : null;
             return (
-              <li key={estudante.id}>
-                <div>
-                  <h2 style={{ fontSize: "var(--tamanho-md)", marginBottom: "var(--esp-1)" }}>
+              <li key={estudante.id} className="cartao-estudante" data-papel={papel ?? undefined}>
+                <span className="cartao-estudante__avatar" aria-hidden="true">
+                  {estudante.nome.trim().charAt(0).toUpperCase()}
+                </span>
+                <div className="cartao-estudante__corpo">
+                  <h2 className="cartao-estudante__nome">
                     <Link to={`/estudantes/${estudante.id}`}>{estudante.nome}</Link>
                   </h2>
                   <div className="chips">
@@ -91,7 +94,7 @@ export function Painel() {
 
       {consulta.dados && consulta.dados.length > 0 && (
         <Card titulo="Como funciona o acesso" nivel={3} className="nao-imprimir">
-          <p className="meta">
+          <p className="texto-apoio">
             Sem consentimento ativo do responsável, docente e profissional de saúde não leem nem escrevem nada sobre o estudante. O
             responsável e a coordenação continuam vendo o histórico. A nota clínica é exclusiva do profissional de saúde.
           </p>

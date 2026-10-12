@@ -87,7 +87,7 @@ export function EntrarPapel() {
 
       <section aria-labelledby="titulo-demo">
         <h2 id="titulo-demo">Escolha um perfil de demonstração</h2>
-        <p className="meta">
+        <p className="texto-apoio">
           Papel no sistema: {PAPEL[espec.papel]}. Sem senha nesta demonstração; os dados são fictícios.
         </p>
         {mutacao.erro && (
@@ -116,7 +116,7 @@ export function EntrarPapel() {
             <li key={a}>{a}</li>
           ))}
         </ul>
-        <p className="meta">A autenticação por e-mail e senha (Supabase Auth) substitui esta tela sem alterar o restante do sistema.</p>
+        <p className="texto-apoio">A autenticação por e-mail e senha (Supabase Auth) substitui esta tela sem alterar o restante do sistema.</p>
       </Card>
 
       <div className="grupo-botoes">

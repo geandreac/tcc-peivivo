@@ -130,10 +130,15 @@ export function Layout() {
             </ul>
           </nav>
         )}
-        <main id="conteudo" tabIndex={-1}>
-          <div className="container">
+        <main id="conteudo" tabIndex={-1} className={location.pathname === "/" ? "main--inicio" : undefined}>
+          {/* a página inicial controla a própria largura (seções de largura total) */}
+          {location.pathname === "/" ? (
             <Outlet />
-          </div>
+          ) : (
+            <div className="container">
+              <Outlet />
+            </div>
+          )}
         </main>
       </div>
 

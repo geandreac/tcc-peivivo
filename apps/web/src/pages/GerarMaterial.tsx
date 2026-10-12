@@ -6,7 +6,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Carregando, ErroCarregamento, EstadoVazio, ResumoErros } from "../components/Feedback";
+import { Alerta, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { PARAMETRO } from "../utils/rotulos";
@@ -44,7 +44,7 @@ export function GerarMaterial() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const { estudante, papel, consentimentoAtivo } = ctx.dados;
 
@@ -79,6 +79,7 @@ export function GerarMaterial() {
 
       {vigente.dados && (
         <form
+          className="formulario"
           noValidate
           onSubmit={(e) => {
             e.preventDefault();

@@ -5,7 +5,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros } from "../components/Feedback";
+import { Alerta, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { formatarDataHora } from "../utils/datas";
@@ -38,7 +38,7 @@ export function NotasClinicas() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const negado = ehErroApi(notas.erro) && notas.erro.codigo === "NEGADO";
 

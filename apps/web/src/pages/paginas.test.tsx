@@ -155,6 +155,22 @@ describe("Caminhos negados na interface (P4.20)", () => {
     expect(await screen.findByText("Geração bloqueada")).toBeInTheDocument();
   });
 
+  it.each(["consentimento", "observar", "historico", "vinculos", "privacidade"])(
+    "profissional sem vínculo abrindo /%s do estudante B: h1 de acesso negado, sem 'Tentar novamente'",
+    async (subrota) => {
+      const { container } = await renderizarApp(`/estudantes/${ID.estudanteB}/${subrota}`, ID.profissional);
+      expect(await screen.findByRole("heading", { level: 1, name: "Acesso não permitido" })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Tentar novamente" })).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Voltar para meus estudantes" })).toBeInTheDocument();
+      await semViolacoesAxe(container);
+    }
+  );
+
+  it("desfecho de material inexistente/oculto também tem h1", async () => {
+    await renderizarApp(`/materiais/${ID.materialRascunho}/desfecho`, ID.profissional);
+    expect(await screen.findByRole("heading", { level: 1, name: "Não encontrado" })).toBeInTheDocument();
+  });
+
   it("profissional de saúde acessa as notas clínicas", async () => {
     const { container } = await renderizarApp(`/estudantes/${ID.estudanteA}/notas-clinicas`, ID.profissional);
     expect(await screen.findByRole("heading", { level: 2, name: "Nova nota" })).toBeInTheDocument();

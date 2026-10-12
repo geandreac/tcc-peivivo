@@ -45,7 +45,7 @@ export function Acessibilidade() {
   return (
     <>
       <h1>Acessibilidade</h1>
-      <p style={{ maxWidth: "var(--largura-leitura)" }}>
+      <p className="pagina-leitura">
         Ajuste a interface do seu jeito. As preferências ficam salvas neste dispositivo e valem para todas as telas. O zoom do navegador
         (até 400 %) também funciona — nada aqui o substitui.
       </p>

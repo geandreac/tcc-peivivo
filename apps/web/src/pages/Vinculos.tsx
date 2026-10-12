@@ -5,7 +5,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, ResumoErros } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, ResumoErros, FalhaPagina, VazioSecao } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { Modal } from "../components/Modal";
@@ -63,7 +63,7 @@ export function Vinculos() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
   if (!ehCoord) {
     return (
       <>
@@ -90,7 +90,7 @@ export function Vinculos() {
         <>
           <Card titulo="Vínculos ativos">
             {ativos.length === 0 ? (
-              <p className="meta">Ninguém vinculado ainda.</p>
+              <VazioSecao>Ninguém vinculado ainda.</VazioSecao>
             ) : (
               <ul className="lista-simples" aria-label="Vínculos ativos">
                 {ativos.map((v) => (
@@ -115,7 +115,7 @@ export function Vinculos() {
 
           {pendentes.length > 0 && (
             <Card titulo="Aguardando a família">
-              <p className="meta">Profissionais de saúde só passam a ter acesso depois que o responsável confirma.</p>
+              <p className="texto-apoio">Profissionais de saúde só passam a ter acesso depois que o responsável confirma.</p>
               <ul className="lista-simples" aria-label="Aguardando a família">
                 {pendentes.map((v) => (
                   <li key={v.id}>
@@ -142,7 +142,7 @@ export function Vinculos() {
               vincular.executar();
             }}
             aria-labelledby="titulo-novo-vinculo"
-            style={{ maxWidth: "var(--largura-leitura)" }}
+            className="formulario"
           >
             <h2 id="titulo-novo-vinculo">Vincular quem já tem conta</h2>
             <ResumoErros erros={erros} />

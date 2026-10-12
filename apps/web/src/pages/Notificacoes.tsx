@@ -3,7 +3,7 @@ import { api, mensagemAmigavel, type Estudante, type Notificacao, type TipoNotif
 import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";
 import { useAnuncio } from "../hooks/useAnuncio";
-import { Alerta, Badge, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
+import { Alerta, Badge, Esqueleto, ErroCarregamento, EstadoVazio } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { textoNotificacao } from "../utils/rotulos";
 import { formatarDataHora } from "../utils/datas";
@@ -54,7 +54,7 @@ export function Notificacoes() {
           {mensagemAmigavel(marcar.erro)}
         </Alerta>
       )}
-      {dados.carregando && <Carregando />}
+      {dados.carregando && <Esqueleto texto="Carregando notificações…" />}
       {dados.erro && <ErroCarregamento erro={dados.erro} tentarNovamente={dados.recarregar} />}
       {dados.dados && dados.dados.lista.length === 0 && (
         <EstadoVazio titulo="Nenhuma notificação">

@@ -6,7 +6,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Modal } from "../components/Modal";
 import { DIMENSAO, ESCALA, PAPEL, PARAMETRO } from "../utils/rotulos";
@@ -68,7 +68,7 @@ export function FecharCiclo() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   if (ctx.dados.papel !== "DOCENTE") {
     return (
@@ -142,7 +142,7 @@ export function FecharCiclo() {
                 <li key={o.id}>
                   <div>
                     <strong>{DIMENSAO[o.dimensao].titulo}</strong>: {ESCALA[o.valorEscala]}
-                    {o.evidencia && <div className="meta">“{o.evidencia}”</div>}
+                    {o.evidencia && <div className="texto-apoio">“{o.evidencia}”</div>}
                   </div>
                   <Badge>{PAPEL[o.papelAutor]}</Badge>
                 </li>
@@ -152,13 +152,13 @@ export function FecharCiclo() {
 
           <h2>Proposta de parâmetros</h2>
           <Card>
-            <div className="chips" style={{ marginBottom: "var(--esp-3)" }}>
+            <div className="chips chips--secao">
               <Badge tom={previa.dados.previa.modoPedagogico ? "info" : "aviso"}>
                 {previa.dados.previa.modoPedagogico ? "Modo pedagógico: entra em vigor ao fechar" : "Vai para validação clínica ao fechar"}
               </Badge>
             </div>
             <TabelaDiff diff={previa.dados.previa.diff} legenda="Parâmetros: vigente → proposto" />
-            <p className="meta" style={{ marginTop: "var(--esp-3)" }}>
+            <p className="texto-apoio u-mt-3">
               Elevar um parâmetro exige 2 ciclos consecutivos de melhora; reduzir é imediato. O sistema erra a favor do material mais acessível.
             </p>
           </Card>

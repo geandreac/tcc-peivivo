@@ -14,9 +14,9 @@
   gap: var(--esp-2);
   min-height: var(--alvo-minimo);
   min-width: var(--alvo-minimo);
-  padding: var(--esp-2) var(--esp-4);
+  padding: var(--esp-2) var(--esp-5);
   border: 2px solid var(--botao-borda);
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-pill); /* D-41: pílula, como nos sistemas de referência */
   background: var(--botao-fundo);
   color: var(--botao-texto);
   font-weight: var(--peso-negrito);
@@ -98,6 +98,13 @@
   flex-wrap: wrap;
   gap: var(--esp-3);
   margin-top: var(--esp-4);
+}
+.grupo-botoes--centro {
+  justify-content: center;
+}
+.grupo-botoes--topo {
+  margin-top: 0;
+  margin-bottom: var(--esp-5);
 }
 .grupo-botoes--empilhado {
   flex-direction: column;
@@ -312,7 +319,7 @@ legend {
   background: var(--cor-superficie);
   border: 1px solid var(--cor-borda-suave);
   border-radius: var(--raio-lg);
-  padding: var(--esp-5);
+  padding: clamp(var(--esp-5), 2.5vw, var(--esp-6));
   box-shadow: var(--sombra-1);
   margin-bottom: var(--esp-4);
 }
@@ -327,19 +334,16 @@ legend {
 .card--acao .botao {
   align-self: flex-start;
 }
+/* Colunas pelo espaço disponível, não pelo aparelho (Apple HIG Layout): 2 cartões ocupam
+   a linha toda, 3 ficam lado a lado e 4 viram 2×2 — nunca sobra cartão sozinho. */
 .grade-cards {
   display: grid;
   gap: var(--esp-4);
-  grid-template-columns: 1fr;
-}
-@media (min-width: 48em) {
-  .grade-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
 }
 @media (min-width: 64em) {
-  .grade-cards--3 {
-    grid-template-columns: repeat(3, 1fr);
+  .grade-cards:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -388,7 +392,7 @@ legend {
   color: var(--cor-texto);
 }
 .modal::backdrop {
-  background: rgba(27, 27, 27, 0.6);
+  background: var(--cor-sobreposicao);
 }
 .modal__conteudo {
   padding: var(--esp-5);
@@ -430,6 +434,71 @@ legend {
 .estado-vazio h3 {
   color: var(--cor-texto);
 }
+.vazio-secao {
+  margin: 0;
+  padding: var(--esp-4) var(--esp-5);
+  border: 2px dashed var(--cor-borda-suave);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-corpo);
+}
+
+/* Esqueleto: forma do conteúdo enquanto carrega. Pulsa só a opacidade (compositor) e
+   fica parado com movimento reduzido (as regras globais de base.css zeram a animação). */
+.esqueleto {
+  display: grid;
+  gap: var(--esp-3);
+}
+.esqueleto--cartao {
+  gap: var(--esp-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+.esqueleto__item {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-4);
+  min-height: 4.5rem;
+  padding: var(--esp-4) var(--esp-5);
+  border: 1px solid var(--cor-borda-suave);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+}
+.esqueleto--cartao .esqueleto__item {
+  min-height: 9rem;
+  align-items: flex-start;
+}
+.esqueleto__avatar,
+.esqueleto__traco {
+  display: block;
+  background: var(--cor-superficie-2);
+  animation: esqueleto-pulsa 1.4s ease-in-out infinite;
+}
+.esqueleto__avatar {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--raio-pill);
+}
+.esqueleto__corpo {
+  flex: 1;
+  display: grid;
+  gap: var(--esp-2);
+}
+.esqueleto__traco {
+  height: 0.875rem;
+  width: 70%;
+  border-radius: var(--raio-pill);
+}
+.esqueleto__traco--titulo {
+  height: 1.125rem;
+  width: 45%;
+}
+@keyframes esqueleto-pulsa {
+  50% {
+    opacity: 0.45;
+  }
+}
 
 /* ----------------------------------------------------------- Toast / status (4.1.3) */
 .toasts {
@@ -440,7 +509,7 @@ legend {
   flex-direction: column;
   align-items: center;
   gap: var(--esp-2);
-  z-index: 200;
+  z-index: var(--camada-aviso);
   pointer-events: none;
   padding-inline: var(--esp-4);
 }
@@ -466,8 +535,7 @@ legend {
   --botao-fundo: transparent;
   --botao-borda: var(--cor-fundo);
   --botao-texto: var(--cor-fundo);
-  min-height: 2.25rem;
-  padding-inline: var(--esp-3);
+  padding-inline: var(--esp-3); /* altura mínima de 44px vem de .botao (antes 36px) */
 }
 
 /* ----------------------------------------------------------- Lista de definição / diff */
@@ -531,20 +599,20 @@ legend {
   max-width: var(--largura-leitura);
 }
 .material[data-contraste="7"] {
-  --material-fundo: #ffffff;
-  --material-texto: #000000;
-  border: 2px solid #000;
+  --material-fundo: var(--material-claro);
+  --material-texto: var(--material-contorno);
+  border: 2px solid var(--material-contorno);
 }
 .material__bloco {
   padding: var(--esp-4);
   margin-bottom: var(--esp-4);
   border-radius: var(--raio-md);
-  background: rgba(29, 78, 137, 0.05);
+  background: var(--material-bloco);
   border-left: 5px solid var(--cor-primaria);
 }
 .material[data-contraste="7"] .material__bloco {
-  background: #fff;
-  border: 2px solid #000;
+  background: var(--material-claro);
+  border: 2px solid var(--material-contorno);
   border-left-width: 8px;
 }
 .material__bloco p {
@@ -565,6 +633,55 @@ legend {
   font-style: normal;
   text-decoration: underline dotted;
   text-underline-offset: 0.2em;
+}
+
+/* D-43 — apoios de leitura */
+.material__etapa + .material__etapa {
+  margin-top: var(--esp-2);
+}
+.material__etapa--picto .pictograma {
+  display: inline-block;
+  vertical-align: middle;
+  width: 2.2em;
+  height: 2.2em;
+  margin-right: var(--esp-3);
+  padding: 0.2em;
+  border-radius: var(--raio-sm);
+  background: var(--material-fundo, var(--cor-superficie));
+  color: var(--cor-primaria);
+  border: 2px solid currentColor;
+}
+.material[data-contraste="7"] .pictograma {
+  color: var(--material-contorno);
+}
+.material__ouvir {
+  margin-top: var(--esp-3);
+}
+.material__glossario {
+  margin-top: var(--esp-5);
+  padding: var(--esp-4);
+  border-radius: var(--raio-md);
+  border: 2px solid var(--cor-borda);
+  background: var(--cor-superficie);
+}
+.material[data-contraste="7"] .material__glossario {
+  background: var(--material-claro);
+  border-color: var(--material-contorno);
+}
+.material__glossario > :is(h2, h3) {
+  margin: 0 0 var(--esp-3);
+  font-size: var(--tamanho-lg);
+}
+.material__glossario dl {
+  margin: 0;
+  display: grid;
+  gap: var(--esp-3);
+}
+.material__termo dt {
+  font-weight: var(--peso-negrito);
+}
+.material__termo dd {
+  margin: 0;
 }
 
 /* comparação lado a lado (P4.13) */
@@ -608,7 +725,13 @@ legend {
 }
 .meta {
   color: var(--cor-texto-secundario);
-  font-size: var(--tamanho-xs);
+  font-size: var(--texto-meta);
+}
+/* Frase de apoio (explicação, "nada aqui ainda"): cor secundária, mas no tamanho do corpo.
+   .meta (14px) fica só para metadado curto — data, autor, contador. */
+.texto-apoio {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-corpo);
 }
 .lista-simples {
   list-style: none;
@@ -631,6 +754,9 @@ legend {
   display: flex;
   flex-wrap: wrap;
   gap: var(--esp-2);
+}
+.chips--secao {
+  margin-bottom: var(--esp-4);
 }
 dl.dados {
   display: grid;
@@ -945,4 +1071,39 @@ ul.perfis {
 }
 .resumo-escola {
   margin-bottom: var(--esp-6);
+}
+
+/* ----------------------------------------------------------- Formulário de página */
+/* Campos na largura de leitura (~70 caracteres), não na tela toda: o olho não viaja
+   990px para um título curto, e o contador fica perto do campo (Fluent 2 Layout). */
+.formulario {
+  max-width: var(--largura-leitura);
+}
+
+/* ----------------------------------------------------------- Variantes pequenas */
+.estado-vazio--esquerda {
+  text-align: left;
+}
+.codigo-rolagem {
+  max-height: 24rem;
+  overflow: auto;
+}
+.texto-original {
+  white-space: pre-wrap;
+}
+.material__etapas {
+  margin: 0;
+  padding-left: 1.5em;
+}
+
+/* ----------------------------------------------------------- Utilitários de espaço */
+/* Só os que as telas usam; sempre com tokens. */
+.u-mt-3 {
+  margin-top: var(--esp-3);
+}
+.u-mt-4 {
+  margin-top: var(--esp-4);
+}
+.u-mt-5 {
+  margin-top: var(--esp-5);
 }

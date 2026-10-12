@@ -5,6 +5,10 @@ import { router } from "./routes";
 import { SessaoProvider } from "./hooks/useSessao";
 import { AnuncioProvider } from "./hooks/useAnuncio";
 import { aplicarPreferencias, lerPreferencias } from "./hooks/usePreferencias";
+import "@fontsource/atkinson-hyperlegible-next/latin-400.css";
+import "@fontsource/atkinson-hyperlegible-next/latin-600.css";
+import "@fontsource/atkinson-hyperlegible-next/latin-700.css";
+import "@fontsource/atkinson-hyperlegible-next/latin-800.css";
 import "./styles/index.css";
 
 // Preferências de acessibilidade valem desde a primeira pintura, em qualquer tela.

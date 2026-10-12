@@ -5,7 +5,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, ResumoErros } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, ResumoErros, FalhaPagina, VazioSecao } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Modal } from "../components/Modal";
 import { ESCOPO, EVENTO, PAPEL } from "../utils/rotulos";
@@ -51,7 +51,7 @@ export function Consentimento() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const { estudante, consentimento, consentimentoAtivo } = ctx.dados;
 
@@ -84,7 +84,7 @@ export function Consentimento() {
 
       {consentimento && (
         <Card titulo="Situação atual">
-          <div className="chips" style={{ marginBottom: "var(--esp-3)" }}>
+          <div className="chips chips--secao">
             <Badge tom={consentimentoAtivo ? "sucesso" : "erro"}>{consentimentoAtivo ? "Ativo" : consentimento.status === "REVOGADO" ? "Revogado" : "Expirado"}</Badge>
             <span className="meta">Concedido em {formatarDataHora(consentimento.dataConcessao)}</span>
             {consentimento.dataRevogacao && <span className="meta">· revogado em {formatarDataHora(consentimento.dataRevogacao)}</span>}
@@ -166,7 +166,7 @@ export function Consentimento() {
           <h2>Trilha de auditoria</h2>
           {auditoria.carregando && <Carregando />}
           {auditoria.erro && <ErroCarregamento erro={auditoria.erro} tentarNovamente={auditoria.recarregar} />}
-          {auditoria.dados && auditoria.dados.length === 0 && <p className="meta">Nenhum evento registrado ainda.</p>}
+          {auditoria.dados && auditoria.dados.length === 0 && <VazioSecao>Nenhum evento registrado ainda.</VazioSecao>}
           {auditoria.dados && auditoria.dados.length > 0 && (
             <ol className="linha-tempo">
               {auditoria.dados.map((a) => (
@@ -210,7 +210,7 @@ export function Consentimento() {
         </label>
       </Modal>
 
-      <p className="meta">
+      <p className="texto-apoio">
         Só o {PAPEL.RESPONSAVEL.toLowerCase()} autoriza ou retira a autorização. A trilha acima só você e a coordenação veem; os demais vinculados sabem apenas se a autorização está ativa.
       </p>
     </>

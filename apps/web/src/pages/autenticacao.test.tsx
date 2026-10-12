@@ -67,7 +67,7 @@ describe("Redirecionamento e sessão (TF-02, TF-37, TF-44)", () => {
     await renderizarApp("/painel", ID.docente);
     await screen.findByRole("heading", { level: 1, name: "Meus estudantes" });
     await userEvent.click(screen.getByRole("button", { name: "Sair" }));
-    expect(await screen.findByRole("heading", { level: 1, name: "O PEI que executa a si mesmo" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Cada estudante lê do seu jeito." })).toBeInTheDocument();
     expect(api.usuarioAtual()).toBeNull();
     const nav = screen.getByRole("navigation", { name: "Principal" });
     expect(within(nav).getByRole("link", { name: "Entrar" })).toBeInTheDocument();

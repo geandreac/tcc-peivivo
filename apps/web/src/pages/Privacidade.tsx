@@ -7,7 +7,7 @@ import { useAnuncio } from "../hooks/useAnuncio";
 import { Modal } from "../components/Modal";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, FalhaPagina, VazioSecao } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { EVENTO, PAPEL } from "../utils/rotulos";
 import { formatarData, formatarDataHora } from "../utils/datas";
@@ -62,7 +62,7 @@ export function Privacidade() {
   });
 
   if (ctx.carregando) return <Carregando texto="Carregando…" />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   if (!ehResponsavel) {
     return (
@@ -211,11 +211,11 @@ export function Privacidade() {
               </tbody>
             </table>
           </div>
-          <p className="meta">O sistema não guarda laudo nem diagnóstico. Sem a sua autorização, docente e profissional não veem nada.</p>
+          <p className="texto-apoio">O sistema não guarda laudo nem diagnóstico. Sem a sua autorização, docente e profissional não veem nada.</p>
 
           <h2>Quem leu as notas do profissional de saúde</h2>
           {leiturasClinicas.length === 0 ? (
-            <p className="meta">Ninguém leu as notas reservadas até agora.</p>
+            <VazioSecao>Ninguém leu as notas reservadas até agora.</VazioSecao>
           ) : (
             <ul className="lista-simples" aria-label="Leituras de notas clínicas">
               {leiturasClinicas.slice(0, 10).map((e) => (
@@ -230,7 +230,7 @@ export function Privacidade() {
 
           <h2>Histórico de acessos e mudanças</h2>
           {dados.dados.eventos.length === 0 ? (
-            <p className="meta">Nenhum evento registrado ainda.</p>
+            <VazioSecao>Nenhum evento registrado ainda.</VazioSecao>
           ) : (
             <ol className="linha-tempo" aria-label="Histórico">
               {dados.dados.eventos.slice(0, 30).map((e) => (

@@ -21,6 +21,9 @@
   --cor-fundo: #f6f8fb;
   --cor-superficie: #ffffff;
   --cor-superficie-2: #edeff2;
+  /* cartão em destaque (hover/foco). No claro a sombra basta; no escuro a sombra some,
+     então a elevação vem do tom, como no Material 3. */
+  --cor-superficie-destaque: var(--cor-superficie);
   --cor-borda: #767676;             /* 4,54:1 — bordas de campos (1.4.11) */
   --cor-borda-suave: #d5d9e0;       /* decorativa (cards) */
   --cor-desabilitado-texto: #6b6b6b;
@@ -43,10 +46,24 @@
   /* --- material adaptado (D-10: CSS a partir de parametros) --- */
   --material-fundo: #fffdf5;
   --material-texto: #1b1b1b;
+  /* O material é a "folha" do estudante: fica claro em todos os temas (D-10), por isso
+     estes valores NÃO são redefinidos no tema escuro. Usados também pelo QR do TOTP. */
+  --material-claro: #ffffff;
+  --material-contorno: #000000;             /* perfil com contraste 7:1 */
+  --material-destaque: #163b68;             /* 11,29:1 sobre branco; 10,9:1 sobre o creme */
+  --material-destaque-tint: #e8eff8;
+  --material-bloco: rgba(29, 78, 137, 0.05); /* véu da primária sobre o creme */
+
+  /* --- sobreposição de diálogo --- */
+  --cor-sobreposicao: rgba(27, 27, 27, 0.6);
 
   /* --- tipografia --- */
-  --fonte-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --fonte-leitura: "Atkinson Hyperlegible", "Verdana", system-ui, sans-serif;
+  /* D-40: Atkinson Hyperlegible Next (Braille Institute, feita para baixa visão), hospedada no
+     próprio app — nenhuma requisição a terceiros. Pesos 400/600/800, subconjunto latino. */
+  --fonte-base: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fonte-leitura: "Atkinson Hyperlegible Next", "Verdana", system-ui, sans-serif;
+  --tamanho-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem); /* título do herói */
+  --tamanho-3xl: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);   /* títulos de seção da página inicial */
   --tamanho-xs: 0.875rem;  /* 14px — só metadados */
   --tamanho-sm: 1rem;      /* 16px — mínimo do corpo */
   --tamanho-md: 1.125rem;  /* 18px */
@@ -54,9 +71,20 @@
   --tamanho-xl: 1.75rem;   /* 28px */
   --tamanho-2xl: 2.25rem;  /* 36px */
   --altura-linha: 1.6;
+  /* Pesos = arquivos carregados em main.tsx (400/600/700/800). Pedir um peso sem arquivo faz o
+     navegador trocar por outro: 500 virava 400 e 700 virava 800 (docs/diagnostico-de-interface.md #1). */
   --peso-normal: 400;
-  --peso-medio: 500;
+  --peso-medio: 600;
   --peso-negrito: 700;
+  --peso-display: 800;
+
+  /* --- papéis tipográficos (Material 3: display/headline/title/body/label) ---
+     Telas usam o papel, não o tamanho: mudar a escala é mexer só aqui. */
+  --texto-titulo-pagina: clamp(1.75rem, 1.45rem + 1.2vw, 2.25rem); /* h1: 28px no celular → 36px */
+  --texto-titulo-secao: var(--tamanho-lg);  /* h2 */
+  --texto-subtitulo: var(--tamanho-md);     /* h3, título de cartão */
+  --texto-corpo: var(--tamanho-sm);         /* frases, inclusive texto de apoio: nunca abaixo de 16px */
+  --texto-meta: var(--tamanho-xs);          /* só metadado curto: data, autor, contador */
 
   /* --- espaçamento (base 4px) --- */
   --esp-1: 0.25rem;
@@ -69,12 +97,26 @@
   --esp-8: 4rem;
 
   /* --- forma --- */
-  --raio-sm: 4px;
-  --raio-md: 8px;
-  --raio-lg: 12px;
+  --raio-sm: 6px;
+  --raio-md: 12px;
+  --raio-lg: 20px;
+  --raio-xl: 28px;
   --raio-pill: 999px;
-  --sombra-1: 0 1px 2px rgba(27, 27, 27, 0.08), 0 1px 3px rgba(27, 27, 27, 0.06);
-  --sombra-2: 0 4px 12px rgba(27, 27, 27, 0.12);
+  /* sombras em camadas, frias (puxadas para o azul da marca) */
+  --sombra-1: 0 1px 2px rgba(16, 38, 66, 0.06), 0 2px 8px rgba(16, 38, 66, 0.05);
+  --sombra-2: 0 2px 4px rgba(16, 38, 66, 0.05), 0 12px 32px rgba(16, 38, 66, 0.1);
+  --sombra-3: 0 4px 8px rgba(16, 38, 66, 0.06), 0 24px 64px rgba(16, 38, 66, 0.16);
+
+  /* --- cores por papel (das mãos do logo) — identidade, nunca semântica de estado --- */
+  --papel-escola: #1d4e89;         /* 8,39:1 */
+  --papel-escola-tint: #e8eff8;
+  --papel-familia: #146c43;        /* 6,4:1 */
+  --papel-familia-tint: #e3f2ea;
+  --papel-saude: #a52a5c;          /* 6,6:1 */
+  --papel-saude-tint: #f8e7ee;
+  --papel-coordenacao: #8a5300;    /* 6,3:1 */
+  --papel-coordenacao-tint: #fbf0dc;
+  --vidro: rgba(255, 255, 255, 0.78); /* cabeçalho translúcido */
 
   /* --- alvos de toque (2.5.8 exige 24px; adotamos 44px) --- */
   --alvo-minimo: 2.75rem;
@@ -83,8 +125,20 @@
   --largura-conteudo: 64rem;
   --largura-leitura: 44rem;
 
-  /* --- movimento --- */
-  --duracao: 160ms;
+  /* --- movimento (Fluent 2 Motion: elemento maior anima por mais tempo; curvas nomeadas) --- */
+  --duracao-curta: 160ms;  /* hover, foco, cor */
+  --duracao-media: 280ms;  /* barra de progresso, cartões */
+  --duracao-longa: 520ms;  /* entrada da demonstração na página inicial */
+  --duracao: var(--duracao-curta); /* apelido legado */
+  --curva-padrao: cubic-bezier(0.2, 0, 0, 1);     /* mudança de estado */
+  --curva-entrada: cubic-bezier(0.2, 0.7, 0.2, 1); /* algo que chega à tela */
+
+  /* --- camadas (z-index): uma escala só --- */
+  --camada-fixo: 10;          /* barra de progresso que gruda ao rolar */
+  --camada-cabecalho: 50;
+  --camada-navegacao: 60;     /* barra inferior no celular */
+  --camada-aviso: 200;        /* toasts */
+  --camada-pular: 1000;       /* link "pular para o conteúdo" */
 }
 
 /* Tema de alto contraste (P4.1: contrasteMinimo 7). Ativado por preferência
@@ -114,6 +168,12 @@
   --material-texto: #000000;
   --sombra-1: none;
   --sombra-2: none;
+  --sombra-3: none;
+  --papel-escola: #0b2a50;
+  --papel-familia: #0f4a24;
+  --papel-saude: #6b1238;
+  --papel-coordenacao: #5c3600;
+  --vidro: #ffffff;
 }
 
 /* Tema escuro (R4.6): segue o sistema, a menos que a pessoa escolha "claro"
@@ -132,6 +192,7 @@
     --cor-fundo: #111418;
     --cor-superficie: #1a1e24;
     --cor-superficie-2: #252b34;
+    --cor-superficie-destaque: #252b34;
     --cor-borda: #8a94a3;
     --cor-borda-suave: #343b46;
     --cor-desabilitado-texto: #9aa3ae;
@@ -149,6 +210,16 @@
     --cor-foco: #9ec5ff;
     --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.5);
     --sombra-2: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --sombra-3: 0 24px 64px rgba(0, 0, 0, 0.6);
+    --papel-escola: #9ec5ff;
+    --papel-escola-tint: #1c2a3d;
+    --papel-familia: #7fd69a;
+    --papel-familia-tint: #13261b;
+    --papel-saude: #f4a3c3;
+    --papel-saude-tint: #33161f;
+    --papel-coordenacao: #f2c46b;
+    --papel-coordenacao-tint: #2b2210;
+    --vidro: rgba(26, 30, 36, 0.78);
   }
 }
 :root[data-tema="escuro"]:not([data-contraste="alto"]) {
@@ -163,6 +234,7 @@
   --cor-fundo: #111418;
   --cor-superficie: #1a1e24;
   --cor-superficie-2: #252b34;
+  --cor-superficie-destaque: #252b34;
   --cor-borda: #8a94a3;
   --cor-borda-suave: #343b46;
   --cor-desabilitado-texto: #9aa3ae;
@@ -180,6 +252,16 @@
   --cor-foco: #9ec5ff;
   --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.5);
   --sombra-2: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --sombra-3: 0 24px 64px rgba(0, 0, 0, 0.6);
+  --papel-escola: #9ec5ff;
+  --papel-escola-tint: #1c2a3d;
+  --papel-familia: #7fd69a;
+  --papel-familia-tint: #13261b;
+  --papel-saude: #f4a3c3;
+  --papel-saude-tint: #33161f;
+  --papel-coordenacao: #f2c46b;
+  --papel-coordenacao-tint: #2b2210;
+  --vidro: rgba(26, 30, 36, 0.78);
 }
 
 /* Leitura facilitada (R4.6, prompt §7.1.3): fonte de alta legibilidade
@@ -204,9 +286,13 @@
 /* 2.3.3 — respeita a preferência do sistema E a escolha na página. */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --duracao: 0ms;
+    --duracao-curta: 0ms;
+    --duracao-media: 0ms;
+    --duracao-longa: 0ms;
   }
 }
 :root[data-movimento="reduzido"] {
-  --duracao: 0ms;
+  --duracao-curta: 0ms;
+  --duracao-media: 0ms;
+  --duracao-longa: 0ms;
 }

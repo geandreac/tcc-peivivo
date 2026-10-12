@@ -60,10 +60,10 @@ export function ConvidarPessoa({ estudanteId, aoConvidar }: { estudanteId: strin
         enviar.executar();
       }}
       aria-labelledby="titulo-convite"
-      style={{ maxWidth: "var(--largura-leitura)" }}
+      className="formulario"
     >
       <h2 id="titulo-convite">Convidar alguém novo por e-mail</h2>
-      <p className="meta">A pessoa recebe um link para criar a senha. O link vale por 7 dias e só funciona uma vez.</p>
+      <p className="texto-apoio">A pessoa recebe um link para criar a senha. O link vale por 7 dias e só funciona uma vez.</p>
       <ResumoErros erros={erros} />
       {enviar.erro && (
         <Alerta tom="erro" vivo>

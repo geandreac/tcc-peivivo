@@ -1,9 +1,10 @@
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { api, ehErroApi, type Ciclo, type Material, type VersaoPerfil } from "../services";
 import { useEstudante } from "../hooks/useEstudante";
 import { useConsulta } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, Esqueleto, EstadoVazio } from "../components/Feedback";
 import { LinkBotao } from "../components/Botao";
 import { EXPLICA_RITMO_PERFIL, PARAMETRO, STATUS_APROVACAO, STATUS_VALIDACAO, descreverPerfil } from "../utils/rotulos";
 import { formatarData, formatarDataHora, idade } from "../utils/datas";
@@ -30,12 +31,12 @@ export function ParametrosLista({ parametros, tecnico = true }: { parametros: Pa
   return (
     <dl className="dados">
       {campos.map((c) => (
-        <div key={c} style={{ display: "contents" }}>
+        <Fragment key={c}>
           <dt>{PARAMETRO[c].titulo}</dt>
           <dd>
             {PARAMETRO[c].valor(parametros[c])} <span className="meta">— {PARAMETRO[c].explica}</span>
           </dd>
-        </div>
+        </Fragment>
       ))}
     </dl>
   );
@@ -114,7 +115,7 @@ export function Estudante() {
 
       {/* ações por papel */}
       <h2>O que você pode fazer</h2>
-      <div className="grade-cards grade-cards--3">
+      <div className="grade-cards grade-cards--acoes">
         {papel === "RESPONSAVEL" && (
           <>
             <Card titulo="Privacidade" nivel={3} className="card--acao">
@@ -224,7 +225,7 @@ export function Estudante() {
       {podeLerDados && (
         <>
           <h2>Perfil de aprendizagem vigente</h2>
-          {dados.carregando && <Carregando />}
+          {dados.carregando && <Esqueleto texto="Carregando perfil e materiais…" itens={2} />}
           {dados.erro && <ErroCarregamento erro={dados.erro} tentarNovamente={dados.recarregar} />}
           {dados.dados && !dados.dados.vigente && (
             <EstadoVazio titulo="Ainda não há perfil vigente">
@@ -233,7 +234,7 @@ export function Estudante() {
           )}
           {dados.dados?.vigente && (
             <Card>
-              <div className="chips" style={{ marginBottom: "var(--esp-3)" }}>
+              <div className="chips chips--secao">
                 <Badge tom="sucesso">{STATUS_VALIDACAO.VIGENTE.texto}</Badge>
                 <span className="meta">
                   Ciclo {dados.dados.vigente.numeroCiclo} · desde {formatarData(dados.dados.vigente.dataVigencia)}
@@ -241,7 +242,7 @@ export function Estudante() {
                 {pendente && <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>Ciclo {pendente.numeroCiclo}: {STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>}
               </div>
               <ParametrosLista parametros={dados.dados.vigente.parametros} tecnico={papel === "PROFISSIONAL_SAUDE"} />
-              <p className="meta" style={{ marginTop: "var(--esp-3)" }}>
+              <p className="texto-apoio u-mt-3">
                 {EXPLICA_RITMO_PERFIL}
               </p>
             </Card>

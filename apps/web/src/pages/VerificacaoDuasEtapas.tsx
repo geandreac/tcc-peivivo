@@ -117,7 +117,7 @@ export function VerificacaoDuasEtapas() {
 
       {nivel.dados.temFatorCadastrado && !cadastro && formCodigo}
 
-      <p className="meta">Perdeu o celular? Fale com a coordenação da escola: ela confere sua identidade e libera um novo cadastro.</p>
+      <p className="texto-apoio">Perdeu o celular? Fale com a coordenação da escola: ela confere sua identidade e libera um novo cadastro.</p>
     </div>
   );
 }

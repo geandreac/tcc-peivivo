@@ -2,6 +2,38 @@
 // Fórmula de luminância relativa da WCAG 2.x. Uso: node scripts/contraste.mjs
 // Falha (exit 1) se algum par de TEXTO ficar abaixo de 4,5:1 ou de COMPONENTE
 // abaixo de 3:1. Pares decorativos (bordas de card) e desabilitados são só informativos.
+//
+// Os valores vêm de apps/web/src/styles/tokens.css — fonte única (docs/diagnostico-de-interface.md #16).
+// Os pares citam o NOME do token; mudar uma cor em tokens.css já é verificado aqui.
+// Também falha se os dois blocos do tema escuro (sistema e escolha manual) divergirem.
+import { readFileSync } from "node:fs";
+
+const CSS = readFileSync(new URL("../apps/web/src/styles/tokens.css", import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+
+/** Declarações `--nome: valor;` do primeiro bloco cujo seletor bate exatamente. */
+function bloco(seletor) {
+  const i = CSS.indexOf(`${seletor} {`);
+  if (i < 0) throw new Error(`tokens.css: bloco "${seletor}" não encontrado`);
+  const corpo = CSS.slice(i + seletor.length + 2, CSS.indexOf("}", i));
+  return Object.fromEntries([...corpo.matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]));
+}
+
+const claro = bloco(":root");
+const alto = { ...claro, ...bloco(':root[data-contraste="alto"]') };
+const escuroSistema = bloco(':root:not([data-tema="claro"]):not([data-contraste="alto"])');
+const escuroEscolhido = bloco(':root[data-tema="escuro"]:not([data-contraste="alto"])');
+const escuro = { ...claro, ...escuroSistema };
+const TEMAS = { claro, alto, escuro };
+
+const resolver = (tema, nome, visitados = new Set()) => {
+  const v = tema[nome];
+  if (v === undefined) throw new Error(`token --${nome} não existe`);
+  const ref = v.match(/^var\(--([\w-]+)\)$/);
+  if (!ref) return v;
+  if (visitados.has(nome)) throw new Error(`referência circular em --${nome}`);
+  return resolver(tema, ref[1], visitados.add(nome));
+};
+
 const lum = (hex) => {
   const c = hex.replace("#", "");
   const [r, g, b] = [0, 2, 4]
@@ -14,76 +46,115 @@ const razao = (a, b) => {
   return (l1 + 0.05) / (l2 + 0.05);
 };
 
-// [nome, frente, fundo, mínimo exigido (0 = informativo)]
+// [tema, nome, token da frente, token do fundo, mínimo exigido (0 = informativo)]
 const PARES = [
-  ["texto / superfície", "#1B1B1B", "#FFFFFF", 4.5],
-  ["texto / fundo", "#1B1B1B", "#F6F8FB", 4.5],
-  ["texto secundário / superfície", "#4D4D4D", "#FFFFFF", 4.5],
-  ["texto secundário / fundo", "#4D4D4D", "#F6F8FB", 4.5],
-  ["branco / primária (botão)", "#FFFFFF", "#1D4E89", 4.5],
-  ["primária / superfície (link)", "#1D4E89", "#FFFFFF", 4.5],
-  ["primária / tint (info)", "#1D4E89", "#E8EFF8", 4.5],
-  ["primária escura / superfície", "#163B68", "#FFFFFF", 4.5],
-  ["secundária / superfície", "#0F6E56", "#FFFFFF", 4.5],
-  ["sucesso / superfície", "#1E6B3A", "#FFFFFF", 4.5],
-  ["sucesso / fundo sucesso", "#1E6B3A", "#E3F3E8", 4.5],
-  ["aviso / superfície", "#8A5300", "#FFFFFF", 4.5],
-  ["aviso / fundo aviso", "#8A5300", "#FFF3D6", 4.5],
-  ["erro / superfície", "#B42318", "#FFFFFF", 4.5],
-  ["erro / fundo erro", "#B42318", "#FDE8E6", 4.5],
-  ["branco / erro (botão perigo)", "#FFFFFF", "#B42318", 4.5],
-  ["badge neutro", "#4D4D4D", "#EDEFF2", 4.5],
-  ["material texto / fundo creme", "#1B1B1B", "#FFFDF5", 7],
-  ["borda de campo / superfície", "#767676", "#FFFFFF", 3],
-  ["borda de campo / fundo", "#767676", "#F6F8FB", 3],
-  ["anel de foco / superfície", "#1D4E89", "#FFFFFF", 3],
-  ["anel de foco / fundo", "#1D4E89", "#F6F8FB", 3],
-  ["alto contraste: texto", "#000000", "#FFFFFF", 7],
-  ["alto contraste: branco / primária", "#FFFFFF", "#0B2A50", 7],
-  ["alto contraste: primária / branco", "#0B2A50", "#FFFFFF", 7],
-  ["alto contraste: secundário", "#333333", "#FFFFFF", 7],
-  ["alto contraste: sucesso", "#0F4A24", "#FFFFFF", 7],
-  ["alto contraste: aviso", "#5C3600", "#FFFFFF", 7],
-  ["alto contraste: erro", "#8B1A10", "#FFFFFF", 7],
-  ["toast: fundo claro sobre texto (claro)", "#F6F8FB", "#1B1B1B", 4.5],
-  // ---- tema escuro (R4.6)
-  ["escuro: texto / superfície", "#ECEFF3", "#1A1E24", 4.5],
-  ["escuro: texto / fundo", "#ECEFF3", "#111418", 4.5],
-  ["escuro: texto secundário / superfície", "#B8C0CC", "#1A1E24", 4.5],
-  ["escuro: texto secundário / fundo", "#B8C0CC", "#111418", 4.5],
-  ["escuro: botão primário (texto / fundo)", "#0B1A2E", "#9EC5FF", 4.5],
-  ["escuro: link / superfície", "#9EC5FF", "#1A1E24", 4.5],
-  ["escuro: link / fundo", "#9EC5FF", "#111418", 4.5],
-  ["escuro: primária / tint (info)", "#9EC5FF", "#1C2A3D", 4.5],
-  ["escuro: primária escura / tint (nav atual)", "#C4DCFF", "#1C2A3D", 4.5],
-  ["escuro: secundária / superfície", "#6FD3B6", "#1A1E24", 4.5],
-  ["escuro: sucesso / superfície", "#7FD69A", "#1A1E24", 4.5],
-  ["escuro: sucesso / fundo sucesso", "#7FD69A", "#13261B", 4.5],
-  ["escuro: aviso / superfície", "#F2C46B", "#1A1E24", 4.5],
-  ["escuro: aviso / fundo aviso", "#F2C46B", "#2B2210", 4.5],
-  ["escuro: erro / superfície", "#FF9B8F", "#1A1E24", 4.5],
-  ["escuro: erro / fundo erro", "#FF9B8F", "#2D1614", 4.5],
-  ["escuro: botão perigo (texto / fundo)", "#2D0B07", "#FF9B8F", 4.5],
-  ["escuro: botão perigo hover", "#2D0B07", "#FFC2BA", 4.5],
-  ["escuro: badge neutro", "#B8C0CC", "#252B34", 4.5],
-  ["escuro: toast (fundo sobre texto)", "#111418", "#ECEFF3", 4.5],
-  ["escuro: borda de campo / superfície", "#8A94A3", "#1A1E24", 3],
-  ["escuro: borda de campo / fundo", "#8A94A3", "#111418", 3],
-  ["escuro: anel de foco / superfície", "#9EC5FF", "#1A1E24", 3],
-  ["escuro: anel de foco / fundo", "#9EC5FF", "#111418", 3],
-  ["(decorativo) borda suave / superfície", "#D5D9E0", "#FFFFFF", 0],
-  ["(isento) desabilitado", "#6B6B6B", "#E9E9E9", 0],
+  ["claro", "texto / superfície", "cor-texto", "cor-superficie", 4.5],
+  ["claro", "texto / fundo", "cor-texto", "cor-fundo", 4.5],
+  ["claro", "texto secundário / superfície", "cor-texto-secundario", "cor-superficie", 4.5],
+  ["claro", "texto secundário / fundo", "cor-texto-secundario", "cor-fundo", 4.5],
+  ["claro", "branco / primária (botão)", "cor-sobre-primaria", "cor-primaria", 4.5],
+  ["claro", "primária / superfície (link)", "cor-primaria", "cor-superficie", 4.5],
+  ["claro", "primária / tint (info)", "cor-primaria", "cor-primaria-tint", 4.5],
+  ["claro", "primária escura / superfície", "cor-primaria-escura", "cor-superficie", 4.5],
+  ["claro", "secundária / superfície", "cor-secundaria", "cor-superficie", 4.5],
+  ["claro", "sucesso / superfície", "cor-sucesso", "cor-superficie", 4.5],
+  ["claro", "sucesso / fundo sucesso", "cor-sucesso", "cor-sucesso-fundo", 4.5],
+  ["claro", "aviso / superfície", "cor-aviso", "cor-superficie", 4.5],
+  ["claro", "aviso / fundo aviso", "cor-aviso", "cor-aviso-fundo", 4.5],
+  ["claro", "erro / superfície", "cor-erro", "cor-superficie", 4.5],
+  ["claro", "erro / fundo erro", "cor-erro", "cor-erro-fundo", 4.5],
+  ["claro", "branco / erro (botão perigo)", "cor-sobre-erro", "cor-erro", 4.5],
+  ["claro", "badge neutro", "cor-texto-secundario", "cor-superficie-2", 4.5],
+  ["claro", "material texto / fundo creme", "material-texto", "material-fundo", 7],
+  ["claro", "material: destaque / creme", "material-destaque", "material-fundo", 4.5],
+  ["claro", "material: destaque / branco", "material-destaque", "material-claro", 4.5],
+  ["claro", "material: branco / destaque (avatar)", "material-claro", "material-destaque", 4.5],
+  ["claro", "material: destaque / tint (selos)", "material-destaque", "material-destaque-tint", 4.5],
+  ["claro", "material: contorno / branco (7:1)", "material-contorno", "material-claro", 7],
+  ["claro", "borda de campo / superfície", "cor-borda", "cor-superficie", 3],
+  ["claro", "borda de campo / fundo", "cor-borda", "cor-fundo", 3],
+  ["claro", "anel de foco / superfície", "cor-foco", "cor-superficie", 3],
+  ["claro", "anel de foco / fundo", "cor-foco", "cor-fundo", 3],
+  ["claro", "toast: fundo claro sobre texto", "cor-fundo", "cor-texto", 4.5],
+  // D-41: cores de papel — texto/ícone sobre superfície e tint, número sobre o papel
+  ["claro", "papel família / superfície", "papel-familia", "cor-superficie", 4.5],
+  ["claro", "papel família / tint família", "papel-familia", "papel-familia-tint", 4.5],
+  ["claro", "papel saúde / tint saúde", "papel-saude", "papel-saude-tint", 4.5],
+  ["claro", "papel coordenação / tint coordenação", "papel-coordenacao", "papel-coordenacao-tint", 4.5],
+  ["claro", "papel escola / tint escola", "papel-escola", "papel-escola-tint", 4.5],
+  ["claro", "fundo / papel saúde (número do ciclo)", "cor-fundo", "papel-saude", 4.5],
+  ["claro", "fundo / papel família (número do ciclo)", "cor-fundo", "papel-familia", 4.5],
+  ["claro", "fundo / papel coordenação (número)", "cor-fundo", "papel-coordenacao", 4.5],
+  ["claro", "(decorativo) borda suave / superfície", "cor-borda-suave", "cor-superficie", 0],
+  ["claro", "(isento) desabilitado", "cor-desabilitado-texto", "cor-desabilitado-fundo", 0],
+
+  ["alto", "texto / superfície", "cor-texto", "cor-superficie", 7],
+  ["alto", "branco / primária", "cor-sobre-primaria", "cor-primaria", 7],
+  ["alto", "primária / superfície", "cor-primaria", "cor-superficie", 7],
+  ["alto", "secundário / superfície", "cor-texto-secundario", "cor-superficie", 7],
+  ["alto", "sucesso / superfície", "cor-sucesso", "cor-superficie", 7],
+  ["alto", "aviso / superfície", "cor-aviso", "cor-superficie", 7],
+  ["alto", "erro / superfície", "cor-erro", "cor-superficie", 7],
+
+  // tema escuro (R4.6)
+  ["escuro", "texto / superfície", "cor-texto", "cor-superficie", 4.5],
+  ["escuro", "texto / fundo", "cor-texto", "cor-fundo", 4.5],
+  ["escuro", "texto / superfície em destaque", "cor-texto", "cor-superficie-destaque", 4.5],
+  ["escuro", "texto secundário / superfície", "cor-texto-secundario", "cor-superficie", 4.5],
+  ["escuro", "texto secundário / fundo", "cor-texto-secundario", "cor-fundo", 4.5],
+  ["escuro", "texto secundário / sup. destaque", "cor-texto-secundario", "cor-superficie-destaque", 4.5],
+  ["escuro", "botão primário (texto / fundo)", "cor-sobre-primaria", "cor-primaria", 4.5],
+  ["escuro", "link / superfície", "cor-primaria", "cor-superficie", 4.5],
+  ["escuro", "link / fundo", "cor-primaria", "cor-fundo", 4.5],
+  ["escuro", "link / superfície em destaque", "cor-primaria", "cor-superficie-destaque", 4.5],
+  ["escuro", "primária / tint (info)", "cor-primaria", "cor-primaria-tint", 4.5],
+  ["escuro", "primária escura / tint (nav atual)", "cor-primaria-escura", "cor-primaria-tint", 4.5],
+  ["escuro", "secundária / superfície", "cor-secundaria", "cor-superficie", 4.5],
+  ["escuro", "sucesso / superfície", "cor-sucesso", "cor-superficie", 4.5],
+  ["escuro", "sucesso / fundo sucesso", "cor-sucesso", "cor-sucesso-fundo", 4.5],
+  ["escuro", "aviso / superfície", "cor-aviso", "cor-superficie", 4.5],
+  ["escuro", "aviso / fundo aviso", "cor-aviso", "cor-aviso-fundo", 4.5],
+  ["escuro", "erro / superfície", "cor-erro", "cor-superficie", 4.5],
+  ["escuro", "erro / fundo erro", "cor-erro", "cor-erro-fundo", 4.5],
+  ["escuro", "botão perigo (texto / fundo)", "cor-sobre-erro", "cor-erro", 4.5],
+  ["escuro", "botão perigo hover", "cor-sobre-erro", "cor-erro-forte", 4.5],
+  ["escuro", "badge neutro", "cor-texto-secundario", "cor-superficie-2", 4.5],
+  ["escuro", "toast (fundo sobre texto)", "cor-fundo", "cor-texto", 4.5],
+  ["escuro", "borda de campo / superfície", "cor-borda", "cor-superficie", 3],
+  ["escuro", "borda de campo / fundo", "cor-borda", "cor-fundo", 3],
+  ["escuro", "anel de foco / superfície", "cor-foco", "cor-superficie", 3],
+  ["escuro", "anel de foco / fundo", "cor-foco", "cor-fundo", 3],
+  ["escuro", "papel família / superfície", "papel-familia", "cor-superficie", 4.5],
+  ["escuro", "papel família / tint família", "papel-familia", "papel-familia-tint", 4.5],
+  ["escuro", "papel saúde / tint saúde", "papel-saude", "papel-saude-tint", 4.5],
+  ["escuro", "papel coordenação / tint", "papel-coordenacao", "papel-coordenacao-tint", 4.5],
+  ["escuro", "papel escola / tint escola", "papel-escola", "papel-escola-tint", 4.5], // avatar do cartão de estudante
+  ["escuro", "fundo / papel saúde (número)", "cor-fundo", "papel-saude", 4.5],
 ];
 
 let falhas = 0;
-for (const [nome, a, b, minimo] of PARES) {
+
+// Os dois blocos escuros precisam ser idênticos (o CSS não junta media query e atributo numa regra só).
+const nomes = new Set([...Object.keys(escuroSistema), ...Object.keys(escuroEscolhido)]);
+for (const n of nomes) {
+  if (n === "color-scheme") continue;
+  if (escuroSistema[n] !== escuroEscolhido[n]) {
+    falhas++;
+    console.log(`✗ tema escuro divergente: --${n} = ${escuroSistema[n] ?? "(ausente)"} (sistema) × ${escuroEscolhido[n] ?? "(ausente)"} (escolhido)`);
+  }
+}
+
+for (const [tema, nome, frente, fundo, minimo] of PARES) {
+  const a = resolver(TEMAS[tema], frente);
+  const b = resolver(TEMAS[tema], fundo);
   const r = razao(a, b);
   const ok = minimo === 0 || r >= minimo;
   if (!ok) falhas++;
-  console.log(`${ok ? "✓" : "✗"} ${nome.padEnd(40)} ${a} sobre ${b}  ${r.toFixed(2).replace(".", ",")}:1${minimo ? `  (mín. ${minimo})` : ""}`);
+  const rotulo = `${tema === "claro" ? "" : `${tema}: `}${nome}`;
+  console.log(`${ok ? "✓" : "✗"} ${rotulo.padEnd(46)} ${a.toUpperCase()} sobre ${b.toUpperCase()}  ${r.toFixed(2).replace(".", ",")}:1${minimo ? `  (mín. ${minimo})` : ""}`);
 }
 if (falhas > 0) {
-  console.error(`\n✗ ${falhas} par(es) abaixo do mínimo.`);
+  console.error(`\n✗ ${falhas} problema(s): par abaixo do mínimo ou tema escuro divergente.`);
   process.exit(1);
 }
-console.log("\nOK — todos os pares atendem à WCAG 2.2 AA (1.4.3 / 1.4.11).");
+console.log(`\nOK — ${PARES.length} pares lidos de tokens.css atendem à WCAG 2.2 AA (1.4.3 / 1.4.11); temas escuros idênticos.`);
