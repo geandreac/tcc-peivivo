@@ -1,6 +1,6 @@
 # Diagrama de classes v3 (após R1, migrations 0001–0005)
 
-**Atenção para o artigo:** `docs/tcc/class_diagram.svg` está **desatualizado** em relação ao código. Este diagrama em Mermaid é a referência até a dupla redesenhar o SVG/PNG na ferramenta original. Divergências em relação ao diagrama do artigo:
+**Para o artigo:** use `docs/tcc/class_diagram.png` (e `usecase_diagram.png`, `sequence_diagram.png`), gerados a partir do código por `npm run diagramas` (`scripts/diagramas/`), já com a migration 0008. Este Mermaid é um resumo; em divergência, vale o PNG gerado.
 
 | Mudança | Decisão |
 |---|---|
