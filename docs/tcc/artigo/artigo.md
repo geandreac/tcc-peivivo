@@ -25,11 +25,11 @@ The Individualized Education Plan (PEI) required by Brazilian inclusion law ofte
 
 # 1. INTRODUÇÃO
 
-O crescimento das matrículas da Educação Especial no Brasil evidencia um avanço expressivo no acesso à escolarização de estudantes com deficiência e transtornos do neurodesenvolvimento: em 2025, essas matrículas alcançaram 2,5 milhões, um aumento de 82% em relação a 2021, com mais de 90% dos estudantes já inseridos em classes comuns do ensino regular (INSTITUTO NACIONAL DE ESTUDOS E PESQUISAS EDUCACIONAIS ANÍSIO TEIXEIRA, 2026). Esse avanço, contudo, não veio acompanhado de igual fortalecimento da estrutura pedagógica necessária para sustentar a permanência desses estudantes com aprendizagem efetiva: o mesmo levantamento indica que apenas 11,3% das equipes gestoras escolares possuem formação continuada específica em Educação Especial.
+O crescimento das matrículas da Educação Especial no Brasil evidencia um avanço expressivo no acesso à escolarização de estudantes com deficiência e transtornos do neurodesenvolvimento: em 2025, essas matrículas alcançaram 2,5 milhões, um aumento de 82% em relação a 2021, com mais de 90% dos estudantes já inseridos em classes comuns do ensino regular, segundo o Censo Escolar do Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (Inep, 2026). Esse avanço, contudo, não veio acompanhado de igual fortalecimento da estrutura pedagógica necessária para sustentar a permanência desses estudantes com aprendizagem efetiva: o mesmo levantamento indica que apenas 11,3% das equipes gestoras escolares possuem formação continuada específica em Educação Especial.
 
-O principal instrumento previsto para responder a essa demanda é o Plano Educacional Individualizado (PEI), cujo amparo legal decorre da Lei Brasileira de Inclusão da Pessoa com Deficiência, Lei nº 13.146 (BRASIL, 2015). A literatura nacional recente, entretanto, é convergente ao apontar a baixa operacionalização desse instrumento na prática escolar. Segundo Silva e Camargo (2021), o PEI é concebido, em tese, como processo colaborativo, mas frequentemente se converte em documento burocrático elaborado uma única vez por período letivo. Pereira (2022) e Fontana e Cruz (2022) reforçam esse diagnóstico ao descreverem a dificuldade de professores em traduzir as diretrizes do plano em prática pedagógica cotidiana, enquanto Battistello, Lisboa e Martins (2024) e Modesto, Araújo e Mendonça (2023) associam essa lacuna à ausência de suporte tecnológico capaz de acompanhar a evolução do estudante ao longo do ano letivo.
+O principal instrumento previsto para responder a essa demanda é o Plano Educacional Individualizado (PEI), cujo amparo legal decorre da Lei Brasileira de Inclusão da Pessoa com Deficiência, Lei nº 13.146 (Brasil, 2015). A literatura nacional recente, entretanto, é convergente ao apontar a baixa operacionalização desse instrumento na prática escolar. Segundo Silva e Camargo (2021), o PEI é concebido, em tese, como processo colaborativo, mas frequentemente se converte em documento burocrático elaborado uma única vez por período letivo. Pereira (2022) e Fontana e Cruz (2022) reforçam esse diagnóstico ao descreverem a dificuldade de professores em traduzir as diretrizes do plano em prática pedagógica cotidiana, enquanto Battistello, Lisboa e Martins (2024) e Modesto, Araújo e Mendonça (2023) associam essa lacuna à ausência de suporte tecnológico capaz de acompanhar a evolução do estudante ao longo do ano letivo.
 
-Especificamente para os casos de dislexia e Transtorno do Déficit de Atenção com Hiperatividade (TDAH), a Lei nº 14.254 (BRASIL, 2021) determina o acompanhamento integral do educando, com articulação entre a rede de ensino e a rede de saúde. No levantamento exploratório realizado neste trabalho (seção 3.1), 63,0% dos 27 respondentes descreveram a comunicação atual entre escola, família e saúde como informal e fragmentada, conduzida predominantemente por aplicativos de mensagens, sem histórico recuperável nem continuidade entre ciclos letivos. Por se tratar de amostra de conveniência, esse dado caracteriza o problema no grupo consultado, sem pretensão de generalização.
+Especificamente para os casos de dislexia e Transtorno do Déficit de Atenção com Hiperatividade (TDAH), a Lei nº 14.254 (Brasil, 2021) determina o acompanhamento integral do educando, com articulação entre a rede de ensino e a rede de saúde. No levantamento exploratório realizado neste trabalho (seção 3.1), 63,0% dos 27 respondentes descreveram a comunicação atual entre escola, família e saúde como informal e fragmentada, conduzida predominantemente por aplicativos de mensagens, sem histórico recuperável nem continuidade entre ciclos letivos. Por se tratar de amostra de conveniência, esse dado caracteriza o problema no grupo consultado, sem pretensão de generalização.
 
 Mesmo quando o conhecimento sobre o estudante é registrado, sua conversão em material didático acessível exige que o docente reescreva cada texto segundo as necessidades de cada estudante, tarefa que concorre com o tempo de planejamento de uma turma numerosa e com múltiplos perfis de necessidade. A adaptação, nesse contexto, frequentemente não ocorre, não por omissão docente, mas pela ausência de um mecanismo que a torne operacionalmente viável em escala. [PREENCHER: se a dupla cronometrar docentes adaptando o mesmo texto, inserir aqui o tempo medido e o método; caso contrário, manter o parágrafo sem número.]
 
@@ -49,11 +49,11 @@ e) avaliar a usabilidade do protótipo com docentes, responsáveis e profissiona
 
 ## 1.1 Justificativa
 
-A relevância do tema sustenta-se em três dimensões complementares. No plano legal e social, o problema investigado corresponde a uma obrigação normativa vigente e ainda sem instrumento operacional, conforme a Lei nº 14.254/2021. No plano tecnológico, as soluções de mercado consultadas (seção 2.6) tratam a adaptação de conteúdo, a gestão documental do plano e a validação por profissional de saúde como problemas isolados, sem integrá-los em um único ciclo. No plano prático, um sistema como o PEI Vivo pode reduzir o esforço da adaptação docente e preservar o conhecimento sobre o estudante entre ciclos letivos e trocas de professor, uma vez que o perfil pertence ao estudante e não ao docente.
+A relevância do tema sustenta-se em três dimensões complementares. No plano legal e social, o problema investigado corresponde a uma obrigação normativa vigente e ainda sem instrumento operacional, conforme a Lei nº 14.254/2021. No plano tecnológico, as soluções de mercado consultadas (seção 2.6) já combinam gestão do plano e adaptação de conteúdo por IA, mas nenhuma integra ao ciclo a validação por profissional de saúde nem oferece uma adaptação que funcione sem IA. No plano prático, um sistema como o PEI Vivo pode reduzir o esforço da adaptação docente e preservar o conhecimento sobre o estudante entre ciclos letivos e trocas de professor, uma vez que o perfil pertence ao estudante e não ao docente.
 
-Há ainda uma justificativa de proteção de dados. Informações sobre a saúde de crianças são dados pessoais sensíveis (BRASIL, 2018, art. 11) e exigem consentimento específico de pelo menos um dos pais ou responsável (BRASIL, 2018, art. 14). Um sistema que circula esse tipo de informação entre escola e saúde precisa demonstrar, e não apenas declarar, que cada pessoa acessa somente o necessário ao seu papel.
+Há ainda uma justificativa de proteção de dados. Informações sobre a saúde de crianças são dados pessoais sensíveis (Brasil, 2018, art. 11) e exigem consentimento específico de pelo menos um dos pais ou responsável (Brasil, 2018, art. 14). Um sistema que circula esse tipo de informação entre escola e saúde precisa demonstrar, e não apenas declarar, que cada pessoa acessa somente o necessário ao seu papel.
 
-O trabalho relaciona-se aos Objetivos de Desenvolvimento Sustentável 4 (Educação de Qualidade), em especial à meta 4.5, que trata do acesso igualitário à educação para pessoas com deficiência, e 3 (Saúde e Bem-Estar), ao formalizar a participação da rede de saúde no acompanhamento escolar (ORGANIZAÇÃO DAS NAÇÕES UNIDAS, 2015). O sistema não mede bem-estar diretamente; a contribuição para o ODS 3 é de articulação entre serviços.
+O trabalho relaciona-se aos Objetivos de Desenvolvimento Sustentável 4 (Educação de Qualidade), em especial à meta 4.5, que trata do acesso igualitário à educação para pessoas com deficiência, e 3 (Saúde e Bem-Estar), ao formalizar a participação da rede de saúde no acompanhamento escolar (Organização das Nações Unidas, 2015). O sistema não mede bem-estar diretamente; a contribuição para o ODS 3 é de articulação entre serviços.
 
 O escopo delimita-se ao ensino fundamental, com cenário de demonstração de um estudante fictício de nove anos, a escolas que adotem o sistema por iniciativa da coordenação pedagógica e a estudantes cujas famílias consintam com o uso. Transferência entre escolas e uso pelo próprio estudante ficam fora do escopo.
 
@@ -61,11 +61,11 @@ O escopo delimita-se ao ensino fundamental, com cenário de demonstração de um
 
 ## 2.1 Educação inclusiva e o Plano Educacional Individualizado
 
-O Plano Educacional Individualizado é o instrumento central de personalização do ensino para estudantes público-alvo da Educação Especial, sendo amparado pela Lei Brasileira de Inclusão (BRASIL, 2015) e, para os casos de dislexia e TDAH, pela Lei nº 14.254 (BRASIL, 2021). Silva e Camargo (2021), em revisão integrativa da produção científica nacional sobre o tema, identificam que a elaboração colaborativa do plano é amplamente defendida na literatura, mas raramente sustentada por mecanismos que garantam sua atualização contínua. Pereira (2022) descreve desafios semelhantes ao analisar práticas colaborativas de ensino, enquanto Fontana e Cruz (2022) discutem a aplicação do PEI em componente curricular específico, evidenciando a dificuldade de tradução do plano em atividade prática replicável. Modesto, Araújo e Mendonça (2023) e Battistello, Lisboa e Martins (2024) convergem ao apontar que a ausência de suporte tecnológico dedicado é fator determinante para a baixa efetividade do instrumento.
+O Plano Educacional Individualizado é o instrumento central de personalização do ensino para estudantes público-alvo da Educação Especial, sendo amparado pela Lei Brasileira de Inclusão (Brasil, 2015) e, para os casos de dislexia e TDAH, pela Lei nº 14.254 (Brasil, 2021). Silva e Camargo (2021), em revisão integrativa da produção científica nacional sobre o tema, identificam que a elaboração colaborativa do plano é amplamente defendida na literatura, mas raramente sustentada por mecanismos que garantam sua atualização contínua. Pereira (2022) descreve desafios semelhantes ao analisar práticas colaborativas de ensino, enquanto Fontana e Cruz (2022) discutem a aplicação do PEI em componente curricular específico, evidenciando a dificuldade de tradução do plano em atividade prática replicável. Modesto, Araújo e Mendonça (2023) e Battistello, Lisboa e Martins (2024) convergem ao apontar que a ausência de suporte tecnológico dedicado é fator determinante para a baixa efetividade do instrumento.
 
 ## 2.2 TEA, TDAH e dislexia: implicações para a leitura
 
-O Transtorno do Espectro Autista (TEA), o TDAH e a dislexia são transtornos do neurodesenvolvimento com manifestações distintas, mas com efeitos convergentes sobre a leitura de materiais escolares (AMERICAN PSYCHIATRIC ASSOCIATION, 2023). No TDAH, a dificuldade de sustentar a atenção torna textos longos e enunciados com várias instruções encadeadas mais custosos. Na dislexia, a decodificação de palavras é mais lenta e menos precisa, o que aumenta o peso de vocabulário pouco frequente e de blocos densos de texto. No TEA, a sensibilidade sensorial e a preferência por instruções explícitas podem tornar relevantes o contraste visual, a previsibilidade da estrutura e o uso de interesses específicos como ponto de entrada.
+O Transtorno do Espectro Autista (TEA), o TDAH e a dislexia são transtornos do neurodesenvolvimento com manifestações distintas, mas com efeitos convergentes sobre a leitura de materiais escolares (American Psychiatric Association, 2023). No TDAH, a dificuldade de sustentar a atenção torna textos longos e enunciados com várias instruções encadeadas mais custosos. Na dislexia, a decodificação de palavras é mais lenta e menos precisa, o que aumenta o peso de vocabulário pouco frequente e de blocos densos de texto. No TEA, a sensibilidade sensorial e a preferência por instruções explícitas podem tornar relevantes o contraste visual, a previsibilidade da estrutura e o uso de interesses específicos como ponto de entrada.
 
 Para este trabalho, importa menos a categoria diagnóstica e mais o comportamento observável em sala, que varia entre estudantes com o mesmo diagnóstico e no mesmo estudante ao longo do tempo. Por isso o sistema registra seis dimensões observáveis (atenção sustentada, compreensão de enunciados, autonomia com palavras, interesse manifesto, sensibilidade visual e cansaço na tarefa) em escala de três pontos (reduzida, estável, ampliada) e, por decisão de projeto, não armazena laudo nem diagnóstico (seção 3.2.3).
 
@@ -73,27 +73,27 @@ Para este trabalho, importa menos a categoria diagnóstica e mais o comportament
 
 O Desenho Universal para a Aprendizagem (DUA) propõe oferecer múltiplos meios de representação do conteúdo, reduzindo barreiras sem alterar o objetivo de aprendizagem (CAST, 2018). As estratégias aplicadas pelo motor do PEI Vivo seguem essa orientação: o texto é o mesmo da turma, mas apresentado em blocos de poucas linhas, com enunciados compostos divididos em etapas, contraste mínimo configurável, limite de blocos por material e apoios de leitura (pictograma por etapa, glossário de palavras e leitura em voz alta pelo navegador).
 
-Os limiares de contraste adotados (4,5:1 e 7:1) correspondem aos critérios de sucesso 1.4.3 (nível AA) e 1.4.6 (nível AAA) das WCAG 2.2 (WORLD WIDE WEB CONSORTIUM, 2024), também incorporadas à ABNT NBR 17225 (ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS, 2025). A preferência por fontes sem serifa e de formas bem diferenciadas encontra apoio em Rello e Baeza-Yates (2013), que mediram desempenho de leitura de pessoas com dislexia em diferentes fontes. Os demais limiares (número de linhas por bloco, níveis de vocabulário e quantidade de blocos por material) não têm valor de referência único na literatura consultada: são hipóteses de projeto, explícitas e ajustáveis pelo profissional de saúde, a serem calibradas no uso.
+Os limiares de contraste adotados (4,5:1 e 7:1) correspondem aos critérios de sucesso 1.4.3 (nível AA) e 1.4.6 (nível AAA) das WCAG 2.2 (World Wide Web Consortium, 2024), também incorporadas à ABNT NBR 17225 (Associação Brasileira de Normas Técnicas, 2025). A preferência por fontes sem serifa e de formas bem diferenciadas encontra apoio em Rello e Baeza-Yates (2013), que mediram desempenho de leitura de pessoas com dislexia em diferentes fontes. Os demais limiares (número de linhas por bloco, níveis de vocabulário e quantidade de blocos por material) não têm valor de referência único na literatura consultada: são hipóteses de projeto, explícitas e ajustáveis pelo profissional de saúde, a serem calibradas no uso.
 
 ## 2.4 Proteção de dados e controle de acesso na camada de dados
 
-O tratamento de dados de crianças e adolescentes com deficiência envolve dado pessoal sensível (BRASIL, 2018, art. 11) e exige consentimento específico e em destaque dado por pelo menos um dos pais ou pelo responsável legal (BRASIL, 2018, art. 14, § 1º). A lei também impõe os princípios da finalidade e da necessidade (BRASIL, 2018, art. 6º, I e III), segundo os quais cada pessoa deve acessar apenas o mínimo necessário à sua função.
+O tratamento de dados de crianças e adolescentes com deficiência envolve dado pessoal sensível (Brasil, 2018, art. 11) e exige consentimento específico e em destaque dado por pelo menos um dos pais ou pelo responsável legal (Brasil, 2018, art. 14, § 1º). A lei também impõe os princípios da finalidade e da necessidade (Brasil, 2018, art. 6º, I e III), segundo os quais cada pessoa deve acessar apenas o mínimo necessário à sua função.
 
-Para atender a esses princípios de forma verificável, adotou-se o sistema gerenciador de banco de dados relacional PostgreSQL, que oferece Row Level Security (RLS): políticas que restringem, na própria camada do banco, quais linhas de uma tabela cada usuário autenticado pode ler ou modificar (POSTGRESQL GLOBAL DEVELOPMENT GROUP, 2025). Com isso, a restrição de acesso de um docente às notas reservadas do profissional de saúde, por exemplo, é aplicada pelo banco independentemente da interface, o que impede que a informação seja obtida por chamada direta à interface de programação de aplicações (API).
+Para atender a esses princípios de forma verificável, adotou-se o sistema gerenciador de banco de dados relacional PostgreSQL, que oferece Row Level Security (RLS): políticas que restringem, na própria camada do banco, quais linhas de uma tabela cada usuário autenticado pode ler ou modificar (PostgreSQL Global Development Group, 2025). Com isso, a restrição de acesso de um docente às notas reservadas do profissional de saúde, por exemplo, é aplicada pelo banco independentemente da interface, o que impede que a informação seja obtida por chamada direta à interface de programação de aplicações (API).
 
 ## 2.5 Tecnologias para sistemas web
 
-A construção de sistemas de informação demanda escolhas arquiteturais que equilibrem manutenibilidade, desempenho, segurança e confiabilidade, características de qualidade definidas na norma ISO/IEC 25010 (INTERNATIONAL ORGANIZATION FOR STANDARDIZATION, 2023). Neste trabalho, adotou-se a linguagem TypeScript em todas as camadas, por sua tipagem estática, que permite detectar em tempo de compilação uma configuração inválida de parâmetros de adaptação. A interface foi construída com a biblioteca React e a ferramenta de build Vite. A camada de servidor usa a plataforma Supabase, que reúne PostgreSQL, autenticação com segundo fator (TOTP) e funções serverless (Edge Functions) executadas fora do navegador (SUPABASE, 2025).
+A construção de sistemas de informação demanda escolhas arquiteturais que equilibrem manutenibilidade, desempenho, segurança e confiabilidade, características de qualidade definidas na norma ISO/IEC 25010 (International Organization for Standardization, 2023). Neste trabalho, adotou-se a linguagem TypeScript em todas as camadas, por sua tipagem estática, que permite detectar em tempo de compilação uma configuração inválida de parâmetros de adaptação. A interface foi construída com a biblioteca React e a ferramenta de build Vite. A camada de servidor usa a plataforma Supabase, que reúne PostgreSQL, autenticação com segundo fator (TOTP) e funções serverless (Edge Functions) executadas fora do navegador (Supabase, 2025).
 
 A separação entre uma camada determinística, implementada como código-fonte auditável, e uma camada opcional assistida por modelo de linguagem decorre de exigência de confiabilidade: regras que alteram o material recebido por uma criança devem ser verificáveis e reproduzíveis, condição que código determinístico satisfaz e que a saída de um modelo de linguagem não garante.
 
 ## 2.6 Projetos semelhantes
 
-Três categorias de solução tecnológica relacionam-se ao problema investigado. A primeira é a plataforma brasileira Prova Adaptada (PROVA ADAPTADA, 2026), que utiliza inteligência artificial para adaptar provas e atividades a partir da categoria diagnóstica selecionada pelo docente (TEA, TDAH, dislexia, baixa visão ou discalculia). Como a adaptação é parametrizada pela categoria, e não por um perfil individual construído ao longo do tempo, dois estudantes com o mesmo laudo recebem tratamento equivalente.
+Três categorias de solução tecnológica relacionam-se ao problema investigado. A primeira é a plataforma brasileira Prova Adaptada, hoje oferecida também sob o nome IncluiAI (Prova Adaptada, 2026), que utiliza inteligência artificial para gerar o PEI e adaptar atividades e provas elaboradas pelo docente. A adaptação é descrita em função das necessidades do aluno atípico, sem menção a um perfil individual atualizado ciclo a ciclo nem à validação por profissional de saúde. [CONFERIR: a versão anterior do artigo dizia que a adaptação era parametrizada pela categoria diagnóstica escolhida pelo docente (TEA, TDAH, dislexia, baixa visão ou discalculia); a página pública consultada em 13/10/2026 não cita as categorias. Confirmar dentro da plataforma ou retirar.]
 
-A segunda é a plataforma Vínculoo (VÍNCULOO, 2026), que digitaliza e centraliza os documentos do PEI, do Plano de Desenvolvimento Individual e do Plano de Atendimento Educacional Especializado, com preenchimento colaborativo entre escola e família. Trata-se de solução essencialmente documental: a informação registrada não gera material didático adaptado.
+A segunda é a plataforma Vínculoo (Vínculoo, 2026), que organiza o PEI e o Plano de Atendimento Educacional Especializado em um padrão único, com participação da família no plano. Seu assistente de IA lê laudos, relatórios e observações importados, rascunha o plano e adapta a atividade da turma para cada estudante, e o professor faz o ajuste final. A diferença em relação ao PEI Vivo está na origem e no controle da adaptação: no Vínculoo, ela parte de documentos, inclusive laudos, e de um modelo de IA; no PEI Vivo, parte de observações periódicas, por regras determinísticas, sem armazenar laudo e com validação do profissional de saúde.
 
-No cenário internacional, as plataformas estadunidenses Frontline Education (FRONTLINE EDUCATION, 2026) e Goalbook Toolkit (GOALBOOK, 2026) apoiam a gestão do Individualized Education Program (IEP), equivalente ao PEI. Essas soluções priorizam a conformidade com a legislação norte-americana e o rastreamento de metas, sem gerar o material didático usado em sala nem integrar formalmente a rede de saúde.
+No cenário internacional, as plataformas estadunidenses Frontline Education (Frontline Education, 2026) e Goalbook Toolkit (Goalbook, 2026) apoiam a elaboração e a gestão do Individualized Education Program (IEP), equivalente ao PEI. Essas soluções priorizam a conformidade com a legislação norte-americana, a escrita de metas e o acompanhamento do plano, sem gerar o material didático usado em sala nem integrar formalmente a rede de saúde.
 
 No campo acadêmico, Rello e Baeza-Yates (2013) avaliaram experimentalmente o efeito de fontes tipográficas na leitura de pessoas com dislexia, o que sustenta parte das decisões de apresentação do material, mas não propõem um sistema de acompanhamento. [PREENCHER: incluir 1 ou 2 trabalhos acadêmicos sobre sistemas de apoio ao PEI/IEP ou simplificação de texto, com a busca descrita em 3.4.]
 
@@ -105,10 +105,10 @@ Quadro 1 – Comparação entre o PEI Vivo e soluções semelhantes
 
 | Critério | Prova Adaptada | Vínculoo | Frontline / Goalbook | PEI Vivo |
 |---|---|---|---|---|
-| Perfil individual atualizado por ciclo | Não (categoria diagnóstica) | Não | Metas do IEP | Sim (6 dimensões, quinzenal) |
+| Perfil individual atualizado por ciclo | Não documentado | Não documentado | Metas do IEP | Sim (6 dimensões, quinzenal) |
 | Participação formal da saúde | Não | Não documentada | Não | Validação do conjunto de parâmetros |
-| Geração de material adaptado | Sim (IA) | Não | Não | Sim (regras determinísticas) |
-| Funciona sem IA | Não | Não se aplica | Não se aplica | Sim |
+| Geração de material adaptado | Sim (IA) | Sim (IA, a partir de documentos e laudos) | Não | Sim (regras determinísticas, sem laudo) |
+| Funciona sem IA | Não | Não documentado | Não se aplica | Sim |
 | Consentimento granular e revogável | Não documentado | Não documentado | Não documentado | Sim, por escopo, com trilha |
 | Permissões aplicadas no banco e auditadas | Não documentado | Não documentado | Não documentado | Sim (RLS e auditoria) |
 
@@ -118,13 +118,13 @@ Fonte: Autoria própria (2026), com base na documentação pública das soluçõ
 
 ## 3.1 Classificação da pesquisa
 
-Quanto à natureza, esta pesquisa classifica-se como aplicada, por ter como finalidade a geração de conhecimento dirigido à solução de um problema específico (PRODANOV; FREITAS, 2013). Quanto aos objetivos, é exploratória e descritiva. Quanto aos procedimentos, segue a Design Science Research (HEVNER et al., 2004; DRESCH; LACERDA; ANTUNES JÚNIOR, 2015), abordagem que orienta a construção de um artefato para resolver um problema relevante e a sua avaliação com critérios definidos previamente. O artefato é o PEI Vivo; a avaliação combina verificação técnica automatizada (seção 3.4) e avaliação de usabilidade com usuários (seção 4.5). Não houve experimento controlado.
+Quanto à natureza, esta pesquisa classifica-se como aplicada, por ter como finalidade a geração de conhecimento dirigido à solução de um problema específico (Prodanov; Freitas, 2013). Quanto aos objetivos, é exploratória e descritiva. Quanto aos procedimentos, segue a Design Science Research (Hevner et al., 2004; Dresch; Lacerda; Antunes Júnior, 2015), abordagem que orienta a construção de um artefato para resolver um problema relevante e a sua avaliação com critérios definidos previamente. O artefato é o PEI Vivo; a avaliação combina verificação técnica automatizada (seção 3.4) e avaliação de usabilidade com usuários (seção 4.5). Não houve experimento controlado.
 
 Na etapa de conscientização do problema, aplicou-se em setembro de 2026 um questionário eletrônico (Google Forms) a 27 pessoas envolvidas no acompanhamento de estudantes neurodivergentes: 12 responsáveis, 10 profissionais de apoio escolar e 5 docentes. Nenhum profissional de saúde respondeu, o que constitui limitação relevante, já que esse é o perfil que valida os parâmetros no sistema. O questionário abordou a comunicação atual entre escola, família e saúde, a avaliação da proposta em escala de 1 a 5 e as preocupações com a plataforma.
 
 Para 63,0% dos respondentes a comunicação atual é informal e fragmentada, enquanto 18,5% discordaram dessa afirmação. A proposta recebeu nota 4 ou 5 de 81,5% (22 de 27). As preocupações mais citadas foram a dependência de tecnologia em escolas com poucos recursos (59,3%), a privacidade dos dados da criança (51,9%) e a confiabilidade do material gerado por IA (37,0%); 11,1% não indicaram preocupação. [CONFERIR: recontar cada percentual na planilha original com CONT.SE antes da entrega.] Como a pergunta de avaliação foi feita logo após a apresentação da proposta pelos autores, o resultado indica aceitação inicial do conceito, e não validação do produto. As regras de privacidade (RN01, RN02 e RN08) já constavam da especificação antes da coleta; as respostas as confirmaram, e a preocupação com dependência de tecnologia orientou a decisão de manter uma camada que funciona sem IA e a versão impressa do material.
 
-O formulário coletou nome e e-mail dos participantes, dado que não era necessário à análise, e não apresentou Termo de Consentimento Livre e Esclarecido (TCLE). Para a análise, as respostas foram codificadas de R01 a R27 e os identificadores foram descartados. [CONFERIR: executar a anonimização antes de citar esta frase; declarar ou excluir a resposta com conflito de interesse e recalcular.] A pesquisa de opinião com participantes não identificados está dispensada de registro no sistema CEP/Conep (BRASIL, 2016, art. 1º, parágrafo único, I) [CONFERIR: inciso com a orientadora]; a avaliação de usabilidade (seção 4.5) usa formulário anônimo com TCLE na primeira página.
+O formulário coletou nome e e-mail dos participantes, dado que não era necessário à análise, e não apresentou Termo de Consentimento Livre e Esclarecido (TCLE). Para a análise, as respostas foram codificadas de R01 a R27 e os identificadores foram descartados. [CONFERIR: executar a anonimização antes de citar esta frase; declarar ou excluir a resposta com conflito de interesse e recalcular.] A pesquisa de opinião com participantes não identificados está dispensada de registro no sistema CEP/Conep (Brasil, 2016, art. 1º, parágrafo único, I) [CONFERIR: inciso com a orientadora]; a avaliação de usabilidade (seção 4.5) usa formulário anônimo com TCLE na primeira página.
 
 ## 3.2 Método de desenvolvimento
 
@@ -196,7 +196,7 @@ Quadro 4 – Regras de negócio
 
 Fonte: Autoria própria (2026).
 
-### 3.2.4 Diagrama 1: Diagrama de Classes
+### 3.2.4 Diagrama de classes
 
 O Diagrama de Classes, reproduzido na Figura 1, define o modelo de dados do sistema e foi gerado a partir das migrações do banco (0001 a 0008), de modo que cada classe persistente corresponde a uma tabela. São 15 classes persistentes, entre as quais Estudante, Consentimento, CicloObservacao, Observacao, VersaoPerfil, NotaClinica e MaterialAdaptado, e 2 objetos de valor (ParametrosAdaptacao, com os seis parâmetros, e TextoAdaptado). O diagrama registra ainda os 17 tipos enumerados, as restrições garantidas pelo banco (uma versão vigente por estudante, um consentimento ativo, parâmetros imutáveis) e a função do banco ou Edge Function que implementa cada operação. A senha e o segundo fator não aparecem porque são mantidos pelo serviço de autenticação, e não pelo esquema da aplicação.
 
@@ -204,7 +204,7 @@ O Diagrama de Classes, reproduzido na Figura 1, define o modelo de dados do sist
 
 Fonte: Autoria própria (2026).
 
-### 3.2.5 Diagrama 2: Diagrama de Casos de Uso
+### 3.2.5 Diagrama de casos de uso
 
 O Diagrama de Casos de Uso, apresentado na Figura 2, especifica as interações dos quatro perfis (responsável legal, docente regente, profissional de saúde e coordenação pedagógica), de um ator abstrato Usuário, que reúne o que é comum a todos (entrar, aceitar convite, recuperar senha e ver notificações), e do ator Tempo, que dispara diariamente a expiração das validações pendentes (RN05). São 28 casos de uso, dos quais 4 são subfluxos internos ligados por inclusão ou extensão, como a aplicação condicional da camada de IA, que estende a geração de material. Casos especificados mas ainda sem tela no sistema, como a exclusão dos dados do estudante, foram deixados de fora e indicados na legenda.
 
@@ -212,7 +212,7 @@ O Diagrama de Casos de Uso, apresentado na Figura 2, especifica as interações 
 
 Fonte: Autoria própria (2026).
 
-### 3.2.6 Diagrama 3: Diagrama de Sequência
+### 3.2.6 Diagrama de sequência
 
 O Diagrama de Sequência, exibido na Figura 3, detalha a geração e a aprovação de material adaptado na ordem em que o código as executa. A Edge Function valida o texto recebido e solicita ao banco, com a identidade do docente, a verificação de vínculo, consentimento e versão vigente; se alguma condição falha, a requisição é negada (erro 403) ou recusada por conflito (erro 409). Quando a camada de IA é permitida (RN06), ela atua antes do motor determinístico. O rascunho é gravado por uma função do banco que confere novamente as condições. A aprovação vai direto ao banco, pela função fn_decidir_material, que recusa a aprovação caso a família tenha revogado o consentimento depois da geração.
 
@@ -267,7 +267,9 @@ Fonte: Autoria própria (2026).
 
 A qualidade do código é verificada com Vitest, para os testes unitários do motor, das funções e da interface, e com Playwright, para os fluxos ponta a ponta. As políticas de acesso são testadas em PGlite, um PostgreSQL executado em processo, e no projeto Supabase real, no pipeline de integração contínua do GitHub Actions. A acessibilidade é auditada automaticamente com axe-core em todas as telas. A interface foi prototipada diretamente em código, sem ferramenta de design à parte.
 
-O protótipo usa um cenário demonstrativo fictício, sem dados reais de estudante: um estudante de nove anos, do 4º ano, com interesse manifesto por dinossauros, cujo perfil de aprendizagem foi construído por docente, responsável e profissional de saúde fictícios. A Figura 4 reproduz o trecho do motor determinístico que aplica a assimetria conservadora da RN03 ao nível de vocabulário; a mesma regra vale para os demais parâmetros (D-42).
+O protótipo usa um cenário demonstrativo fictício, sem dados reais de estudante: um estudante de nove anos, do 4º ano, com interesse manifesto por dinossauros, cujo perfil de aprendizagem foi construído por docente, responsável e profissional de saúde fictícios. O Código 1 reproduz o trecho do motor determinístico que aplica a assimetria conservadora da RN03 ao nível de vocabulário; a mesma regra vale para os demais parâmetros (D-42).
+
+Código 1 – Trecho do motor de adaptação determinístico (TypeScript)
 
 ```
 function paraProximoNivel(
@@ -287,8 +289,6 @@ function paraProximoNivel(
 }
 ```
 
-Figura 4 – Trecho do motor de adaptação determinístico (TypeScript)
-
 Fonte: Autoria própria (2026).
 
 ## 3.4 Procedimentos metodológicos
@@ -297,7 +297,7 @@ A avaliação do artefato seguiu dois procedimentos, definidos antes da coleta.
 
 O primeiro é a verificação técnica automatizada. Para cada regra de acesso foi escrito primeiro o teste que tenta o acesso negado (por exemplo, um docente lendo nota clínica pela API) e só depois o caminho permitido. Uma sonda de 31 tentativas de acesso indevido, construída a partir da matriz de permissões, foi executada contra as políticas de cada versão. Toda alteração no repositório dispara a suíte completa no GitHub Actions, incluindo o job que aplica as migrações em um projeto Supabase real e executa ali os mesmos testes de política. A acessibilidade foi verificada com axe-core nos testes de cada tela e em navegador real nos testes ponta a ponta, nas larguras de 390 e 1280 pixels, e as páginas públicas foram medidas com Lighthouse.
 
-O segundo é a avaliação de usabilidade com usuários, em sessão individual de cerca de 20 minutos sobre o protótipo com dados fictícios. Cada participante lê o TCLE, executa três tarefas do seu perfil (por exemplo, o docente registra uma observação, gera e aprova um material; o responsável verifica quem tem acesso aos dados e revoga o consentimento) e responde ao questionário SUS (BROOKE, 1996). São registrados o tempo de cada tarefa, a conclusão com ou sem ajuda e os problemas observados. O formulário não coleta nome nem e-mail. [PREENCHER: local, período, número de participantes por perfil, incluindo pelo menos 2 profissionais de saúde.]
+O segundo é a avaliação de usabilidade com usuários, em sessão individual de cerca de 20 minutos sobre o protótipo com dados fictícios. Cada participante lê o TCLE, executa três tarefas do seu perfil (por exemplo, o docente registra uma observação, gera e aprova um material; o responsável verifica quem tem acesso aos dados e revoga o consentimento) e responde ao questionário SUS (Brooke, 1996). São registrados o tempo de cada tarefa, a conclusão com ou sem ajuda e os problemas observados. O formulário não coleta nome nem e-mail. [PREENCHER: local, período, número de participantes por perfil, incluindo pelo menos 2 profissionais de saúde.]
 
 [PREENCHER, se fizerem a busca: bases consultadas (por exemplo, Google Acadêmico, SciELO e ACM Digital Library), termos de busca, período e número de trabalhos selecionados para a seção 2.6.]
 
@@ -309,53 +309,53 @@ O PEI Vivo foi implementado como protótipo funcional com 31 telas, organizadas 
 
 ## 4.2 Funcionalidades e telas principais
 
-As Figuras 5 a 11 percorrem um ciclo completo com os dados fictícios do protótipo.
+As Figuras 4 a 10 percorrem um ciclo completo com os dados fictícios do protótipo.
 
 ### 4.2.1 Tela de observação
 
-Na tela de observação (Figura 5), o docente registra, para cada uma das seis dimensões, se o comportamento ficou reduzido, estável ou ampliado em relação ao ciclo anterior, com evidência opcional em texto livre. A mesma tela atende responsável e profissional de saúde, com rótulos adaptados a cada um. Em teste automatizado em navegador, o registro das seis dimensões levou cerca de 1 segundo de máquina; o tempo humano será medido na avaliação com usuários.
+Na tela de observação (Figura 4), o docente registra, para cada uma das seis dimensões, se o comportamento ficou reduzido, estável ou ampliado em relação ao ciclo anterior, com evidência opcional em texto livre. A mesma tela atende responsável e profissional de saúde, com rótulos adaptados a cada um. Em teste automatizado em navegador, o registro das seis dimensões levou cerca de 1 segundo de máquina; o tempo humano será medido na avaliação com usuários.
 
-![Figura 5 – Registro de observação pelo docente](telas/01-observar.png)
+![Figura 4 – Registro de observação pelo docente](telas/01-observar.png)
 
 Fonte: Autoria própria (2026).
 
 ### 4.2.2 Tela de fechamento de ciclo
 
-Ao fechar o ciclo (Figura 6), o docente vê a proposta de parâmetros calculada pelo motor, comparada com a versão vigente. No exemplo, o cansaço ampliado relatado pela família reduz de imediato o número de blocos por material, enquanto a melhora na autonomia com palavras aguarda um segundo ciclo para elevar o vocabulário, conforme a RN03.
+Ao fechar o ciclo (Figura 5), o docente vê a proposta de parâmetros calculada pelo motor, comparada com a versão vigente. No exemplo, o cansaço ampliado relatado pela família reduz de imediato o número de blocos por material, enquanto a melhora na autonomia com palavras aguarda um segundo ciclo para elevar o vocabulário, conforme a RN03.
 
-![Figura 6 – Fechamento de ciclo com a proposta de parâmetros](telas/02-fechar-ciclo.png)
+![Figura 5 – Fechamento de ciclo com a proposta de parâmetros](telas/02-fechar-ciclo.png)
 
 Fonte: Autoria própria (2026).
 
 ### 4.2.3 Tela de validação
 
-O profissional de saúde valida o conjunto de parâmetros do ciclo (Figura 7), nunca um material individual (RN07). Ele pode aprovar, pedir revisão ou ajustar; um ajuste cria nova versão com justificativa obrigatória. Sem resposta em sete dias, a proposta expira e a versão anterior permanece vigente (RN05).
+O profissional de saúde valida o conjunto de parâmetros do ciclo (Figura 6), nunca um material individual (RN07). Ele pode aprovar, pedir revisão ou ajustar; um ajuste cria nova versão com justificativa obrigatória. Sem resposta em sete dias, a proposta expira e a versão anterior permanece vigente (RN05).
 
-![Figura 7 – Validação dos parâmetros pelo profissional de saúde](telas/03-validar.png)
+![Figura 6 – Validação dos parâmetros pelo profissional de saúde](telas/03-validar.png)
 
 Fonte: Autoria própria (2026).
 
 ### 4.2.4 Telas de revisão e de material aprovado
 
-O docente cola o texto da aula e recebe o rascunho adaptado, exibido ao lado do original para revisão e edição (Figura 8). O rascunho é visível apenas ao seu autor. Somente após a aprovação o material passa a ser visto pela família, pelo profissional e pela coordenação (Figura 9), com opção de leitura em voz alta por trecho e versão para impressão.
+O docente cola o texto da aula e recebe o rascunho adaptado, exibido ao lado do original para revisão e edição (Figura 7). O rascunho é visível apenas ao seu autor. Somente após a aprovação o material passa a ser visto pela família, pelo profissional e pela coordenação (Figura 8), com opção de leitura em voz alta por trecho e versão para impressão.
 
-![Figura 8 – Revisão do material: original e adaptado lado a lado](telas/04-revisar.png)
+![Figura 7 – Revisão do material: original e adaptado lado a lado](telas/04-revisar.png)
 
 Fonte: Autoria própria (2026).
 
-![Figura 9 – Material aprovado](telas/05-material.png)
+![Figura 8 – Material aprovado](telas/05-material.png)
 
 Fonte: Autoria própria (2026).
 
 ### 4.2.5 Telas de privacidade e de acesso negado
 
-Na tela de privacidade (Figura 10), o responsável vê quem tem acesso aos dados do estudante, o que cada pessoa pode ver e o histórico de acessos, e pode remover o acesso do profissional ou revogar o consentimento. A Figura 11 mostra o que ocorre quando o docente tenta abrir as notas reservadas do profissional: a interface apenas explica a negação, que é decidida pelo banco.
+Na tela de privacidade (Figura 9), o responsável vê quem tem acesso aos dados do estudante, o que cada pessoa pode ver e o histórico de acessos, e pode remover o acesso do profissional ou revogar o consentimento. A Figura 10 mostra o que ocorre quando o docente tenta abrir as notas reservadas do profissional: a interface apenas explica a negação, que é decidida pelo banco.
 
-![Figura 10 – Privacidade: quem tem acesso aos dados do estudante](telas/06-privacidade.png)
+![Figura 9 – Privacidade: quem tem acesso aos dados do estudante](telas/06-privacidade.png)
 
 Fonte: Autoria própria (2026).
 
-![Figura 11 – Acesso negado do docente às notas clínicas reservadas](telas/07-negado.png)
+![Figura 10 – Acesso negado do docente às notas clínicas reservadas](telas/07-negado.png)
 
 Fonte: Autoria própria (2026).
 
@@ -409,13 +409,13 @@ Quadro 9 – Indicadores da avaliação com usuários
 | Usabilidade | System Usability Scale (SUS) | Média ≥ 68 | [PREENCHER] |
 | Conclusão das tarefas | Observação da sessão | ≥ 80% sem ajuda | [PREENCHER] |
 | Tempo para registrar observação | Cronometragem na sessão | < 60 segundos | [PREENCHER] |
-| Legibilidade do material adaptado | Índice de Flesch adaptado ao português (MARTINS et al., 1996), antes e depois | Ganho ≥ 15 pontos | [PREENCHER] |
+| Legibilidade do material adaptado | Índice de Flesch adaptado ao português (Martins et al., 1996), antes e depois | Ganho ≥ 15 pontos | [PREENCHER] |
 
 Fonte: Autoria própria (2026).
 
 ## 4.6 Discussão
 
-A comparação com as soluções semelhantes (Quadro 1) evidencia a diferença central do PEI Vivo. A Prova Adaptada parametriza a adaptação pela categoria diagnóstica; o motor deste trabalho a parametriza por observações datadas e atribuíveis a quem as registrou, acumuladas ciclo a ciclo, o que se traduz no código na contagem de ciclos consecutivos exibida na Figura 4. O Vínculoo centraliza documentos sem gerar conteúdo, enquanto o PEI Vivo converte o registro em material entregue ao estudante. Frontline e Goalbook tratam a conformidade legal como fim; no PEI Vivo, a arquitetura de permissões é o meio que viabiliza, com segurança, a participação da rede de saúde exigida pela Lei nº 14.254/2021.
+A comparação com as soluções semelhantes (Quadro 1) evidencia a diferença central do PEI Vivo. A Prova Adaptada adapta o material por IA a partir das necessidades informadas pelo docente; o motor deste trabalho a parametriza por observações datadas e atribuíveis a quem as registrou, acumuladas ciclo a ciclo, o que se traduz no código na contagem de ciclos consecutivos exibida no Código 1. O Vínculoo também adapta atividades com IA, mas a partir de laudos e documentos importados; o PEI Vivo não armazena laudo, e a adaptação decorre de regras auditáveis aplicadas a observações e validadas pela saúde. Frontline e Goalbook tratam a conformidade legal como fim; no PEI Vivo, a arquitetura de permissões é o meio que viabiliza, com segurança, a participação da rede de saúde exigida pela Lei nº 14.254/2021.
 
 A principal escolha de projeto discutível é a camada de IA desligada. Ela foi desligada por duas razões: a confiabilidade do material gerado por IA foi uma das preocupações dos respondentes, e um texto colado pelo docente poderia conter instruções capazes de manipular o modelo. A camada determinística entrega o núcleo do valor sem esse risco, e a porta para a IA permanece implementada e condicionada à RN06. O efeito é que o nível de vocabulário e a âncora de interesse ainda não alteram o texto; o vocabulário atua apenas por meio do glossário de apoio.
 
@@ -437,58 +437,58 @@ Como trabalhos futuros, propõe-se: concluir a avaliação com usuários e o pil
 
 # REFERÊNCIAS
 
-AMERICAN PSYCHIATRIC ASSOCIATION. **Manual diagnóstico e estatístico de transtornos mentais: DSM-5-TR**. 5. ed., texto revisado. Porto Alegre: Artmed, 2023.
+AMERICAN PSYCHIATRIC ASSOCIATION. **Manual diagnóstico e estatístico de transtornos mentais**: DSM-5-TR. 5. ed., texto revisado. Porto Alegre: Artmed, 2023.
 
 ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS. **NBR 17225**: acessibilidade em conteúdo e aplicações web – requisitos. Rio de Janeiro: ABNT, 2025.
 
-BATTISTELLO, Viviane Cristina de Mattos; LISBOA, Elise Ribas; MARTINS, Rosemari Lorenz. Inclusão de alunos com autismo em sala de aula e o Plano Educacional Individualizado (PEI). **Linguagens, Educação e Sociedade**, v. 28, n. 57, p. 1-23, 2024.
+BATTISTELLO, Viviane Cristina de Mattos; LISBOA, Elise Ribas; MARTINS, Rosemari Lorenz. Inclusão de alunos com autismo em sala de aula e o Plano Educacional Individualizado (PEI). **Linguagens, Educação e Sociedade**, [Teresina], v. 28, n. 57, p. 1-23, 2024.
 
-BRASIL. Conselho Nacional de Saúde. **Resolução nº 510, de 7 de abril de 2016**. Dispõe sobre as normas aplicáveis a pesquisas em Ciências Humanas e Sociais. Brasília, DF: CNS, 2016.
+BRASIL. Conselho Nacional de Saúde. Resolução nº 510, de 7 de abril de 2016. Dispõe sobre as normas aplicáveis a pesquisas em Ciências Humanas e Sociais. **Diário Oficial da União**: seção 1, Brasília, DF, p. 44-46, 24 maio 2016.
 
-BRASIL. **Lei nº 13.146, de 6 de julho de 2015**. Institui a Lei Brasileira de Inclusão da Pessoa com Deficiência. Brasília, DF: Presidência da República, 2015.
+BRASIL. **Lei nº 13.146, de 6 de julho de 2015**. Institui a Lei Brasileira de Inclusão da Pessoa com Deficiência (Estatuto da Pessoa com Deficiência). Brasília, DF: Presidência da República, [2015]. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm. Acesso em: 13 out. 2026.
 
-BRASIL. **Lei nº 13.709, de 14 de agosto de 2018**. Lei Geral de Proteção de Dados Pessoais. Brasília, DF: Presidência da República, 2018.
+BRASIL. **Lei nº 13.709, de 14 de agosto de 2018**. Lei Geral de Proteção de Dados Pessoais (LGPD). Brasília, DF: Presidência da República, [2018]. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. Acesso em: 13 out. 2026.
 
-BRASIL. **Lei nº 14.254, de 30 de novembro de 2021**. Dispõe sobre o acompanhamento integral para educandos com dislexia ou Transtorno do Déficit de Atenção com Hiperatividade (TDAH) ou outro transtorno de aprendizagem. Brasília, DF: Presidência da República, 2021.
+BRASIL. **Lei nº 14.254, de 30 de novembro de 2021**. Dispõe sobre o acompanhamento integral para educandos com dislexia ou Transtorno do Déficit de Atenção com Hiperatividade (TDAH) ou outro transtorno de aprendizagem. Brasília, DF: Presidência da República, [2021]. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14254.htm. Acesso em: 13 out. 2026.
 
 BROOKE, John. SUS: a "quick and dirty" usability scale. In: JORDAN, Patrick W. et al. (ed.). **Usability evaluation in industry**. London: Taylor & Francis, 1996. p. 189-194.
 
-CAST. **Universal Design for Learning Guidelines version 2.2**. Wakefield, MA: CAST, 2018. Disponível em: <https://udlguidelines.cast.org>. Acesso em: [PREENCHER].
+CAST. **Universal Design for Learning Guidelines version 2.2**. Wakefield, MA: CAST, 2018. Disponível em: https://udlguidelines.cast.org. Acesso em: 13 out. 2026.
 
 DRESCH, Aline; LACERDA, Daniel Pacheco; ANTUNES JÚNIOR, José Antonio Valle. **Design science research**: método de pesquisa para avanço da ciência e tecnologia. Porto Alegre: Bookman, 2015.
 
-FONTANA, Evelline Cristhine; CRUZ, Gilmar de Carvalho. Plano Educacional Individualizado e o reconhecimento da diferença para o ensino da Educação Física. **Caderno de Educação Física e Esporte**, v. 20, 2022.
+FONTANA, Evelline Cristhine; CRUZ, Gilmar de Carvalho. Plano Educacional Individualizado e o reconhecimento da diferença para o ensino da Educação Física. **Caderno de Educação Física e Esporte**, Marechal Cândido Rondon, v. 20, 2022.
 
-FRONTLINE EDUCATION. **Special Education Management**. [S. l.], 2026. Disponível em: [PREENCHER: URL]. Acesso em: [PREENCHER].
+FRONTLINE EDUCATION. **IEP and Special Education Management**. [S. l.], 2026. Disponível em: https://www.frontlineeducation.com/special-programs/special-ed-software/iep-management/. Acesso em: 13 out. 2026.
 
-GOALBOOK. **Goalbook Toolkit**. [S. l.], 2026. Disponível em: [PREENCHER: URL]. Acesso em: [PREENCHER].
+GOALBOOK. **Goalbook Toolkit**. [S. l.], 2026. Disponível em: https://goalbook.com/explore-toolkit/. Acesso em: 13 out. 2026.
 
-HEVNER, Alan R.; MARCH, Salvatore T.; PARK, Jinsoo; RAM, Sudha. Design science in information systems research. **MIS Quarterly**, v. 28, n. 1, p. 75-105, 2004.
+HEVNER, Alan R.; MARCH, Salvatore T.; PARK, Jinsoo; RAM, Sudha. Design science in information systems research. **MIS Quarterly**, Minneapolis, v. 28, n. 1, p. 75-105, 2004.
 
-INSTITUTO NACIONAL DE ESTUDOS E PESQUISAS EDUCACIONAIS ANÍSIO TEIXEIRA. **Notas estatísticas**: Censo Escolar da Educação Básica 2025. Brasília, DF: Inep, 2026.
+INSTITUTO NACIONAL DE ESTUDOS E PESQUISAS EDUCACIONAIS ANÍSIO TEIXEIRA (INEP). **Notas estatísticas**: Censo Escolar da Educação Básica 2025. Brasília, DF: Inep, 2026. Disponível em: [CONFERIR: link da publicação no portal gov.br/inep, de onde saíram os dados de 2,5 milhões, 82% e 11,3%]. Acesso em: [CONFERIR].
 
 INTERNATIONAL ORGANIZATION FOR STANDARDIZATION. **ISO/IEC 25010:2023**: systems and software engineering – systems and software quality requirements and evaluation (SQuaRE) – product quality model. Geneva: ISO, 2023.
 
 MARTINS, Teresa B. F.; GHIRALDELO, Claudete M.; NUNES, Maria das Graças V.; OLIVEIRA JÚNIOR, Osvaldo N. **Readability formulas applied to textbooks in Brazilian Portuguese**. São Carlos: ICMSC-USP, 1996. (Notas do ICMSC, n. 28). [CONFERIR: dados da publicação.]
 
-MODESTO, Mônica Andrade; ARAÚJO, Isabela Rosália Lima de; MENDONÇA, Ana Cláudia Sousa. Desafios e possibilidades para a implementação de uma educação especial e inclusiva na rede estadual de ensino de Sergipe. **Revista Brasileira de Educação Especial**, v. 29, 2023.
+MODESTO, Mônica Andrade; ARAÚJO, Isabela Rosália Lima de; MENDONÇA, Ana Cláudia Sousa. Desafios e possibilidades para a implementação de uma educação especial e inclusiva na rede estadual de ensino de Sergipe. **Revista Brasileira de Educação Especial**, Bauru, v. 29, 2023.
 
-ORGANIZAÇÃO DAS NAÇÕES UNIDAS. **Transformando nosso mundo**: a Agenda 2030 para o Desenvolvimento Sustentável. Nova York: ONU, 2015.
+ORGANIZAÇÃO DAS NAÇÕES UNIDAS. **Transformando nosso mundo**: a Agenda 2030 para o Desenvolvimento Sustentável. Nova York: ONU, 2015. Disponível em: https://brasil.un.org/pt-br/91863-agenda-2030-para-o-desenvolvimento-sustent%C3%A1vel. Acesso em: 13 out. 2026.
 
-PEREIRA, Marta Aparecida de Mello. Planejamento educacional individualizado: desafios e avanços nas práticas colaborativas de ensino. **Colloquium Humanarum**, v. 19, n. 1, 2022.
+PEREIRA, Marta Aparecida de Mello. Planejamento educacional individualizado: desafios e avanços nas práticas colaborativas de ensino. **Colloquium Humanarum**, Presidente Prudente, v. 19, n. 1, 2022.
 
-POSTGRESQL GLOBAL DEVELOPMENT GROUP. **PostgreSQL documentation**: row security policies. [S. l.], 2025. Disponível em: <https://www.postgresql.org/docs/current/ddl-rowsecurity.html>. Acesso em: [PREENCHER].
+POSTGRESQL GLOBAL DEVELOPMENT GROUP. **PostgreSQL documentation**: row security policies. [S. l.], 2025. Disponível em: https://www.postgresql.org/docs/current/ddl-rowsecurity.html. Acesso em: 13 out. 2026.
 
-PRODANOV, Cleber Cristiano; FREITAS, Ernani Cesar de. **Metodologia do trabalho científico**: métodos e técnicas da pesquisa e do trabalho acadêmico. 2. ed. Novo Hamburgo: Feevale, 2013.
+PRODANOV, Cleber Cristiano; FREITAS, Ernani Cesar de. **Metodologia do trabalho científico**: métodos e técnicas da pesquisa e do trabalho acadêmico. 2. ed. Novo Hamburgo: Feevale, 2013. E-book. Disponível em: https://www.feevale.br/Comum/midias/0163c988-1f5d-496f-b118-a6e009a7a2f9/E-book%20Metodologia%20do%20Trabalho%20Cientifico.pdf. Acesso em: 13 out. 2026.
 
-PROVA ADAPTADA. **Prova Adaptada**. [S. l.], 2026. Disponível em: [PREENCHER: URL]. Acesso em: [PREENCHER].
+PROVA ADAPTADA. **IncluiAI**: Prova Adaptada. [S. l.], 2026. Disponível em: https://incluiai.com.br/. Acesso em: 13 out. 2026.
 
 RELLO, Luz; BAEZA-YATES, Ricardo. Good fonts for dyslexia. In: INTERNATIONAL ACM SIGACCESS CONFERENCE ON COMPUTERS AND ACCESSIBILITY, 15., 2013, Bellevue. **Proceedings** [...]. New York: ACM, 2013.
 
 SILVA, Gabrielle Lenz da; CAMARGO, Síglia Pimentel Höher. Revisão integrativa da produção científica nacional sobre o Plano Educacional Individualizado. **Revista Educação Especial**, Santa Maria, v. 34, p. 1-23, 2021.
 
-SUPABASE. **Supabase documentation**: row level security. [S. l.], 2025. Disponível em: <https://supabase.com/docs/guides/database/postgres/row-level-security>. Acesso em: [PREENCHER].
+SUPABASE. **Supabase documentation**: row level security. [S. l.], 2025. Disponível em: https://supabase.com/docs/guides/database/postgres/row-level-security. Acesso em: 13 out. 2026.
 
-VÍNCULOO. **Vínculoo**. [S. l.], 2026. Disponível em: [PREENCHER: URL]. Acesso em: [PREENCHER].
+VÍNCULOO. **Vínculoo**: educação especial e inclusiva. [S. l.], 2026. Disponível em: https://vinculoo.com.br/. Acesso em: 13 out. 2026.
 
-WORLD WIDE WEB CONSORTIUM. **Web Content Accessibility Guidelines (WCAG) 2.2**. W3C Recommendation, 5 out. 2023, atualizada em 12 dez. 2024. Disponível em: <https://www.w3.org/TR/WCAG22/>. Acesso em: 21 set. 2026.
+WORLD WIDE WEB CONSORTIUM. **Web Content Accessibility Guidelines (WCAG) 2.2**. W3C Recommendation, 5 out. 2023, atualizada em 12 dez. 2024. Disponível em: https://www.w3.org/TR/WCAG22/. Acesso em: 13 out. 2026.

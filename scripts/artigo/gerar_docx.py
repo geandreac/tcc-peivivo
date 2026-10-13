@@ -6,7 +6,8 @@
 Formatação ABNT (NBR 14724/6022), na estrutura do modelo FAMETRO: capa, folha de
 rosto, título com autores, resumo, abstract e seções numeradas. A4, margens
 3/2 cm, Arial 12, entrelinha 1,5, recuo de 1,25 cm. Quadros, fontes, código e
-referências em espaço simples. Figuras com {paisagem} vão para página deitada; com {pagina}, para página retrato inteira.
+referências em espaço simples. Código como listagem numerada (Código N);
+diagramas com .svg ao lado do .png entram como vetor. Figuras com {paisagem} vão para página deitada; com {pagina}, para página retrato inteira.
 Marcadores [PREENCHER: …] e [CONFERIR: …] saem destacados em amarelo.
 """
 import re
@@ -17,8 +18,11 @@ from docx.enum.section import WD_ORIENT, WD_SECTION
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_COLOR_INDEX, WD_LINE_SPACING
 from docx.oxml import OxmlElement
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
+from docx.opc.packuri import PackURI
+from docx.opc.part import Part
 from docx.oxml.ns import qn
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor
 from PIL import Image
 
 RAIZ = Path(__file__).resolve().parents[2]
@@ -32,10 +36,11 @@ NATUREZA = ("Artigo técnico apresentado ao Curso de Bacharelado em Sistemas de 
             "do título de Bacharel em Sistemas de Informação.")
 ORIENTADORA = "Orientadora: Profa. Luana Magalhães Leal"
 LOCAL_ANO = ["MANAUS – AM", "2026"]
-AUTORIA = [
-    ("Geandre Alfaia Colares", "Discente do Curso de Sistemas de Informação. E-mail: geandre51@gmail.com"),
-    ("Jean Victor Torres dos Santos", "Discente do Curso de Sistemas de Informação. E-mail: jeanvictor.st29@gmail.com"),
-    ("Luana Magalhães Leal", "Docente do Curso de Sistemas de Informação. Orientadora. E-mail: prof.luanalealm@gmail.com"),
+VINCULO = "Curso de Bacharelado em Sistemas de Informação, Centro Universitário CEUNI – FAMETRO, Manaus, Amazonas, Brasil"
+AUTORIA = [  # nota de autoria (NBR 6022): função, curso, instituição, cidade, estado, país e e-mail
+    ("Geandre Alfaia Colares", f"Discente do {VINCULO}. E-mail: geandre51@gmail.com"),
+    ("Jean Victor Torres dos Santos", f"Discente do {VINCULO}. E-mail: jeanvictor.st29@gmail.com"),
+    ("Luana Magalhães Leal", f"Docente e orientadora do {VINCULO}. E-mail: prof.luanalealm@gmail.com"),
 ]
 
 FONTE = "Arial"
@@ -220,7 +225,7 @@ def figura(doc, titulo, caminho, modo, fonte_texto):
     paisagem = modo == "paisagem"
     if modo == "pagina":  # diagrama alto: página retrato inteira
         quebra(doc)
-        larg_max, alt_max = LARGURA_RETRATO, Cm(22)
+        larg_max, alt_max = LARGURA_RETRATO, Cm(23)
     elif paisagem:
         nova = doc.add_section(WD_SECTION.NEW_PAGE)
         margens(nova, paisagem=True)
@@ -235,18 +240,41 @@ def figura(doc, titulo, caminho, modo, fonte_texto):
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     espacamento(p, simples=True)
     p.paragraph_format.keep_with_next = True
-    p.add_run().add_picture(str(caminho), width=int(w * escala))
+    r = p.add_run()
+    r.add_picture(str(caminho), width=int(w * escala))
+    if caminho.with_suffix(".svg").exists():
+        vetor(doc, r, caminho.with_suffix(".svg"))
     fonte_do_elemento(doc, fonte_texto)
     if paisagem:
         margens(doc.add_section(WD_SECTION.NEW_PAGE))
 
 
+def vetor(doc, run, svg):
+    """Embute o SVG junto do PNG (o Word 2016+ usa o vetor e o PNG fica de reserva):
+    o diagrama pode ser ampliado no arquivo digital sem perder nitidez."""
+    vetor.n = getattr(vetor, "n", 0) + 1
+    parte = Part(PackURI(f"/word/media/vetor{vetor.n}.svg"), "image/svg+xml", svg.read_bytes(), doc.part.package)
+    rid = doc.part.relate_to(parte, RT.IMAGE)
+    ns_svg = "http://schemas.microsoft.com/office/drawing/2016/SVG/main"
+    lista, ext = OxmlElement("a:extLst"), OxmlElement("a:ext")
+    ext.set("uri", "{96DAC541-7B7A-43D3-8B79-37D633B846F1}")
+    svg_blip = ext.makeelement(f"{{{ns_svg}}}svgBlip", nsmap={"asvg": ns_svg})
+    svg_blip.set(qn("r:embed"), rid)
+    ext.append(svg_blip)
+    lista.append(ext)
+    run._r.find(".//" + qn("a:blip")).append(lista)
+
+
 def codigo(doc, linhas):
-    for i, linha in enumerate(linhas):
+    """Listagem como texto (não imagem): fonte monoespaçada e linhas numeradas."""
+    for i, linha in enumerate(linhas, 1):
         p = doc.add_paragraph()
-        espacamento(p, simples=True, antes=6 if i == 0 else 0)
+        espacamento(p, simples=True, antes=3 if i == 1 else 0)
         p.paragraph_format.left_indent = Cm(1)
-        p.paragraph_format.keep_with_next = True
+        p.paragraph_format.keep_with_next = i < len(linhas)
+        r = p.add_run(f"{i:>2}  ")
+        r.font.name, r.font.size = "Consolas", Pt(9)
+        r.font.color.rgb = RGBColor(0x6B, 0x6B, 0x6B)
         texto(p, linha or " ", tam=9, mono=True)
 
 
@@ -289,7 +317,7 @@ while i < len(linhas):
     elif l.startswith("## ") or l.startswith("### "):
         p = paragrafo(doc, l.lstrip("#").strip(), WD_ALIGN_PARAGRAPH.LEFT, recuo=False, negrito=l.startswith("## "), antes=6, depois=3)
         p.paragraph_format.keep_with_next = True
-    elif re.match(r"^(Quadro \d+|Figura \d+) – ", l):
+    elif re.match(r"^(Quadro|Figura|Código) \d+ – ", l):
         legenda(doc, l.strip())
     elif l.startswith("|"):
         bloco = []
