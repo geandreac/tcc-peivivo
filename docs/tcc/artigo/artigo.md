@@ -311,7 +311,7 @@ Fonte: Autoria própria (2026).
 
 O diagrama de sequência, exibido na Figura 9, detalha a geração e a aprovação de material adaptado na ordem em que o código as executa. A Edge Function valida o texto recebido e solicita ao banco, com a identidade do docente, a verificação de vínculo, consentimento e versão vigente; se alguma condição falha, a requisição é negada (erro 403) ou recusada por conflito (erro 409). Quando a camada de IA é permitida (RN06), ela atua antes do motor determinístico. O rascunho é gravado por uma função do banco que confere novamente as condições. A aprovação vai direto ao banco, pela função fn_decidir_material, que recusa a aprovação caso a família tenha revogado o consentimento depois da geração.
 
-![Figura 9 – Diagrama de sequência: geração e aprovação de material adaptado](../sequence_diagram.png){paisagem}
+![Figura 9 – Diagrama de sequência: geração e aprovação de material adaptado](../sequence_diagram.png){pagina}
 
 Fonte: Autoria própria (2026).
 
