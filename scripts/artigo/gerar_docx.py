@@ -1,7 +1,7 @@
 """Gera o .docx do artigo a partir de docs/tcc/artigo/artigo.md.
 
     pip install python-docx pillow
-    python scripts/artigo/gerar_docx.py   → docs/tcc/artigo/Artigo_PEI_Vivo_v2.docx
+    python scripts/artigo/gerar_docx.py   → docs/tcc/artigo/Artigo_PEI_Vivo_v3.docx
 
 Formatação ABNT (NBR 14724/6022), na estrutura do modelo FAMETRO: capa, folha de
 rosto, título com autores, resumo, abstract e seções numeradas. A4, margens
@@ -27,7 +27,7 @@ from PIL import Image
 
 RAIZ = Path(__file__).resolve().parents[2]
 ORIGEM = RAIZ / "docs/tcc/artigo/artigo.md"
-DESTINO = RAIZ / "docs/tcc/artigo/Artigo_PEI_Vivo_v2.docx"
+DESTINO = RAIZ / "docs/tcc/artigo/Artigo_PEI_Vivo_v3.docx"  # a v2 fica como estava
 
 INSTITUICAO = ["CENTRO UNIVERSITÁRIO CEUNI – FAMETRO", "FACULDADE METROPOLITANA DE MANAUS – FAMETRO", "CURSO DE BACHARELADO EM SISTEMAS DE INFORMAÇÃO"]
 AUTORES = ["GEANDRE ALFAIA COLARES", "JEAN VICTOR TORRES DOS SANTOS"]
@@ -45,7 +45,7 @@ AUTORIA = [  # nota de autoria (NBR 6022): função, curso, instituição, cidad
 
 FONTE = "Arial"
 LARGURA_RETRATO = Cm(16)
-MARCADOR = re.compile(r"(\[(?:PREENCHER|CONFERIR)[^\]]*\])")
+MARCADOR = re.compile(r"(\[(?:PREENCHER|CONFERIR|CONFIRMAR COM O AVALIADOR)[^\]]*\])")
 NEGRITO = re.compile(r"(\*\*[^*]+\*\*)")
 
 
@@ -194,8 +194,13 @@ def tabela(doc, linhas):
         for c, s in zip(t.add_row().cells, linha):
             celula(c, s)
     # largura de cada coluna proporcional ao texto mais longo dela (mínimo 2,1 cm)
+    # e nunca menor que a palavra mais longa (nada de "Semana/s" partido); texto curto cabe inteiro
     pesos = [max(len(l[k]) for l in linhas) ** 0.8 for k in range(len(cab))]
-    larguras = [max(Cm(2.1), int(LARGURA_RETRATO * w / sum(pesos))) for w in pesos]
+    def minimo(k):
+        textos = [l[k] for l in linhas]
+        maior = max(len(t) for t in textos) if max(len(t) for t in textos) <= 14 else max(len(p) for t in textos for p in t.split())
+        return max(Cm(2.1), Cm(0.23 * maior + 0.6))  # cabeçalho em negrito é mais largo
+    larguras = [max(minimo(k), int(LARGURA_RETRATO * w / sum(pesos))) for k, w in enumerate(pesos)]
     escala = LARGURA_RETRATO / sum(larguras)
     t.autofit = False
     for col, w in zip(t._tbl.tblGrid.findall(qn("w:gridCol")), larguras):
@@ -213,25 +218,26 @@ def tabela(doc, linhas):
 
 def legenda(doc, s):
     """Identificação de quadro ou figura, acima do elemento (ABNT)."""
-    p = paragrafo(doc, s, WD_ALIGN_PARAGRAPH.CENTER, recuo=False, simples=True, tam=10, negrito=True, antes=6, depois=3)
+    p = paragrafo(doc, s, WD_ALIGN_PARAGRAPH.CENTER, recuo=False, simples=True, tam=10, negrito=True, antes=12, depois=6)
     p.paragraph_format.keep_with_next = True
 
 
 def fonte_do_elemento(doc, s):
-    paragrafo(doc, s, WD_ALIGN_PARAGRAPH.CENTER, recuo=False, simples=True, tam=10, antes=3, depois=9)
+    paragrafo(doc, s, WD_ALIGN_PARAGRAPH.CENTER, recuo=False, simples=True, tam=10, antes=6, depois=12)
 
 
 def figura(doc, titulo, caminho, modo, fonte_texto):
     paisagem = modo == "paisagem"
     if modo == "pagina":  # diagrama alto: página retrato inteira
         quebra(doc)
-        larg_max, alt_max = LARGURA_RETRATO, Cm(23)
+        larg_max, alt_max = LARGURA_RETRATO, Cm(22.3)
     elif paisagem:
         nova = doc.add_section(WD_SECTION.NEW_PAGE)
         margens(nova, paisagem=True)
         larg_max, alt_max = Cm(24.7), Cm(13.5)
-    else:
-        larg_max, alt_max = LARGURA_RETRATO, Cm(10)
+    else:  # {cm=11}: largura máxima própria (figura estreita não precisa ocupar 16 cm)
+        larg_max = Cm(float(modo[3:].replace(",", "."))) if modo else LARGURA_RETRATO
+        alt_max = Cm(21)
     legenda(doc, titulo)
     with Image.open(caminho) as img:
         w, h = img.size
@@ -312,7 +318,7 @@ while i < len(linhas):
     elif l.startswith("# "):
         referencias = l[2:].strip() == "REFERÊNCIAS"
         quebra(doc) if l[2:].startswith("1.") or referencias else None
-        p = paragrafo(doc, l[2:].strip(), WD_ALIGN_PARAGRAPH.CENTER if referencias else WD_ALIGN_PARAGRAPH.LEFT, recuo=False, negrito=True, antes=12, depois=6)
+        p = paragrafo(doc, l[2:].strip(), WD_ALIGN_PARAGRAPH.LEFT if l[2].isdigit() else WD_ALIGN_PARAGRAPH.CENTER, recuo=False, negrito=True, antes=12, depois=6)
         p.paragraph_format.keep_with_next = True
     elif l.startswith("## ") or l.startswith("### "):
         p = paragrafo(doc, l.lstrip("#").strip(), WD_ALIGN_PARAGRAPH.LEFT, recuo=False, negrito=l.startswith("## "), antes=6, depois=3)
@@ -328,7 +334,7 @@ while i < len(linhas):
         tabela(doc, bloco)
         continue
     elif l.startswith("!["):
-        m = re.match(r"!\[(.+?)\]\((.+?)\)(?:\{(paisagem|pagina)\})?", l)
+        m = re.match(r"!\[(.+?)\]\((.+?)\)(?:\{(paisagem|pagina|cm=[0-9.,]+)\})?", l)
         j = i + 1
         while not linhas[j].strip():
             j += 1
@@ -358,4 +364,4 @@ while i < len(linhas):
 
 doc.save(DESTINO)
 pendencias = len(MARCADOR.findall(md))
-print(f"OK {DESTINO.relative_to(RAIZ)}  ({pendencias} marcadores [PREENCHER]/[CONFERIR] destacados)")
+print(f"OK {DESTINO.relative_to(RAIZ)}  ({pendencias} marcadores destacados em amarelo)")

@@ -2,12 +2,13 @@
 // packages/motor-adaptacao/src/tipos.ts. Ao mudar uma tabela, mude aqui.
 import { COR, MONO, caminho, documento, rotulo, texto, titulo } from "./svg.mjs";
 
-const W = 380;
+export const W = 380;
+const LARGURA_PADRAO = W;
 const GAP_X = 100;
-const LINHA = 19;
+export const LINHA = 19;
 const col = (c) => 40 + c * (W + GAP_X);
 
-const CLASSES = [
+export const CLASSES = [
   { id: "escola", nome: "Escola", col: 0, lin: 0,
     attrs: ["- id: UUID", "- nome: string {único}", "- createdAt: DateTime"] },
   { id: "membro", nome: "MembroEscola", col: 1, lin: 0,
@@ -93,7 +94,7 @@ const CLASSES = [
       "- parametros: ParametrosAdaptacao", "- apoios: ApoiosLeitura [0..1]", "- glossario: ItemGlossario [*]  (IA)"] },
 ];
 
-function altura(c) {
+export function altura(c) {
   const cab = c.estereotipo ? 48 : 36;
   let h = cab + 8 + c.attrs.length * LINHA;
   if (c.ops?.length) h += 10 + c.ops.length * LINHA;
@@ -101,7 +102,7 @@ function altura(c) {
   return h + 8;
 }
 
-function desenharClasse(c) {
+export function desenharClasse(c, W = c.w ?? LARGURA_PADRAO) {
   const { x, y, h } = c;
   const corCab = c.cor ?? COR.azul;
   const cab = c.estereotipo ? 48 : 36;
@@ -156,7 +157,7 @@ const dir = (c) => c.x + W;
 const baixo = (c) => c.y + c.h;
 
 /** Associação: pontos, multiplicidades nas pontas, nome no ponto `meio`. */
-function associacao(pts, { ini, fim, nome, meio, composicaoNoInicio = false }) {
+export function associacao(pts, { ini, fim, nome, meio, composicaoNoInicio = false }) {
   let s = `<path d="${caminho(pts)}" fill="none" stroke="${COR.linha}" stroke-width="1.6"${composicaoNoInicio ? ' marker-start="url(#losangoCheio)"' : ""}/>`;
   const mult = (p, q, m, comp) => {
     const dx = Math.sign(q[0] - p[0]);
@@ -274,7 +275,7 @@ export function diagramaClasses() {
     associacao([[dir(mat), yD], [txt.x, yD]], { ini: "1", fim: "0..1", nome: "texto adaptado", meio: [(dir(mat) + txt.x) / 2, yD + 20], composicaoNoInicio: true }),
   ];
   s += linhas.join("\n");
-  s += CLASSES.map(desenharClasse).join("\n");
+  s += CLASSES.map((c) => desenharClasse(c)).join("\n");
 
   // painéis
   const yPain = fim + 60;

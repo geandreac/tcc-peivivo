@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 683 700" width="683" height="700" font-family="Calibri, Arial, sans-serif">
+<rect x="0" y="0" width="683" height="700" fill="#FFFFFF"/>
+<defs>
+  <marker id="setaAberta" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#4A6478" stroke-width="1.6"/></marker>
+  <marker id="setaAbertaVerde" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#1C7293" stroke-width="1.8"/></marker>
+  <marker id="setaAbertaLaranja" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#E8A33D" stroke-width="1.8"/></marker>
+  <marker id="setaCheia" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#0B3D63"/></marker>
+  <marker id="setaCheiaVermelha" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#B23A3A"/></marker>
+  <marker id="trianguloVazado" markerWidth="18" markerHeight="16" refX="16" refY="8" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L16,8 L1,15 Z" fill="#FFFFFF" stroke="#4A6478" stroke-width="1.6"/></marker>
+  <marker id="losangoCheio" markerWidth="20" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,6 L10,1 L19,6 L10,11 Z" fill="#0B3D63"/></marker>
+</defs>
+<g transform="translate(0 30)"><rect x="251.9736830714133" y="-14" width="414.6319144685105" height="668" rx="10" fill="#F9FBFD" stroke="#0B3D63" stroke-width="2.4"/><text x="267.9736830714133" y="12" font-size="17" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="start" font-family="Cambria, Georgia, serif">PEI Vivo</text><line x1="140" y1="326" x2="373.08731712222357" y2="108.20406969622803" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="326" x2="403.51190964003456" y2="207.61176776389405" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="326" x2="380.8411111234984" y2="294.4664571094854" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="326" x2="384.52116966380163" y2="363.3512723020594" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="326" x2="406.2118576983495" y2="451.896042446729" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="326" x2="374.2220230556648" y2="551.6954514517289" stroke="#4A6478" stroke-width="1.7"/><ellipse cx="413.9736830714133" cy="70" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="413.9736830714133" y="66" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Consultar histórico</text><text x="413.9736830714133" y="84" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">e trilha de acesso</text>
+<ellipse cx="478.32594261061763" cy="174" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="478.32594261061763" y="170" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Vincular pessoa</text><text x="478.32594261061763" y="188" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">ao estudante</text>
+<ellipse cx="506.6055975399238" cy="278" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="506.6055975399238" y="283" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Encerrar vínculo</text>
+<ellipse cx="506.6055975399238" cy="382" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="506.6055975399238" y="387" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Cadastrar estudante</text>
+<ellipse cx="478.32594261061763" cy="486" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="478.32594261061763" y="482" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Convidar pessoa</text><text x="478.32594261061763" y="500" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">(e-mail)</text>
+<ellipse cx="413.9736830714133" cy="590" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="413.9736830714133" y="586" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Acompanhar painel</text><text x="413.9736830714133" y="604" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">da escola (contagens)</text><g stroke="#0B3D63" stroke-width="2.6" fill="none">
+    <circle cx="110" cy="294" r="16" fill="#FFFFFF"/>
+    <line x1="110" y1="310" x2="110" y2="348"/>
+    <line x1="84" y1="324" x2="136" y2="324"/>
+    <line x1="110" y1="348" x2="90" y2="378"/>
+    <line x1="110" y1="348" x2="130" y2="378"/></g><text x="110" y="402" font-size="15" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Coordenação</text><text x="110" y="420" font-size="15" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">pedagógica</text></g>
+</svg>

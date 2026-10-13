@@ -124,7 +124,10 @@ da escola (só contagens), notificações tipadas, tema escuro e leitura facilit
 (D-45); PR #104 empilhado sobre o #103. **Nuvem (12/10):** projeto `tcc-peivivo` (sa-east-1)
 com 0001–0007, RLS em 15/15 tabelas, cron RN05 e 3 EFs (versão de 08/10 — republicar após
 o merge); faltam ajustes de Auth no painel e a primeira escola (`IMPLANTACAO.md` §0).
-**R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v2
-em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera o .docx ABNT, `npm run artigo:telas`
-recaptura as telas com o protótipo em `VITE_API=mock` na 5179); diagramas UML gerados do código por
-`npm run diagramas`. Marcadores `[PREENCHER]`/`[CONFERIR]` = dados que só a dupla tem — nunca inventar.
+**R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v3 (N1: até a
+Metodologia) em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera `Artigo_PEI_Vivo_v3.docx`; a v2 fica
+preservada). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`
+recaptura as telas com o protótipo em `VITE_API=mock` na 5179. Diagramas UML gerados do código por
+`npm run diagramas`: completos em `docs/tcc/*_diagram.svg` e, para impressão, repartidos em
+`docs/tcc/artigo/figuras/` (`scripts/diagramas/impressao.mjs`). Marcadores `[PREENCHER]`/`[CONFERIR]` = dados
+que só a dupla tem; `[CONFIRMAR COM O AVALIADOR]` = dúvida que só o avaliador resolve — nunca inventar.
