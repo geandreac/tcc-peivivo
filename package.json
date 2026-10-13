@@ -26,7 +26,9 @@
     "db:push": "supabase db push",
     "db:validar": "node scripts/validar-migrations.mjs",
     "test:e2e": "npm run test:e2e -w apps/web",
-    "diagramas": "node scripts/diagramas/gerar.mjs"
+    "diagramas": "node scripts/diagramas/gerar.mjs",
+    "artigo:telas": "node scripts/artigo/capturar-telas.mjs",
+    "artigo": "python scripts/artigo/gerar_docx.py"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
