@@ -34,7 +34,7 @@ npx supabase link --project-ref SEU_REF   # pede a senha do banco
 ## 3. Banco: migrations (sem seed)
 ```bash
 npm run db:validar                        # garante localmente (PGlite) antes de subir
-npx supabase db push                      # aplica 0001…0007 no projeto
+npx supabase db push                      # aplica 0001…0008 no projeto
 ```
 **Não** rode o `seed.sql` na nuvem: ele é para desenvolvimento e CI.
 

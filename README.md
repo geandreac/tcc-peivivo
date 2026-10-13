@@ -98,7 +98,7 @@ pei-vivo/
 │       ├── assets/                # (vazio — logo em public/, ícone em SVG inline)
 │       └── test/                  # setup do Vitest e utilitários (renderizarApp, semViolacoesAxe)
 ├── packages/motor-adaptacao/      # regras, ciclos, âncora, adaptador + testes (README próprio)
-├── packages/politicas/            # 100 testes de RLS/RPC (+12 só no CI) (caminho negado primeiro) — PGlite local, Supabase no CI
+├── packages/politicas/            # 113 testes de RLS/RPC (+12 só no CI) (caminho negado primeiro) — PGlite local, Supabase no CI
 ├── packages/contratos/            # schemas Zod compartilhados app ↔ Edge Functions
 ├── packages/funcoes/              # casos de uso das Edge Functions (TS puro, 24 testes)
 ├── supabase/                      # migrations 0001–0006, functions/ (gerar-material, fechar-ciclo), seed fictício, config
@@ -187,14 +187,14 @@ Testes automáticos com axe-core em todas as telas; sessão manual com NVDA plan
 Arquitetura da informação, fluxo (Mermaid), documento de telas e design system
 em `docs/ux-ui.md`. Avaliação heurística (Nielsen) em `docs/avaliacao-heuristica.md`:
 1 problema crítico e 5 relevantes encontrados e corrigidos; nenhum ≥ 3 aberto.
-Decisões de projeto D-01…D-45 em `docs/requisitos.md` §1; reformulação (auditoria, fluxos, ADRs, plano) em `docs/reformulacao/`.
+Decisões de projeto D-01…D-46 em `docs/requisitos.md` §1; reformulação (auditoria, fluxos, ADRs, plano) em `docs/reformulacao/`.
 
 ## 13. Estratégia de testes
 
 | Camada | Ferramenta | Cobertura |
 |---|---|---|
 | Motor (regras puras) | Vitest | 42 testes (RN03 em todas as dimensões, ciclos, âncora, adaptador, apoios de leitura, cenário A) |
-| **Políticas RLS e RPCs (banco)** | Vitest + PGlite / Postgres do Supabase no CI | **100 testes** (+12 HTTP/contrato só no CI) — cada sonda da auditoria de 07/10 vira teste negado; testes de mutação confirmam que detectam regressão |
+| **Políticas RLS e RPCs (banco)** | Vitest + PGlite / Postgres do Supabase no CI | **113 testes** (+12 HTTP/contrato só no CI) — cada sonda da auditoria de 07/10 vira teste negado; testes de mutação confirmam que detectam regressão |
 | Camada de serviços (permissões) | Vitest | 38 cenários negativos no mock, alinhados às políticas v3 |
 | Componentes | Testing Library + axe-core | 10 testes (rótulos, erros, teclado, modal, material) |
 | Telas | Testing Library + axe-core (MemoryRouter) | 17 testes: fluxo principal, validação, vazio, 404, caminhos negados |

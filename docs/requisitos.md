@@ -1,6 +1,6 @@
 # PEI Vivo — Análise de requisitos por perfil de usuário
 
-**Versão:** 1.3 — 12/10/2026 (D-40…D-45: fonte, cores por papel, RN03, apoios de leitura, padrões de interface; v1.2 em 07/10 com D-19…D-39; v1.1 em 14/09; v1.0 em 10/09)
+**Versão:** 1.3 — 12/10/2026 (D-40…D-46: fonte, cores por papel, RN03, apoios de leitura, padrões de interface; v1.2 em 07/10 com D-19…D-39; v1.1 em 14/09; v1.0 em 10/09)
 **Fontes:** pré-projeto (`docs/tcc/TCC - Geandre & Jean.md`), mapeamento dos slides
 (`docs/tcc/PEI_Vivo_Slides_Mapeamento.md`), diagramas de casos de uso, classes e
 sequência (`docs/tcc/*.svg`), foto do quadro com o formato de rastreabilidade
@@ -371,6 +371,7 @@ policies `0002`). Aprovadas pela dupla em 07/10/2026.
 | D-43 | — | Apoios de leitura determinísticos (sem IA, valem com RN06), derivados dos parâmetros já validados (RN07), sem parâmetro novo: pictograma por etapa com `ETAPA_UNICA`; glossário "Palavras para saber" por `nivelVocabulario` (vocabulário local curado, máx. 8, IA só acrescenta); "Ouvir" por trecho com a voz do navegador (sem rede). Pictogramas de desenho próprio, sem licença de terceiros; fotos geradas por IA e fotos do estudante ficam fora | dá efeito a `nivelVocabulario` sem IA; exibe o glossário de `SaidaIA` |
 | D-44 | — | Telas seguem padrões publicados por Apple (HIG), Google (web.dev, Material) e Microsoft (Fluent 2), com fonte por regra em `docs/padroes-de-interface.md` e auditoria em `docs/diagnostico-de-interface.md`. `tokens.css` ganha papéis tipográficos (título de página/seção, corpo, meta), movimento (durações e curvas), camadas (`z-index`) e cores do material sempre claro; pesos de fonte = arquivos carregados; frases nunca abaixo de 16px (`.texto-apoio`); esqueleto onde a forma do conteúdo é conhecida; `scripts/contraste.mjs` lê os valores de `tokens.css` e falha se os dois temas escuros divergirem. Cor da coordenação resolvida em D-45 | fonte única dos tokens; nenhuma regra de negócio nem contrato muda |
 | D-45 | — | Coordenação ganha cor própria, o violeta da faixa do laço do logo (`#6a3d9a` claro 7,6:1 · `#c9b3f5` escuro · `#3f1f66` alto contraste). O âmbar `#8a5300` fica só com `--cor-aviso`, porque cor de papel é identidade e cor de estado é significado (Apple HIG, Color). `scripts/contraste.mjs` falha se uma cor de papel igualar aviso ou erro | revisa D-41 (só a cor da coordenação) |
+| D-46 | — | Endurecimento do banco (`0008`): `anon` não executa nenhuma RPC, e função nova nasce sem EXECUTE (default global de PUBLIC revogado; só GRANT explícito); índice em toda chave estrangeira; docente que deixa a escola (`fn_encerrar_membro`, coordenação aal2, ou service role) tem os vínculos DOCENTE daquela escola encerrados por trigger e auditados (`MEMBRO_ENCERRADO`); coordenação só sai pelo script de implantação | completa D-20/D-23/D-36 |
 
 **Restrição de ambiente (07/10/2026):** a máquina de desenvolvimento não roda
 Docker. Banco validado localmente em PGlite; Supabase real só no CI.

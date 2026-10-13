@@ -23,7 +23,7 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (42) + funções (31) + políticas RLS (100, PGlite) + web (116, axe) — 100%
+npm test                                    # motor (42) + funções (31) + políticas RLS (113, PGlite) + web (116, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
 npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
@@ -74,7 +74,7 @@ banco e políticas são validados no PGlite; o Supabase real roda só no job `db
 
 A tabela completa de RF/RNF e o mapeamento para código está em `README.md`.
 A análise de requisitos por perfil, as decisões de projeto (`D-nn`, hoje até
-D-45) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
+D-46) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
 de implementar qualquer feature; toda decisão nova ganha um `D-nn` lá. Para
 telas: `docs/ux-ui.md` (arquitetura, telas, design system),
 `docs/acessibilidade.md`, `docs/wcag-2.2.md`, `docs/avaliacao-heuristica.md`,
