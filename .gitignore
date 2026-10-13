@@ -24,3 +24,11 @@ Thumbs.db
 # saídas de teste
 playwright-report/
 test-results/
+
+# pesquisa com pessoas e material de terceiros — nunca versionar (LGPD; nome e e-mail de participantes)
+docs/tcc/*.gsheet
+docs/tcc/*.gdoc
+docs/tcc/*respostas*
+docs/tcc/Relat*
+docs/tcc/Artigo Refer*.pdf
+docs/tcc/checklist.jpeg
