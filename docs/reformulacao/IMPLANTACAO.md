@@ -1,21 +1,23 @@
 # Implantação no Supabase (nuvem) — passo a passo, sem Docker
 
 **Para:** Geandre e Jean · **Data:** 08/10/2026 · **Pré-requisito:** R1–R3 e o R2 mesclados (PRs #98 → #103).
-## 0. Estado conferido em 12/10/2026 (projeto `tcc-peivivo`, ref `xjjuugpybbxifwfxjigu`, São Paulo, plano gratuito)
+## 0. Estado conferido em 14/10/2026 (projeto `tcc-peivivo`, ref `xjjuugpybbxifwfxjigu`, São Paulo, plano gratuito)
+Em 14/10 toda a pilha (PRs #98–#108) foi integrada em `development` (`e79747d`) e `main` (`22a4632`); a Vercel publicou `main` em produção.
+
 | Passo | Situação |
 |---|---|
 | 1–2 Projeto e CLI ligada | ✅ |
-| 3 Migrations 0001–0007 | ✅ 15 tabelas, todas com RLS; 17 políticas (= o que as migrations criam); `privado` fora da API; anônimo recebe 42501 |
+| 3 Migrations 0001–0008 | ✅ 0001–0007 em 12/10 (15 tabelas, todas com RLS; `privado` fora da API; anônimo recebe 42501); **0008 (endurecimento, D-46) aplicada em 14/10** com `db push` após `db:validar` |
 | 3 cron RN05 | ✅ `pei-vivo-expirar-validacoes` às 3h |
 | 4 Email ligado, TOTP ligado, confirmar e-mail ligado | ✅ |
-| 4 **Allow new users to sign up** | ❌ ligado — **desligar** (D-32) |
-| 4 **Senha mínima** | ❌ 6 — **mudar para 10** |
-| 4 **Site URL / Redirect URLs** | ❌ `http://localhost:3000`, sem redirects — usar o endereço do app |
-| 4 Sessões 12 h / 8 h, senhas vazadas | ⚠️ só no plano Pro → limitação declarada; o app encerra saúde/coordenação em 30 min |
-| 4 SMTP próprio e modelo de convite em português | ⚠️ pendente (o modelo só é editável com SMTP próprio) |
-| 5 EFs `gerar-material`, `fechar-ciclo`, `convidar` + `ORIGEM_APP` | ✅ publicadas em 08/10 — **republicar** depois do merge do #104 (apoios de leitura, RN03) |
-| 6 Primeira escola | ⏳ 0 escolas, 0 contas |
-| 7 `apps/web/.env.local` | ✅ criado localmente (só a chave anon); login real abre em `/entrar` |
+| 4 Allow new users to sign up | ✅ **desligado** em 14/10 (estava ligado: qualquer um criava conta) |
+| 4 Senha mínima | ✅ **10** em 14/10 (era 6); *Secure password change* ligado |
+| 4 Site URL / Redirect URLs | ✅ Site URL `https://tcc-peivivo.vercel.app`; redirect `https://tcc-peivivo.vercel.app/**` (cobre `/definir-senha` e `/redefinir-senha`) |
+| 4 Sessões 12 h / 8 h, senhas vazadas | ⚠️ só no plano Pro (o painel bloqueia) → limitação declarada; o app encerra saúde/coordenação em 30 min |
+| 4 SMTP próprio e modelo de convite em português | ⚠️ pendente: o painel só edita modelos com SMTP próprio; os e-mails saem em inglês |
+| 5 EFs `gerar-material`, `fechar-ciclo`, `convidar` + `ORIGEM_APP` | ✅ **republicadas em 14/10** (versão 2, com `--use-api`, cópia Deno em dia); sem token respondem 401 |
+| 6 Primeira escola | ✅ 14/10: escola **"Escola Piloto PEI Vivo"**, coordenação **"Coordenação Piloto"** (`geandre51@gmail.com`). O 1º convite saiu antes de corrigir a Site URL; foi reenviado como link de recuperação (ver §6) |
+| 7 App web | ✅ publicado na Vercel (`https://tcc-peivivo.vercel.app`, deploy automático de `main`); `apps/web/.env.local` local com a chave anon |
 
 Tudo aqui roda **sem Docker**. Onde a CLI normalmente usaria Docker (deploy das Edge Functions), usamos `--use-api`, que empacota no servidor (verificado na documentação da CLI em 08/10/2026).
 
@@ -48,7 +50,7 @@ select cron.schedule('pei-vivo-expirar-validacoes', '0 3 * * *', 'select public.
 ```
 
 ## 4. Autenticação (painel: *Authentication*)
-O `supabase/config.toml` vale para o ambiente local e o CI. Na nuvem, confira no painel (ou tente `npx supabase config push`; a documentação não deixa claro se ele envia as configurações de Auth, **confira no painel depois**):
+O `supabase/config.toml` vale para o ambiente local e o CI. **Não** rode `config push` com ele: o arquivo declara `site_url = localhost` e sobrescreveria a nuvem. `config push` só envia o que o arquivo declara; para usá-lo, monte um `config.toml` à parte só com as chaves de `[auth]` da nuvem e rode antes `npx supabase config diff --workdir <pasta>`. Em 14/10 o push não chegou a aplicar nada (as chaves de *Sessions* são só do plano Pro; provável causa), e a configuração foi feita no painel. Confira sempre com `config diff` depois:
 
 | Onde | Valor | Motivo |
 |---|---|---|
@@ -80,6 +82,12 @@ SUPABASE_URL=https://SEU_REF.supabase.co SUPABASE_SERVICE_ROLE_KEY=... \
 ```
 A coordenação recebe o e-mail, cria a senha, aceita os termos e cadastra o aplicativo autenticador no primeiro acesso. Daí em diante, **tudo é pelo app**: cadastrar estudantes, convidar família, docentes e profissionais (tela *Vínculos*).
 
+**Configure a §4 (Site URL e Redirect URLs) antes de rodar o script**, ou o link do convite aponta para a Site URL antiga. **Reenviar convite:** o Supabase recusa um segundo convite para um e-mail já cadastrado (`422 already registered`), e o script só registra o acesso, sem mandar e-mail. Para reenviar, mande um link de recuperação para a mesma tela (com a service role, só no terminal):
+```js
+await sb.auth.resetPasswordForEmail(email, { redirectTo: "https://SEU-APP/definir-senha?convite=1" });
+```
+O e-mail chega com o assunto de redefinição de senha (em inglês, sem SMTP próprio), mas abre a mesma tela "Aceitar convite", com senha e termos. O SMTP padrão permite poucos e-mails por hora.
+
 ## 7. App web
 Crie `apps/web/.env.local` (ignorado pelo git):
 ```
@@ -89,7 +97,7 @@ VITE_SUPABASE_ANON_KEY=cole-a-chave-anon
 ```
 `npm run dev` → o app passa a pedir e-mail e senha. Sem essas variáveis, ele volta a ser a **demonstração** com dados fictícios. As duas versões convivem, o que é útil na banca.
 
-Para publicar, o host do app ainda é uma decisão da dupla. Ele precisa servir a SPA com fallback para `index.html` e permitir os cabeçalhos de segurança/CSP (R5.5).
+O app está publicado na **Vercel** (`https://tcc-peivivo.vercel.app`), com deploy automático a cada push em `main`. O host precisa servir a SPA com fallback para `index.html` e permitir os cabeçalhos de segurança/CSP (R5.5).
 
 ## 8. Conferência pós-implantação (10 minutos)
 1. Entrar como coordenação → cadastrar o TOTP → ver o painel da escola.
