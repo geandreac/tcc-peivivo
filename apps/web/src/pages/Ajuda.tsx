@@ -28,7 +28,7 @@ export function Ajuda() {
   return (
     <>
       <h1>Ajuda</h1>
-      <p style={{ maxWidth: "var(--largura-leitura)" }}>
+      <p className="pagina-leitura">
         Respostas curtas para as dúvidas mais comuns. Se preferir, comece pela <Link to="/">apresentação da solução</Link>.
       </p>
 

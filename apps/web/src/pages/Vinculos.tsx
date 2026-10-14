@@ -5,12 +5,13 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, ResumoErros } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, ResumoErros, FalhaPagina, VazioSecao } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { Modal } from "../components/Modal";
 import { PAPEL } from "../utils/rotulos";
 import { formatarData } from "../utils/datas";
+import { ConvidarPessoa } from "./ConvidarPessoa";
 
 const PAPEIS: Papel[] = ["RESPONSAVEL", "DOCENTE", "PROFISSIONAL_SAUDE"];
 
@@ -22,6 +23,7 @@ export function Vinculos() {
   const [usuarioId, setUsuarioId] = useState("");
   const [papel, setPapel] = useState<Papel>("DOCENTE");
   const [registro, setRegistro] = useState("");
+  const [conferido, setConferido] = useState(false);
   const [erros, setErros] = useState<{ campo: string; mensagem: string }[]>([]);
   const [desativando, setDesativando] = useState<Vinculo | null>(null);
 
@@ -36,13 +38,20 @@ export function Vinculos() {
   const vincular = useMutacao(async () => {
     const lista: { campo: string; mensagem: string }[] = [];
     if (!usuarioId) lista.push({ campo: "usuario", mensagem: "Escolha a pessoa a vincular." });
+    if (papel === "RESPONSAVEL" && !conferido) lista.push({ campo: "conferido", mensagem: "Confirme que o vínculo legal foi conferido presencialmente, com documento." });
     if (papel === "PROFISSIONAL_SAUDE" && !registro.trim()) lista.push({ campo: "registro", mensagem: "Informe o registro no conselho profissional (obrigatório para profissional de saúde)." });
     setErros(lista);
     if (lista.length > 0) return;
-    await api.vincular({ usuarioId, estudanteId: id!, papel, registroConselho: registro });
-    anunciar("Vínculo criado.", "sucesso");
+    const v = await api.vincular({ usuarioId, estudanteId: id!, papel, registroConselho: registro, conferidoPresencialmente: conferido });
+    anunciar(
+      v.status === "PENDENTE_RESPONSAVEL"
+        ? "Proposta enviada. O profissional só terá acesso depois que a família confirmar."
+        : "Vínculo criado.",
+      "sucesso"
+    );
     setUsuarioId("");
     setRegistro("");
+    setConferido(false);
     dados.recarregar();
   });
 
@@ -54,7 +63,7 @@ export function Vinculos() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
   if (!ehCoord) {
     return (
       <>
@@ -66,8 +75,9 @@ export function Vinculos() {
 
   const nomeDe = (uid: string) => dados.dados?.usuarios.find((u) => u.id === uid)?.nome ?? uid;
   const ativos = dados.dados?.vinculos.filter((v) => v.status === "ATIVO") ?? [];
-  const inativos = dados.dados?.vinculos.filter((v) => v.status === "INATIVO") ?? [];
-  const jaVinculados = new Set(ativos.map((v) => v.usuarioId));
+  const pendentes = dados.dados?.vinculos.filter((v) => v.status === "PENDENTE_RESPONSAVEL") ?? [];
+  const inativos = dados.dados?.vinculos.filter((v) => v.status === "ENCERRADO" || v.status === "RECUSADO") ?? [];
+  const jaVinculados = new Set([...ativos, ...pendentes].map((v) => v.usuarioId));
 
   return (
     <>
@@ -80,7 +90,7 @@ export function Vinculos() {
         <>
           <Card titulo="Vínculos ativos">
             {ativos.length === 0 ? (
-              <p className="meta">Ninguém vinculado ainda.</p>
+              <VazioSecao>Ninguém vinculado ainda.</VazioSecao>
             ) : (
               <ul className="lista-simples" aria-label="Vínculos ativos">
                 {ativos.map((v) => (
@@ -92,7 +102,7 @@ export function Vinculos() {
                         {v.registroConselho && ` · ${v.registroConselho}`}
                       </div>
                     </div>
-                    {v.papel !== "COORDENACAO" && (
+                    {v.papel !== "COORDENACAO" && v.papel !== "RESPONSAVEL" && (
                       <Botao variante="secundario" pequeno onClick={() => setDesativando(v)}>
                         Desativar
                       </Botao>
@@ -103,6 +113,28 @@ export function Vinculos() {
             )}
           </Card>
 
+          {pendentes.length > 0 && (
+            <Card titulo="Aguardando a família">
+              <p className="texto-apoio">Profissionais de saúde só passam a ter acesso depois que o responsável confirma.</p>
+              <ul className="lista-simples" aria-label="Aguardando a família">
+                {pendentes.map((v) => (
+                  <li key={v.id}>
+                    <div>
+                      <strong>{nomeDe(v.usuarioId)}</strong>
+                      <div className="meta">
+                        {PAPEL[v.papel]}
+                        {v.registroConselho && ` · ${v.registroConselho}`}
+                      </div>
+                    </div>
+                    <Badge tom="aviso">Aguardando confirmação</Badge>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+
+          <ConvidarPessoa estudanteId={id!} aoConvidar={dados.recarregar} />
+
           <form
             noValidate
             onSubmit={(e) => {
@@ -110,9 +142,9 @@ export function Vinculos() {
               vincular.executar();
             }}
             aria-labelledby="titulo-novo-vinculo"
-            style={{ maxWidth: "var(--largura-leitura)" }}
+            className="formulario"
           >
-            <h2 id="titulo-novo-vinculo">Novo vínculo</h2>
+            <h2 id="titulo-novo-vinculo">Vincular quem já tem conta</h2>
             <ResumoErros erros={erros} />
             {vincular.erro && (
               <Alerta tom="erro" vivo>
@@ -125,7 +157,8 @@ export function Vinculos() {
                 .filter((u) => !jaVinculados.has(u.id) && !u.papelInstitucional)
                 .map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.nome} — {u.email}
+                    {u.nome}
+                    {u.email ? ` — ${u.email}` : ""}
                   </option>
                 ))}
             </Campo>
@@ -140,8 +173,31 @@ export function Vinculos() {
                 </label>
               ))}
             </fieldset>
+            {papel === "RESPONSAVEL" && (
+              <div className={`campo${erros.some((x) => x.campo === "conferido") ? " campo--erro" : ""}`}>
+                <label className="opcao" htmlFor="conferido">
+                  <input
+                    id="conferido"
+                    type="checkbox"
+                    checked={conferido}
+                    onChange={(e) => setConferido(e.target.checked)}
+                    aria-describedby={erros.some((x) => x.campo === "conferido") ? "conferido-erro" : undefined}
+                    aria-invalid={erros.some((x) => x.campo === "conferido") || undefined}
+                  />
+                  <span className="opcao__texto">
+                    <span>Conferi presencialmente, com documento, que esta pessoa é responsável legal</span>
+                    <span className="opcao__descricao">O sistema não guarda cópia do documento; registra só que você conferiu e quando.</span>
+                  </span>
+                </label>
+                {erros.some((x) => x.campo === "conferido") && (
+                  <div id="conferido-erro" className="campo__erro">
+                    {erros.find((x) => x.campo === "conferido")!.mensagem}
+                  </div>
+                )}
+              </div>
+            )}
             {papel === "PROFISSIONAL_SAUDE" && (
-              <Campo id="registro" rotulo="Registro no conselho profissional" dica="Ex.: CREFITO, CRFa, CRP. Obrigatório para profissional de saúde (D-13)." required value={registro} onChange={(e) => setRegistro(e.target.value)} erro={erros.find((x) => x.campo === "registro")?.mensagem ?? null} />
+              <Campo id="registro" rotulo="Registro no conselho profissional" dica="Ex.: CREFITO, CRFa, CRP. Obrigatório para profissional de saúde." required value={registro} onChange={(e) => setRegistro(e.target.value)} erro={erros.find((x) => x.campo === "registro")?.mensagem ?? null} />
             )}
             <div className="grupo-botoes">
               <Botao type="submit" carregando={vincular.ocupado} textoCarregando="Vinculando…">
@@ -151,14 +207,14 @@ export function Vinculos() {
           </form>
 
           {inativos.length > 0 && (
-            <Card titulo="Vínculos desativados" nivel={3}>
+            <Card titulo="Vínculos encerrados" nivel={3}>
               <ul className="lista-simples">
                 {inativos.map((v) => (
                   <li key={v.id}>
                     <span>
                       {nomeDe(v.usuarioId)} · {PAPEL[v.papel]}
                     </span>
-                    <Badge>Inativo</Badge>
+                    <Badge>{v.status === "RECUSADO" ? "Recusado pela família" : "Encerrado"}</Badge>
                   </li>
                 ))}
               </ul>

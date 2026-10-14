@@ -3,7 +3,7 @@
  * A escala REDUZIDA / ESTÁVEL / AMPLIADA ganha um significado leigo por
  * dimensão (HU-R.03) — a mesma tela serve aos três papéis, mudando só o texto.
  */
-import type { DimensaoObservada, EscalaObservacao, Papel, StatusValidacao, StatusAprovacao, ResultadoDesfecho, EscopoConsentimento, EventoAuditoria } from "../services/tipos";
+import type { DimensaoObservada, EscalaObservacao, Papel, StatusValidacao, StatusAprovacao, ResultadoDesfecho, EscopoConsentimento, EventoAuditoria, TipoNotificacao } from "../services/tipos";
 import type { ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 
 export const PAPEL: Record<Papel, string> = {
@@ -66,6 +66,7 @@ export const STATUS_VALIDACAO: Record<StatusValidacao, { texto: string; tom: "su
   PENDENTE: { texto: "Aguardando validação clínica", tom: "aviso" },
   EM_REVISAO: { texto: "Ajuste solicitado", tom: "erro" },
   EXPIRADA: { texto: "Expirada (7 dias sem validação)", tom: "neutro" },
+  SUBSTITUIDA: { texto: "Substituída por uma versão mais nova", tom: "neutro" },
 };
 
 export const STATUS_APROVACAO: Record<StatusAprovacao, { texto: string; tom: "sucesso" | "aviso" | "neutro" }> = {
@@ -83,6 +84,7 @@ export const DESFECHO: Record<ResultadoDesfecho, { texto: string; descricao: str
 export const ESCOPO: Record<EscopoConsentimento, { titulo: string; descricao: string }> = {
   observacao_pedagogica: { titulo: "Observações da escola", descricao: "A professora registra, a cada 15 dias, como o estudante lida com leitura e tarefas. Nunca diagnóstico." },
   observacao_domiciliar: { titulo: "Observações da família", descricao: "Você registra o que percebe em casa: o que ajuda, o que atrapalha, o que interessa." },
+  validacao_clinica: { titulo: "Validação pelo profissional de saúde", descricao: "Um profissional de saúde que você confirmar pode conferir os ajustes do material. Sem isso, só a escola e a família ajustam." },
   geracao_material: { titulo: "Geração de material adaptado", descricao: "A professora recebe textos adaptados ao perfil do estudante. Ela revisa tudo antes de usar." },
 };
 
@@ -99,4 +101,54 @@ export const EVENTO: Record<EventoAuditoria, string> = {
   EXPORTACAO: "Dados exportados",
   EXCLUSAO: "Dados excluídos",
   CADASTRO: "Estudante cadastrado",
+  LEITURA_NOTA_CLINICA: "Notas clínicas lidas pelo profissional",
+  NOTA_CLINICA_REGISTRADA: "Nota clínica registrada",
+  VINCULO_PROPOSTO: "Profissional de saúde proposto",
+  VINCULO_CONFIRMADO: "Profissional de saúde confirmado pela família",
+  VINCULO_RECUSADO: "Profissional de saúde recusado pela família",
+  VERSAO_PROPOSTA: "Nova proposta de perfil enviada para validação",
+  VERSAO_AJUSTADA: "Perfil ajustado pelo profissional de saúde",
+  VERSAO_VIGENTE_SEM_VALIDACAO: "Perfil atualizado pela escola (sem profissional de saúde)",
+  VERSAO_EXPIRADA: "Proposta de perfil expirou sem validação",
+  REGISTRO_VERIFICADO: "Registro profissional conferido pela escola",
 };
+
+/** Frases das notificações (D-28). Revogação nunca expõe motivo (F10). */
+export function textoNotificacao(tipo: TipoNotificacao, estudante: string): string {
+  switch (tipo) {
+    case "CONSENTIMENTO_CONCEDIDO":
+      return `A família de ${estudante} autorizou o acompanhamento.`;
+    case "CONSENTIMENTO_REVOGADO":
+      return `O acompanhamento de ${estudante} está pausado pela família.`;
+    case "PROFISSIONAL_AGUARDANDO_CONFIRMACAO":
+      return `Um profissional de saúde foi proposto para ${estudante} e aguarda a sua confirmação.`;
+    case "VINCULO_ATIVADO":
+      return `Você agora tem acesso a ${estudante}.`;
+    case "VALIDACAO_PENDENTE":
+      return `Há uma proposta de perfil de ${estudante} aguardando a sua validação.`;
+    case "REVISAO_SOLICITADA":
+      return `O profissional pediu revisão no perfil de ${estudante}.`;
+    case "VALIDACAO_EXPIRADA":
+      return `A proposta de perfil de ${estudante} passou 7 dias sem validação; o perfil anterior continua valendo.`;
+  }
+}
+
+/**
+ * Perfil em linguagem leiga (prompt §7.2, UX-04): para família, docente e
+ * coordenação, os parâmetros viram frases sobre o material — nunca siglas
+ * nem números soltos. O profissional de saúde vê a forma técnica (PARAMETRO).
+ */
+export function descreverPerfil(p: ParametrosAdaptacao): string[] {
+  const frases = [
+    `Textos em trechos curtos, de até ${p.maxLinhasPorBloco} linhas.`,
+    p.formatoEnunciado === "ETAPA_UNICA" ? "Uma instrução por vez, em passos numerados." : "Instruções podem ter mais de uma etapa.",
+    { BASICO: "Palavras simples; termos difíceis vêm explicados.", INTERMEDIARIO: "Vocabulário do dia a dia, com poucas palavras difíceis.", ORIGINAL: "Vocabulário do texto original." }[p.nivelVocabulario],
+    `No máximo ${p.blocosPorMaterial} trechos por atividade, para não cansar.`,
+    p.contrasteMinimo === 7 ? "Letras bem escuras sobre fundo claro (contraste reforçado)." : "Contraste de leitura padrão.",
+  ];
+  if (p.interesseAncora) frases.push(`Exemplos ligados a um tema de interesse: ${p.interesseAncora}.`);
+  return frases;
+}
+
+export const EXPLICA_RITMO_PERFIL =
+  "O perfil descreve o que funciona, não um diagnóstico. Ele só fica mais exigente depois de duas quinzenas seguidas de melhora; quando há dificuldade, se ajusta na hora.";

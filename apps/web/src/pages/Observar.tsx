@@ -9,7 +9,7 @@ import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
 import { Escala3 } from "../components/Escala3";
 import { Campo } from "../components/Campo";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPagina, VazioSecao } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { DIMENSAO, ESCALA, PAPEL } from "../utils/rotulos";
 import { formatarData, formatarDataHora } from "../utils/datas";
@@ -27,6 +27,7 @@ export function Observar() {
   const navigate = useNavigate();
   const { anunciar } = useAnuncio();
   const [respostas, setRespostas] = useState<Respostas>({});
+  const respondidas = DIMENSOES.filter((d) => respostas[d]?.escala).length;
   const [erros, setErros] = useState<{ campo: string; mensagem: string }[]>([]);
 
   const id = ctx.dados?.estudante.id;
@@ -67,7 +68,7 @@ export function Observar() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const { estudante, consentimentoAtivo } = ctx.dados;
   const descricaoPapel =
@@ -81,7 +82,7 @@ export function Observar() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Registrar observação" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhuma observação pode ser registrada até o responsável autorizar (RN01).</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhuma observação pode ser registrada até o responsável autorizar.</Alerta>
       </>
     );
   }
@@ -105,7 +106,7 @@ export function Observar() {
         <EstadoVazio titulo="Nenhum ciclo aberto">
           <p>{papel === "DOCENTE" ? "Abra o próximo ciclo quinzenal para começar a registrar." : "Só a docente abre um ciclo. Peça a ela para abrir o próximo."}</p>
           {papel === "DOCENTE" && (
-            <div className="grupo-botoes" style={{ justifyContent: "center" }}>
+            <div className="grupo-botoes grupo-botoes--centro">
               <Botao onClick={() => abrir.executar()} carregando={abrir.ocupado} textoCarregando="Abrindo…">
                 Abrir novo ciclo
               </Botao>
@@ -121,7 +122,7 @@ export function Observar() {
 
       {ciclo.dados?.aberto && (
         <>
-          <p className="meta">
+          <p className="texto-apoio">
             Ciclo <strong>{ciclo.dados.aberto.numero}</strong>, aberto em {formatarData(ciclo.dados.aberto.dataInicio)}. Suas respostas ficam registradas com seu nome e papel ({PAPEL[papel!]}).
           </p>
           <form
@@ -131,11 +132,20 @@ export function Observar() {
               salvar.executar();
             }}
             aria-labelledby="titulo-form-obs"
+            className="form-observacao"
           >
             <h2 id="titulo-form-obs" className="sr-only">
               Formulário de observação
             </h2>
             <ResumoErros erros={erros} />
+            <div className="progresso-obs">
+              <p className="progresso-obs__texto" aria-live="polite">
+                <strong>{respondidas}</strong> de {DIMENSOES.length} dimensões respondidas
+              </p>
+              <div className="progresso-obs__trilho" aria-hidden="true">
+                <div className="progresso-obs__barra" style={{ transform: `scaleX(${respondidas / DIMENSOES.length})` }} />
+              </div>
+            </div>
             {salvar.erro && (
               <Alerta tom="erro" vivo>
                 {mensagemAmigavel(salvar.erro)}
@@ -174,7 +184,7 @@ export function Observar() {
 
           <h2>Já registrado neste ciclo</h2>
           {ciclo.dados.observacoes.filter((o) => o.cicloId === ciclo.dados!.aberto!.id).length === 0 ? (
-            <p className="meta">Ninguém registrou nada neste ciclo ainda.</p>
+            <VazioSecao>Ninguém registrou nada neste ciclo ainda.</VazioSecao>
           ) : (
             <ul className="lista-simples" aria-label="Observações deste ciclo">
               {ciclo.dados.observacoes
@@ -183,7 +193,7 @@ export function Observar() {
                   <li key={o.id}>
                     <div>
                       <strong>{DIMENSAO[o.dimensao].titulo}</strong>: {ESCALA[o.valorEscala]} — {DIMENSAO[o.dimensao].escala[o.valorEscala]}
-                      {o.evidencia && <div className="meta">“{o.evidencia}”</div>}
+                      {o.evidencia && <div className="texto-apoio">“{o.evidencia}”</div>}
                       <div className="meta">{formatarDataHora(o.dataRegistro)}</div>
                     </div>
                     <Badge>{PAPEL[o.papelAutor]}</Badge>

@@ -6,7 +6,7 @@ import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { useEstudante } from "../hooks/useEstudante";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Carregando, ErroCarregamento, ResumoErros } from "../components/Feedback";
+import { Alerta, Carregando, ResumoErros, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { DESFECHO } from "../utils/rotulos";
@@ -37,8 +37,8 @@ export function Desfecho() {
   });
 
   if (material.carregando || (material.dados && ctx.carregando)) return <Carregando />;
-  if (material.erro || !material.dados) return <ErroCarregamento erro={material.erro} />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (material.erro || !material.dados) return <FalhaPagina erro={material.erro} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const m = material.dados;
   if (ctx.dados.papel !== "DOCENTE") {

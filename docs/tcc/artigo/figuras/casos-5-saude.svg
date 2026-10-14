@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 663 720" width="663" height="720" font-family="Calibri, Arial, sans-serif">
+<rect x="0" y="0" width="663" height="720" fill="#FFFFFF"/>
+<defs>
+  <marker id="setaAberta" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#4A6478" stroke-width="1.6"/></marker>
+  <marker id="setaAbertaVerde" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#1C7293" stroke-width="1.8"/></marker>
+  <marker id="setaAbertaLaranja" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L10,5 L1,9" fill="none" stroke="#E8A33D" stroke-width="1.8"/></marker>
+  <marker id="setaCheia" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#0B3D63"/></marker>
+  <marker id="setaCheiaVermelha" markerWidth="14" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L12,6 L1,11 Z" fill="#B23A3A"/></marker>
+  <marker id="trianguloVazado" markerWidth="18" markerHeight="16" refX="16" refY="8" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L16,8 L1,15 Z" fill="#FFFFFF" stroke="#4A6478" stroke-width="1.6"/></marker>
+  <marker id="losangoCheio" markerWidth="20" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,6 L10,1 L19,6 L10,11 Z" fill="#0B3D63"/></marker>
+</defs>
+<g transform="translate(0 36)"><rect x="294.5025252433234" y="-20" width="351.9227661492716" height="644" rx="10" fill="#F9FBFD" stroke="#0B3D63" stroke-width="2.4"/><text x="310.5025252433234" y="6" font-size="17" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="start" font-family="Cambria, Georgia, serif">PEI Vivo</text><line x1="140" y1="216" x2="385.1938000824214" y2="98.24593916312128" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="216" x2="361.9193475008563" y2="185.2512961821563" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="216" x2="365.9012661407309" y2="252.51716897755156" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="216" x2="387.85984107697686" y2="341.2993938731706" stroke="#4A6478" stroke-width="1.7"/><line x1="140" y1="556" x2="348.5346546867794" y2="558.4078456148336" stroke="#4A6478" stroke-width="1.7"/><ellipse cx="456.5025252433234" cy="64" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="456.5025252433234" y="60" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Registrar observação</text><text x="456.5025252433234" y="78" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">no ciclo</text>
+<ellipse cx="486.42529139259494" cy="168" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="486.42529139259494" y="164" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Consultar pendências</text><text x="486.42529139259494" y="182" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">de validação</text>
+<ellipse cx="486.42529139259494" cy="272" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="486.42529139259494" y="268" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Validar parâmetros</text><text x="486.42529139259494" y="286" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">do ciclo</text>
+<ellipse cx="456.5025252433234" cy="376" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="456.5025252433234" y="372" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Registrar e ler nota</text><text x="456.5025252433234" y="390" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">clínica reservada</text>
+<ellipse cx="486.42529139259494" cy="560" rx="138" ry="40" fill="#EEF3F6" stroke="#0B3D63" stroke-width="2"/><text x="486.42529139259494" y="556" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Expirar validações</text><text x="486.42529139259494" y="574" font-size="15" fill="#16222B" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">pendentes (7 dias)</text><g stroke="#0B3D63" stroke-width="2.6" fill="none">
+    <circle cx="110" cy="184" r="16" fill="#FFFFFF"/>
+    <line x1="110" y1="200" x2="110" y2="238"/>
+    <line x1="84" y1="214" x2="136" y2="214"/>
+    <line x1="110" y1="238" x2="90" y2="268"/>
+    <line x1="110" y1="238" x2="130" y2="268"/></g><text x="110" y="292" font-size="15" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Profissional</text><text x="110" y="310" font-size="15" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">de saúde</text>
+<g stroke="#0B3D63" stroke-width="2.6" fill="none">
+    <circle cx="110" cy="524" r="16" fill="#FFFFFF"/>
+    <line x1="110" y1="540" x2="110" y2="578"/>
+    <line x1="84" y1="554" x2="136" y2="554"/>
+    <line x1="110" y1="578" x2="90" y2="608"/>
+    <line x1="110" y1="578" x2="130" y2="608"/></g><text x="110" y="632" font-size="15" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">Tempo</text><text x="110" y="650" font-size="15" fill="#0B3D63" font-weight="bold" font-style="normal" text-anchor="middle" font-family="Calibri, Arial, sans-serif">(pg_cron, diário)</text></g>
+</svg>

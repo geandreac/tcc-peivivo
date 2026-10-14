@@ -6,7 +6,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Carregando, ErroCarregamento, EstadoVazio, ResumoErros } from "../components/Feedback";
+import { Alerta, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { PARAMETRO } from "../utils/rotulos";
@@ -44,7 +44,7 @@ export function GerarMaterial() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const { estudante, papel, consentimentoAtivo } = ctx.dados;
 
@@ -52,7 +52,7 @@ export function GerarMaterial() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Gerar material" />
-        <Alerta tom="info" titulo="Só a docente gera material">Profissional de saúde, família e coordenação leem os materiais aprovados (D-02).</Alerta>
+        <Alerta tom="info" titulo="Só a docente gera material">Profissional de saúde, família e coordenação leem os materiais aprovados.</Alerta>
       </>
     );
   }
@@ -60,7 +60,7 @@ export function GerarMaterial() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Gerar material" />
-        <Alerta tom="erro" titulo="Geração bloqueada">Sem consentimento ativo do responsável, nenhum material é gerado (RN01/RN08).</Alerta>
+        <Alerta tom="erro" titulo="Geração bloqueada">Sem consentimento ativo do responsável, nenhum material é gerado.</Alerta>
       </>
     );
   }
@@ -79,6 +79,7 @@ export function GerarMaterial() {
 
       {vigente.dados && (
         <form
+          className="formulario"
           noValidate
           onSubmit={(e) => {
             e.preventDefault();

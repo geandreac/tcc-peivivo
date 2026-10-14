@@ -22,6 +22,13 @@ import { Desfecho } from "../pages/Desfecho";
 import { Historico } from "../pages/Historico";
 import { Vinculos } from "../pages/Vinculos";
 import { DadosLgpd } from "../pages/DadosLgpd";
+import { Privacidade } from "../pages/Privacidade";
+import { Notificacoes } from "../pages/Notificacoes";
+import { VerificacaoDuasEtapas } from "../pages/VerificacaoDuasEtapas";
+import { RecuperarSenha } from "../pages/RecuperarSenha";
+import { DefinirSenha } from "../pages/DefinirSenha";
+import { Termos } from "../pages/Termos";
+import { Conta } from "../pages/Conta";
 import { NaoEncontrada } from "../pages/NaoEncontrada";
 
 /**
@@ -34,7 +41,12 @@ export const rotas = [
     children: [
       { path: "/", element: <Inicio /> },
       { path: "/entrar", element: <Entrar /> },
+      { path: "/entrar/verificacao", element: <VerificacaoDuasEtapas /> },
       { path: "/entrar/:slug", element: <EntrarPapel /> },
+      { path: "/recuperar-senha", element: <RecuperarSenha /> },
+      { path: "/redefinir-senha", element: <DefinirSenha /> },
+      { path: "/definir-senha", element: <DefinirSenha /> },
+      { path: "/termos", element: <Termos /> },
       { path: "/ajuda", element: <Ajuda /> },
       { path: "/acessibilidade", element: <Acessibilidade /> },
       {
@@ -42,6 +54,8 @@ export const rotas = [
         children: [
           { path: "/painel", element: <Painel /> },
           { path: "/pendencias", element: <Pendencias /> },
+          { path: "/notificacoes", element: <Notificacoes /> },
+          { path: "/conta", element: <Conta /> },
           { path: "/coordenacao/cadastrar", element: <CadastrarEstudante /> },
           { path: "/estudantes/:id", element: <Estudante /> },
           { path: "/estudantes/:id/consentimento", element: <Consentimento /> },
@@ -53,6 +67,7 @@ export const rotas = [
           { path: "/estudantes/:id/historico", element: <Historico /> },
           { path: "/estudantes/:id/vinculos", element: <Vinculos /> },
           { path: "/estudantes/:id/dados", element: <DadosLgpd /> },
+          { path: "/estudantes/:id/privacidade", element: <Privacidade /> },
           { path: "/materiais/:id", element: <MaterialFinal /> },
           { path: "/materiais/:id/revisar", element: <RevisarMaterial /> },
           { path: "/materiais/:id/desfecho", element: <Desfecho /> },

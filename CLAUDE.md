@@ -23,11 +23,19 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (30) + web (61, com axe-core) — deve passar 100%
-npm run dev                                 # protótipo em http://localhost:5173
-npm run contraste                           # tokens de cor ≥ 4,5:1 / 3:1
+npm test                                    # motor (42) + funções (31) + políticas RLS (113, PGlite) + web (116, axe) — 100%
+npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
+npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
+npm run db:validar                          # migrations + seed no PGlite (sem Docker)
+node scripts/sondar-rls.mjs                 # evidência histórica: 25/31 ataques passavam em 0002
+node scripts/sincronizar-funcoes.mjs        # copia motor/contratos/funcoes p/ supabase/functions/_shared/gerado (Deno)
+npm run test:e2e                            # Playwright (Chrome local, porta 5179): 20 E2E em 390/1280 px + axe com contraste real
 npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
 ```
+
+**A máquina da dupla não roda Docker.** Nada de `supabase start`/`db reset` local:
+banco e políticas são validados no PGlite; o Supabase real roda só no job `db` do CI
+(mesma suíte `packages/politicas` via `DATABASE_URL`).
 
 ## Convenções
 
@@ -37,6 +45,14 @@ npx supabase db push                        # aplica as migrations (sem seed) no
   tipo paralelo, estenda esse.
 - Todo `id` é `uuid` (`gen_random_uuid()`), nunca serial incremental.
 - Toda tabela sensível a estudante tem RLS habilitado antes do primeiro `insert`.
+- Políticas (D-20, `0004`): nunca `for all`; toda escrita com `with check`; tabelas
+  que definem acesso de outra pessoa (vínculos, consentimentos, versões, materiais,
+  notas) só são escritas por RPC `security definer` (`search_path = ''`) ou Edge
+  Function. Helpers ficam em `privado` (não exposto). Negado → `42501`, conflito →
+  `PT409`, inválido → `22023`. Toda policy/RPC nova ganha teste negado em
+  `packages/politicas`.
+- GRANT por coluna em `estudantes`, `consentimentos`, `usuarios`: no cliente,
+  **nunca `select *`** — liste as colunas.
 - Front-end (`apps/web`): `button` para ação, `a` para navegação; todo campo com
   `label`; erros via `ResumoErros` + `aria-describedby`; estados carregando /
   vazio / sucesso / erro / negado em toda tela; cores só de `styles/tokens.css`
@@ -48,21 +64,26 @@ npx supabase db push                        # aplica as migrations (sem seed) no
 | Código | Regra |
 |---|---|
 | RN01 | Sem consentimento ativo do responsável, nenhuma escrita nem geração no estudante; leitura só para responsável e coordenação (D-11). |
-| RN02 | Docente nunca lê nota clínica — só `observacoes` e `versoes_perfil.parametros`. O sistema **não armazena laudo/diagnóstico** (D-01). |
+| RN02 | Docente nunca lê nota clínica — só `observacoes` e `versoes_perfil.parametros`. O sistema **não armazena laudo/diagnóstico** (D-01). Nota clínica só via `fn_ler_notas_clinicas` (aal2, auditada). |
 | RN03 | Elevar parâmetro exige 2 ciclos consecutivos "ampliada"; reduzir é imediato. |
 | RN04 | Nenhum material chega ao estudante sem `status_aprovacao = 'APROVADO'` pelo docente. |
-| RN05 | Sem validação do profissional em 7 dias, mantém a última `VersaoPerfil` `VIGENTE`. |
+| RN05 | Sem validação do profissional em 7 dias, a proposta vira `EXPIRADA` (não volta) e mantém a última `VersaoPerfil` `VIGENTE` — no máximo uma `VIGENTE` por estudante (D-35). |
 | RN06 | Sem `PROFISSIONAL_SAUDE` vinculado, só a camada determinística roda (sem IA). |
 | RN07 | Validação clínica é por ciclo (conjunto de parâmetros), nunca por material individual. |
 | RN08 | Responsável revoga consentimento a qualquer momento; bloqueia geração imediatamente. |
 
 A tabela completa de RF/RNF e o mapeamento para código está em `README.md`.
 A análise de requisitos por perfil, as decisões de projeto (`D-nn`, hoje até
-D-18) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
+D-46) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
 de implementar qualquer feature; toda decisão nova ganha um `D-nn` lá. Para
 telas: `docs/ux-ui.md` (arquitetura, telas, design system),
 `docs/acessibilidade.md`, `docs/wcag-2.2.md`, `docs/avaliacao-heuristica.md`,
 `docs/plano-de-testes.md`; prompt de extensão em `docs/prompt-design-ia.md`.
+Governança e processo (auditoria de 21/09/2026): `docs/relatorio-de-conformidade.md`
+(plano de ação), `docs/checklist-final-tcc.md`, `docs/matriz-rastreabilidade.md`,
+`docs/bpmn-processos.md`, `docs/pdca.md`, `docs/itil-servicos.md`,
+`docs/cobit-governanca.md`, `docs/gestao-de-riscos.md`, `docs/seguranca-e-privacidade.md`.
+Fluxo de branches e commits (Conventional Commits, `feature/<autor>-…`): `CONTRIBUTING.md`.
 
 ## Testes
 
@@ -81,10 +102,32 @@ topo do arquivo).
 
 ## Onde estamos
 
-Migrations validadas em PGlite (P0.3). Motor completo (P2.1–P2.5, 30 testes,
-97 %). Protótipo `apps/web` funcional sobre mock com permissões (19 telas, 59
-testes com axe-core), documentação de UX/acessibilidade/WCAG/heurísticas/testes
-entregue (14/09/2026). Plano completo em `docs/plano-desenvolvimento.md`.
-Próximos: P0.1 (GitHub), P0.4 (Supabase dev), Fase 1 (migration `0004` + testes
-RLS reaproveitando `apps/web/src/services/mockApi.test.ts`), Fase 3 (Edge
-Functions), depois `supabaseApi` em `apps/web/src/services/`.
+Motor completo (42 testes, inclui apoios de leitura D-43 e RN03 em todas as dimensões D-42).
+Protótipo `apps/web` com 31 telas, 116 testes com axe-core e 20 E2E (Playwright). Documentação de UX/acessibilidade
+(14/09) e de governança/processos (21/09/2026).
+
+**Reformulação (desde 07/10/2026)** — fonte de verdade: `docs/reformulacao/`
+(AUDITORIA, FLUXOS, DECISOES = ADR-00…20 = D-19…D-39, PLANO R0–R5, marcos/).
+Trilha mínima aprovada até o congelamento de 26/11. **R1 (banco que nega) feito:**
+migrations `0003`–`0005`, políticas verdes no PGlite **e no Supabase real (CI)**.
+**R3 (ciclo no servidor) feito, antecipado:** `0006` (portas das EFs), `packages/
+contratos` (Zod), `packages/funcoes` (casos de uso puros), Edge Functions
+`gerar-material` e `fechar-ciclo` (camada HTTP fina; nunca edite
+`_shared/gerado/`, rode o script). **R2 feito:** `supabaseApi` (modo real com `VITE_API=supabase`), login com senha/TOTP/convite,
+EF `convidar`, `scripts/implantar-escola.mjs`; contrato testado no CI contra Supabase real com
+Edge Functions. Implantação na nuvem sem Docker: `docs/reformulacao/IMPLANTACAO.md`
+(`functions deploy --use-api`). **R4 (UX) feito:** navegação inferior/lateral, linguagem
+leiga (nunca sigla RN/D na tela), Privacidade (família confirma profissional), painel
+da escola (só contagens), notificações tipadas, tema escuro e leitura facilitada
+(pares em `scripts/contraste.mjs`). **Interface (12/10):** padrões Apple/Google/Microsoft
+(`docs/padroes-de-interface.md`, `docs/diagnostico-de-interface.md`, D-44), coordenação em violeta
+(D-45); PR #104 empilhado sobre o #103. **Nuvem (12/10):** projeto `tcc-peivivo` (sa-east-1)
+com 0001–0007, RLS em 15/15 tabelas, cron RN05 e 3 EFs (versão de 08/10 — republicar após
+o merge); faltam ajustes de Auth no painel e a primeira escola (`IMPLANTACAO.md` §0).
+**R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v3 (N1: até a
+Metodologia) em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera `Artigo_PEI_Vivo_v3.docx`; a v2 fica
+preservada). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`
+recaptura as telas com o protótipo em `VITE_API=mock` na 5179. Diagramas UML gerados do código por
+`npm run diagramas`: completos em `docs/tcc/*_diagram.svg` e, para impressão, repartidos em
+`docs/tcc/artigo/figuras/` (`scripts/diagramas/impressao.mjs`). Marcadores `[PREENCHER]`/`[CONFERIR]` = dados
+que só a dupla tem; `[CONFIRMAR COM O AVALIADOR]` = dúvida que só o avaliador resolve — nunca inventar.

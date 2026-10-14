@@ -45,12 +45,35 @@ export function Acessibilidade() {
   return (
     <>
       <h1>Acessibilidade</h1>
-      <p style={{ maxWidth: "var(--largura-leitura)" }}>
+      <p className="pagina-leitura">
         Ajuste a interface do seu jeito. As preferências ficam salvas neste dispositivo e valem para todas as telas. O zoom do navegador
         (até 400 %) também funciona — nada aqui o substitui.
       </p>
 
       <div className="preferencias">
+        <Opcoes
+          chave="tema"
+          legenda="Aparência"
+          descricao="O tema escuro cansa menos a vista à noite. Todos os textos mantêm contraste acima de 7:1."
+          opcoes={[
+            { valor: "sistema", rotulo: "Igual ao meu dispositivo" },
+            { valor: "claro", rotulo: "Claro" },
+            { valor: "escuro", rotulo: "Escuro" },
+          ]}
+          prefs={prefs}
+          definir={definir}
+        />
+        <Opcoes
+          chave="leitura"
+          legenda="Leitura"
+          descricao="Para quem prefere letras mais abertas e mais espaço entre letras, palavras e linhas — útil, por exemplo, com dislexia."
+          opcoes={[
+            { valor: "padrao", rotulo: "Padrão" },
+            { valor: "facilitada", rotulo: "Leitura facilitada", descricao: "Fonte de alta legibilidade e espaçamento maior" },
+          ]}
+          prefs={prefs}
+          definir={definir}
+        />
         <Opcoes
           chave="contraste"
           legenda="Contraste"

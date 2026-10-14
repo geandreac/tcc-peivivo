@@ -50,14 +50,20 @@ h4 {
   font-weight: var(--peso-negrito);
   overflow-wrap: anywhere;
 }
+/* Uma só escala de títulos, por papel (tokens.css). */
 h1 {
-  font-size: var(--tamanho-xl);
+  font-size: var(--texto-titulo-pagina);
+  letter-spacing: -0.01em;
 }
 h2 {
-  font-size: var(--tamanho-lg);
+  font-size: var(--texto-titulo-secao);
 }
 h3 {
-  font-size: var(--tamanho-md);
+  font-size: var(--texto-subtitulo);
+}
+/* telas de autenticação têm coluna estreita: título menor para não quebrar em 3 linhas */
+.pagina-estreita h1 {
+  font-size: var(--tamanho-xl);
 }
 h4 {
   font-size: var(--tamanho-sm);
@@ -116,10 +122,10 @@ textarea {
   position: absolute;
   left: var(--esp-4);
   top: -100%;
-  z-index: 1000;
+  z-index: var(--camada-pular);
   padding: var(--esp-3) var(--esp-4);
   background: var(--cor-primaria);
-  color: #fff;
+  color: var(--cor-sobre-primaria);
   font-weight: var(--peso-negrito);
   border-radius: var(--raio-md);
   text-decoration: none;
@@ -162,11 +168,14 @@ main > .container {
 
 /* cabeçalho */
 .cabecalho {
-  background: var(--cor-superficie);
+  /* D-41: vidro translúcido (o conteúdo passa por baixo, levemente desfocado) */
+  background: var(--vidro);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
   border-bottom: 1px solid var(--cor-borda-suave);
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: var(--camada-cabecalho);
 }
 .cabecalho__linha {
   display: flex;
@@ -196,7 +205,8 @@ main > .container {
   flex: none;
 }
 
-.nav-principal ul {
+/* navegação pública (sem sessão): no cabeçalho */
+.nav-publica ul {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -204,7 +214,7 @@ main > .container {
   flex-wrap: wrap;
   gap: var(--esp-1);
 }
-.nav-principal a {
+.nav-publica a {
   display: inline-flex;
   align-items: center;
   min-height: var(--alvo-minimo);
@@ -214,22 +224,171 @@ main > .container {
   color: var(--cor-texto);
   font-weight: var(--peso-medio);
 }
-.nav-principal a:hover {
+.nav-publica a:hover {
   background: var(--cor-primaria-tint);
   color: var(--cor-primaria-escura);
   text-decoration: underline;
 }
-.nav-principal a[aria-current="page"] {
-  background: var(--cor-primaria);
-  color: #fff;
+.nav-publica a[aria-current="page"] {
+  color: var(--cor-primaria);
+  font-weight: var(--peso-negrito);
 }
+/* "Entrar" é a ação da navegação pública: pílula preenchida */
+.nav-publica li:last-child a {
+  background: var(--cor-primaria);
+  color: var(--cor-sobre-primaria);
+  border-radius: var(--raio-pill);
+  padding-inline: var(--esp-5);
+  font-weight: var(--peso-negrito);
+}
+.nav-publica li:last-child a:hover {
+  background: var(--cor-primaria-escura);
+  color: var(--cor-sobre-primaria);
+}
+
 .sessao {
   display: flex;
   align-items: center;
-  gap: var(--esp-2);
+  gap: var(--esp-3);
   font-size: var(--tamanho-xs);
   color: var(--cor-texto-secundario);
-  flex-wrap: wrap;
+}
+.sessao__nome {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  text-align: right;
+}
+.sessao__papel {
+  font-size: var(--tamanho-xs);
+}
+.sessao .botao {
+  gap: var(--esp-1);
+}
+
+/* ---------------------------------------------------------------- app com sessão
+   Um único <nav class="nav-app">: barra inferior fixa no celular, coluna lateral
+   no desktop (prompt §7.1). Ícone + texto sempre (nunca só ícone). */
+.nav-app ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-app a {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  min-height: var(--alvo-minimo);
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--raio-md);
+  color: var(--cor-texto);
+  font-weight: var(--peso-medio);
+  text-decoration: none;
+}
+.nav-app a:hover {
+  background: var(--cor-primaria-tint);
+  color: var(--cor-primaria-escura);
+}
+.nav-app a[aria-current="page"] {
+  background: var(--cor-primaria-tint);
+  color: var(--cor-primaria-escura);
+  font-weight: var(--peso-negrito);
+  box-shadow: inset 4px 0 0 var(--cor-primaria);
+}
+.nav-app svg {
+  flex: none;
+}
+
+@media (max-width: 47.99em) {
+  .nav-app {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: var(--camada-navegacao);
+    background: var(--cor-superficie);
+    border-top: 1px solid var(--cor-borda-suave);
+    padding: var(--esp-1) var(--esp-1) calc(var(--esp-1) + env(safe-area-inset-bottom, 0px));
+  }
+  .nav-app ul {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--esp-1);
+  }
+  .nav-app a {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-height: 3.5rem;
+    padding: var(--esp-1);
+    font-size: 0.8125rem; /* 13px: rótulo curto sob o ícone; o ícone carrega a forma */
+    text-align: center;
+  }
+  .nav-app a[aria-current="page"] {
+    box-shadow: inset 0 3px 0 var(--cor-primaria);
+  }
+  /* o conteúdo e o foco nunca ficam sob a barra (2.4.11) */
+  .app--com-nav main > .container {
+    padding-bottom: calc(var(--esp-8) + 3rem);
+  }
+  html:has(.app--com-nav) {
+    scroll-padding-bottom: 5.5rem;
+  }
+  .sessao__nome {
+    display: none; /* nome continua na tela de conta; libera espaço no cabeçalho */
+  }
+}
+
+@media (min-width: 48em) {
+  /* cabeçalho e rodapé alinhados à grade com coluna lateral */
+  body:has(.app--com-nav) .cabecalho .container,
+  body:has(.app--com-nav) .rodape .container {
+    max-width: calc(var(--largura-conteudo) + 13.5rem);
+  }
+  .app--com-nav {
+    display: grid;
+    grid-template-columns: 13.5rem minmax(0, 1fr);
+    max-width: calc(var(--largura-conteudo) + 13.5rem);
+    margin-inline: auto;
+  }
+  .nav-app {
+    position: sticky;
+    top: 4.5rem;
+    align-self: start;
+    padding: var(--esp-5) var(--esp-2) var(--esp-5) var(--esp-4);
+  }
+  .nav-app ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--esp-1);
+  }
+}
+
+/* Foco programático no <h1> ao trocar de rota (useTitulo) anuncia a tela ao
+   leitor de tela; o h1 não é interativo, então não mostra anel (UX-02). */
+h1[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* perfil em linguagem leiga */
+.lista-perfil {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--esp-2);
+}
+.lista-perfil li {
+  position: relative;
+  padding-left: var(--esp-5);
+}
+.lista-perfil li::before {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  top: 0.55em;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--cor-secundaria);
 }
 
 .rodape {
@@ -310,4 +469,77 @@ hr {
   border: 0;
   border-top: 1px solid var(--cor-borda-suave);
   margin: var(--esp-5) 0;
+}
+
+/* sino de notificações (R4.7): alvo de 44 px; contagem também no nome acessível */
+.sino {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--alvo-minimo);
+  height: var(--alvo-minimo);
+  border-radius: var(--raio-md);
+  color: var(--cor-texto);
+}
+.sino:hover {
+  background: var(--cor-primaria-tint);
+}
+.sino[aria-current="page"] {
+  background: var(--cor-primaria-tint);
+  color: var(--cor-primaria-escura);
+}
+.sino__contagem {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 4px;
+  border-radius: var(--raio-pill);
+  background: var(--cor-erro);
+  color: var(--cor-sobre-erro);
+  font-size: 0.75rem;
+  font-weight: var(--peso-negrito);
+  line-height: 1.25rem;
+  text-align: center;
+}
+.notificacao--nova {
+  font-weight: var(--peso-medio);
+}
+.bloco-destaque {
+  background: var(--cor-aviso-fundo);
+  border: 1px solid var(--cor-aviso);
+  border-radius: var(--raio-lg);
+  padding: var(--esp-4);
+  margin-block: var(--esp-4);
+}
+.bloco-destaque h2 {
+  margin-top: 0;
+}
+
+/* telas de autenticação e leitura (R2.2) */
+.pagina-estreita {
+  max-width: 28rem;
+  margin-inline: auto;
+}
+.pagina-leitura {
+  max-width: var(--largura-leitura);
+}
+.qr-code {
+  display: block;
+  background: var(--material-claro); /* QR precisa de fundo claro também no tema escuro */
+  padding: var(--esp-2);
+  border-radius: var(--raio-md);
+  margin-block: var(--esp-3);
+}
+.segredo {
+  overflow-wrap: anywhere;
+  font-size: var(--tamanho-md);
+  letter-spacing: 0.08em;
+}
+
+/* página inicial: seções de largura total, sem o padding do container */
+main.main--inicio {
+  overflow-x: clip;
 }

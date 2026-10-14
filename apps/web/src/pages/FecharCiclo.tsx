@@ -6,7 +6,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Modal } from "../components/Modal";
 import { DIMENSAO, ESCALA, PAPEL, PARAMETRO } from "../utils/rotulos";
@@ -31,7 +31,7 @@ export function TabelaDiff({ diff, legenda }: { diff: DiffParametro[]; legenda: 
               <th scope="row">{PARAMETRO[d.campo].titulo}</th>
               <td>{PARAMETRO[d.campo].valor(d.antes === "—" ? null : d.antes)}</td>
               <td>{PARAMETRO[d.campo].valor(d.depois === "—" ? null : d.depois)}</td>
-              <td>{d.mudou ? "Muda" : d.aguardandoSegundoCiclo ? "Aguardando 2º ciclo para elevar (RN03)" : "Sem mudança"}</td>
+              <td>{d.mudou ? "Muda" : d.aguardandoSegundoCiclo ? "Aguardando 2º ciclo para elevar" : "Sem mudança"}</td>
             </tr>
           ))}
         </tbody>
@@ -68,7 +68,7 @@ export function FecharCiclo() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   if (ctx.dados.papel !== "DOCENTE") {
     return (
@@ -82,7 +82,7 @@ export function FecharCiclo() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Fechar ciclo" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhum ciclo pode ser fechado até o responsável autorizar (RN01).</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhum ciclo pode ser fechado até o responsável autorizar.</Alerta>
       </>
     );
   }
@@ -94,8 +94,8 @@ export function FecharCiclo() {
         <Alerta tom="sucesso" titulo={resultado.modoPedagogico ? "Nova versão vigente (modo pedagógico)" : "Enviado para validação clínica"} vivo>
           <p>
             {resultado.modoPedagogico
-              ? "Não há profissional de saúde vinculado, então a versão entra em vigor imediatamente e só a camada determinística roda (RN06)."
-              : "Enquanto o profissional não valida, os materiais continuam usando a versão vigente anterior. Sem resposta em 7 dias, ela permanece (RN05)."}
+              ? "Não há profissional de saúde vinculado, então a versão entra em vigor imediatamente e só a camada determinística roda."
+              : "Enquanto o profissional não valida, os materiais continuam usando a versão vigente anterior. Sem resposta em 7 dias, ela permanece."}
           </p>
         </Alerta>
         <Card titulo="O que mudou">
@@ -142,7 +142,7 @@ export function FecharCiclo() {
                 <li key={o.id}>
                   <div>
                     <strong>{DIMENSAO[o.dimensao].titulo}</strong>: {ESCALA[o.valorEscala]}
-                    {o.evidencia && <div className="meta">“{o.evidencia}”</div>}
+                    {o.evidencia && <div className="texto-apoio">“{o.evidencia}”</div>}
                   </div>
                   <Badge>{PAPEL[o.papelAutor]}</Badge>
                 </li>
@@ -152,14 +152,14 @@ export function FecharCiclo() {
 
           <h2>Proposta de parâmetros</h2>
           <Card>
-            <div className="chips" style={{ marginBottom: "var(--esp-3)" }}>
+            <div className="chips chips--secao">
               <Badge tom={previa.dados.previa.modoPedagogico ? "info" : "aviso"}>
-                {previa.dados.previa.modoPedagogico ? "Modo pedagógico: entra em vigor ao fechar (RN06)" : "Vai para validação clínica ao fechar (RF06)"}
+                {previa.dados.previa.modoPedagogico ? "Modo pedagógico: entra em vigor ao fechar" : "Vai para validação clínica ao fechar"}
               </Badge>
             </div>
             <TabelaDiff diff={previa.dados.previa.diff} legenda="Parâmetros: vigente → proposto" />
-            <p className="meta" style={{ marginTop: "var(--esp-3)" }}>
-              Elevar um parâmetro exige 2 ciclos consecutivos de melhora; reduzir é imediato. O sistema erra a favor do material mais acessível (RN03).
+            <p className="texto-apoio u-mt-3">
+              Elevar um parâmetro exige 2 ciclos consecutivos de melhora; reduzir é imediato. O sistema erra a favor do material mais acessível.
             </p>
           </Card>
 

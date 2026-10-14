@@ -10,7 +10,7 @@ import { Botao } from "./Botao";
 import { Campo } from "./Campo";
 import { Escala3 } from "./Escala3";
 import { Modal } from "./Modal";
-import { Alerta, ResumoErros, Carregando, EstadoVazio, Badge } from "./Feedback";
+import { Alerta, ResumoErros, Carregando, EstadoVazio, Badge, Esqueleto, VazioSecao } from "./Feedback";
 import { MaterialAdaptado } from "./MaterialAdaptado";
 import { adaptar } from "@pei-vivo/motor-adaptacao";
 import { PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA } from "../mocks/dados";
@@ -139,6 +139,22 @@ describe("Feedback", () => {
     expect(container.querySelector(".alerta__icone")).toHaveAttribute("aria-hidden", "true");
     await semViolacoesAxe(container);
   });
+  it("Esqueleto anuncia o carregamento em texto, marca aria-busy e esconde as formas do leitor de tela", async () => {
+    const { container } = render(
+      <>
+        <Esqueleto texto="Carregando seus estudantes…" forma="cartao" itens={2} />
+        <VazioSecao>Ninguém leu as notas reservadas até agora.</VazioSecao>
+      </>
+    );
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("Carregando seus estudantes…");
+    expect(status).toHaveAttribute("aria-busy", "true");
+    const itens = container.querySelectorAll(".esqueleto__item");
+    expect(itens).toHaveLength(2);
+    itens.forEach((i) => expect(i).toHaveAttribute("aria-hidden", "true"));
+    expect(screen.getByText("Ninguém leu as notas reservadas até agora.")).toHaveClass("vazio-secao");
+    await semViolacoesAxe(container);
+  });
   it("ResumoErros recebe foco e cada item leva ao campo", async () => {
     const { container } = render(
       <>
@@ -163,5 +179,53 @@ describe("MaterialAdaptado (D-10)", () => {
     expect(screen.getAllByRole("list").length).toBeGreaterThan(0);
     expect(screen.getByText("Leia o texto acima.")).toBeInTheDocument();
     await semViolacoesAxe(container);
+  });
+});
+
+describe("MaterialAdaptado — apoios de leitura (D-43)", () => {
+  it("etapa única + vocabulário básico: pictograma por etapa e 'Palavras para saber'", async () => {
+    const adaptado = adaptar(TEXTO_CICLO_DA_AGUA, PARAMETROS_CENARIO_A);
+    const { container } = render(<MaterialAdaptado adaptado={adaptado} titulo="Ciclo da água" />);
+    expect(container.querySelector('[data-pictograma="LER"]')).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector('[data-pictograma="CIRCULAR"]')).not.toBeNull();
+    const glossario = screen.getByRole("region", { name: "Palavras para saber" });
+    expect(glossario.querySelector("h3")).not.toBeNull(); // h2 é o título do material
+    expect(screen.getByText("ciclo").tagName).toBe("DT");
+    await semViolacoesAxe(container);
+  });
+
+  it("vocabulário original e várias etapas juntas: sem pictograma nem glossário", () => {
+    const adaptado = adaptar(TEXTO_CICLO_DA_AGUA, { ...PARAMETROS_CENARIO_A, nivelVocabulario: "ORIGINAL", formatoEnunciado: "MULTIPLAS_ETAPAS" });
+    const { container } = render(<MaterialAdaptado adaptado={adaptado} />);
+    expect(container.querySelector(".pictograma")).toBeNull();
+    expect(screen.queryByRole("region", { name: "Palavras para saber" })).not.toBeInTheDocument();
+  });
+
+  it("material gravado antes do D-43 (sem apoios) continua igual", () => {
+    const { apoios: _, ...antigo } = adaptar(TEXTO_CICLO_DA_AGUA, PARAMETROS_CENARIO_A);
+    const { container } = render(<MaterialAdaptado adaptado={antigo} />);
+    expect(container.querySelector(".pictograma")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Ouvir/ })).not.toBeInTheDocument();
+  });
+
+  it("sem voz no navegador não mostra 'Ouvir'; com voz, lê o trecho em pt-BR e vira 'Parar'", async () => {
+    const adaptado = adaptar(TEXTO_CICLO_DA_AGUA, PARAMETROS_CENARIO_A);
+    const semVoz = render(<MaterialAdaptado adaptado={adaptado} />);
+    expect(screen.queryByRole("button", { name: /Ouvir/ })).not.toBeInTheDocument();
+    semVoz.unmount();
+
+    const speak = vi.fn();
+    vi.stubGlobal("speechSynthesis", { speak, cancel: vi.fn() });
+    vi.stubGlobal("SpeechSynthesisUtterance", class { lang = ""; rate = 1; constructor(public text: string) {} });
+    try {
+      const { container } = render(<MaterialAdaptado adaptado={adaptado} />);
+      await userEvent.click(screen.getByRole("button", { name: "Ouvir o trecho 1" }));
+      expect(speak).toHaveBeenCalledTimes(1);
+      expect(speak.mock.calls[0]![0]).toMatchObject({ lang: "pt-BR", text: expect.stringContaining("ciclo da água") });
+      expect(screen.getByRole("button", { name: "Parar o trecho 1" })).toBeInTheDocument();
+      await semViolacoesAxe(container);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

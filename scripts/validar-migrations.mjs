@@ -12,10 +12,20 @@ const dirMigrations = join(raiz, "supabase", "migrations");
 const stubSupabase = `
   create schema if not exists auth;
   create table if not exists auth.users (id uuid primary key);
+  -- Mesma leitura que o Supabase faz: claim.sub legado ou request.jwt.claims (JSON).
+  create or replace function auth.jwt() returns jsonb language sql stable as $$
+    select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
+  $$;
   create or replace function auth.uid() returns uuid language sql stable as $$
-    select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
+    select coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''), auth.jwt() ->> 'sub')::uuid
   $$;
   create role anon nologin; create role authenticated nologin; create role service_role nologin;
+  grant usage on schema auth to anon, authenticated;
+  grant execute on all functions in schema auth to anon, authenticated;
+  grant usage on schema public to anon, authenticated;
+  -- Padrão do Supabase: tabelas novas de public expostas a anon/authenticated (a 0004 revoga).
+  alter default privileges in schema public grant all on tables to anon, authenticated;
+  alter default privileges in schema public grant execute on functions to anon, authenticated;
 `;
 
 const db = new PGlite();

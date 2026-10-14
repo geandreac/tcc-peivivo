@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { mensagemAmigavel } from "../services/erros";
-import { Botao } from "./Botao";
+import { ehErroApi, mensagemAmigavel } from "../services/erros";
+import { Botao, LinkBotao } from "./Botao";
 
 /* ------------------------------------------------------------------ Alerta */
 type Tom = "info" | "sucesso" | "aviso" | "erro";
@@ -79,14 +79,41 @@ export function Carregando({ texto = "Carregando…" }: { texto?: string }) {
   );
 }
 
+/**
+ * Esqueleto (Fluent 2 Skeleton; Apple HIG Loading): só onde a forma do conteúdo é conhecida
+ * (listas e cartões). Reserva a altura aproximada do que vai chegar, evitando que a página
+ * "pule" (web.dev CLS). Para leitor de tela é um status com texto, como `Carregando`.
+ */
+export function Esqueleto({ texto = "Carregando…", itens = 3, forma = "linha" }: { texto?: string; itens?: number; forma?: "linha" | "cartao" }) {
+  return (
+    <div className={`esqueleto esqueleto--${forma}`} role="status" aria-live="polite" aria-busy="true">
+      <span className="sr-only">{texto}</span>
+      {Array.from({ length: itens }, (_, i) => (
+        <div key={i} className="esqueleto__item" aria-hidden="true">
+          {forma === "cartao" && <span className="esqueleto__avatar" />}
+          <span className="esqueleto__corpo">
+            <span className="esqueleto__traco esqueleto__traco--titulo" />
+            <span className="esqueleto__traco" />
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function EstadoVazio({ titulo, children, acao }: { titulo: string; children?: ReactNode; acao?: ReactNode }) {
   return (
     <div className="estado-vazio">
       <h2>{titulo}</h2>
       {children && <div>{children}</div>}
-      {acao && <div className="grupo-botoes" style={{ justifyContent: "center" }}>{acao}</div>}
+      {acao && <div className="grupo-botoes grupo-botoes--centro">{acao}</div>}
     </div>
   );
+}
+
+/** "Nada aqui ainda" dentro de uma seção que já tem título: frase de apoio em moldura tracejada. */
+export function VazioSecao({ children }: { children: ReactNode }) {
+  return <p className="vazio-secao">{children}</p>;
 }
 
 export function ErroCarregamento({ erro, tentarNovamente }: { erro: unknown; tentarNovamente?: (() => void) | undefined }) {
@@ -101,6 +128,24 @@ export function ErroCarregamento({ erro, tentarNovamente }: { erro: unknown; ten
         </div>
       )}
     </Alerta>
+  );
+}
+
+/**
+ * Página inteira que não carregou: sempre com `h1` (1.3.1, 2.4.6) e caminho de
+ * volta. Negado/não encontrado são definitivos → sem "Tentar novamente".
+ */
+export function FalhaPagina({ erro, tentarNovamente }: { erro: unknown; tentarNovamente?: (() => void) | undefined }) {
+  const codigo = ehErroApi(erro) ? erro.codigo : null;
+  const definitivo = codigo === "NEGADO" || codigo === "NAO_ENCONTRADO";
+  return (
+    <>
+      <h1>{codigo === "NEGADO" ? "Acesso não permitido" : codigo === "NAO_ENCONTRADO" ? "Não encontrado" : "Não foi possível abrir esta página"}</h1>
+      <ErroCarregamento erro={erro} tentarNovamente={definitivo ? undefined : tentarNovamente} />
+      <LinkBotao to="/painel" variante="secundario">
+        Voltar para meus estudantes
+      </LinkBotao>
+    </>
   );
 }
 

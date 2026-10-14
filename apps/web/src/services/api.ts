@@ -16,13 +16,18 @@ import type {
   Estudante,
   ExportacaoEstudante,
   Material,
+  Notificacao,
   NotaClinica,
   ObservacaoRegistro,
   Papel,
   Pendencia,
+  ResumoEscola,
   ResultadoDesfecho,
   ResultadoFechamento,
   Usuario,
+  CadastroSegundoFator,
+  NivelSessao,
+  ResultadoEntrada,
   VersaoPerfil,
   Vinculo,
 } from "./tipos";
@@ -45,14 +50,51 @@ export interface NovoVinculo {
   estudanteId: string;
   papel: Papel;
   registroConselho?: string | null;
+  /** D-25: vínculo de responsável só com conferência presencial declarada pela coordenação. */
+  conferidoPresencialmente?: boolean;
+}
+
+export interface NovoConvite {
+  email: string;
+  nome?: string;
+  papel: Papel;
+  /** Obrigatório para RESPONSAVEL e PROFISSIONAL_SAUDE. */
+  estudanteId?: string | null;
+  registroConselho?: string | null;
+  conferidoPresencialmente?: boolean;
+}
+
+export interface RespostaConvite {
+  emailEnviado: boolean;
+  avisos: string[];
 }
 
 export interface PeiVivoApi {
-  // sessão (D-16: modo demonstração)
+  /** "demonstracao" = mock (D-16/D-17); "real" = Supabase Auth + PostgREST (D-32). */
+  readonly modo: "demonstracao" | "real";
+
+  // sessão — modo demonstração (D-16)
   listarPerfisDemo(): Promise<Usuario[]>;
   entrar(usuarioId: string): Promise<Usuario>;
   sair(): Promise<void>;
   usuarioAtual(): Usuario | null;
+
+  // sessão — modo real (D-32): convite, senha, segundo fator, recuperação
+  /** Restaura a sessão salva pelo Auth (ao abrir o app ou voltar de um link de e-mail). */
+  carregarSessao(): Promise<Usuario | null>;
+  entrarComSenha(email: string, senha: string): Promise<ResultadoEntrada>;
+  nivelSessao(): Promise<{ atual: NivelSessao; temFatorCadastrado: boolean }>;
+  iniciarCadastroSegundoFator(): Promise<CadastroSegundoFator>;
+  /** Verifica o código de 6 dígitos: conclui o cadastro (fatorId) ou o desafio do fator existente. */
+  verificarSegundoFator(codigo: string, fatorId?: string): Promise<void>;
+  pedirRecuperacaoSenha(email: string): Promise<void>;
+  /**
+   * Define a nova senha da sessão atual (link de convite ou de recuperação). No
+   * convite, `versaoTermosAceita` registra o aceite dos termos (D-27).
+   */
+  definirSenha(novaSenha: string, versaoTermosAceita?: string): Promise<void>;
+  /** "Sair de todos os dispositivos" (F13). */
+  sairDeTodos(): Promise<void>;
 
   // estudantes e vínculos
   listarEstudantes(): Promise<Estudante[]>;
@@ -63,6 +105,14 @@ export interface PeiVivoApi {
   cadastrarEstudante(dados: NovoEstudante): Promise<Estudante>;
   vincular(dados: NovoVinculo): Promise<Vinculo>;
   desativarVinculo(vinculoId: string): Promise<void>;
+  /** D-24: o responsável confirma (ou recusa) o profissional proposto pela coordenação. */
+  confirmarVinculo(vinculoId: string, aceitar: boolean): Promise<Vinculo>;
+  /** R2.1: coordenação convida por e-mail (Edge Function `convidar` no sistema real). */
+  convidar(dados: NovoConvite): Promise<RespostaConvite>;
+
+  // notificações (D-28)
+  listarNotificacoes(): Promise<Notificacao[]>;
+  marcarNotificacoesLidas(ids?: string[]): Promise<void>;
 
   // consentimento (RN01, RN08)
   obterConsentimento(estudanteId: string): Promise<Consentimento | null>;
@@ -83,6 +133,8 @@ export interface PeiVivoApi {
   fecharCiclo(cicloId: string): Promise<ResultadoFechamento>;
   validarVersao(versaoId: string, decisao: "APROVAR" | "AJUSTE", justificativa?: string): Promise<VersaoPerfil>;
   listarPendencias(): Promise<Pendencia[]>;
+  /** R4.5: só coordenação; só contagens e motivos, nunca conteúdo. */
+  resumoEscola(): Promise<ResumoEscola>;
 
   // materiais (RF08–RF13)
   listarMateriais(estudanteId: string): Promise<Material[]>;

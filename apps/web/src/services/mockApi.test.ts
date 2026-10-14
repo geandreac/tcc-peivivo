@@ -265,3 +265,149 @@ describe("RF15 / D-05 / D-06 — LGPD e auditoria", () => {
     await esperaNegado(api.listarEstudantes(), "NAO_AUTENTICADO");
   });
 });
+
+describe("Reformulação R1 — regras alinhadas às políticas v3 (packages/politicas)", () => {
+  async function docente2NoEstudanteA() {
+    await api.entrar(ID.coordenacao);
+    await api.vincular({ usuarioId: ID.docente2, estudanteId: ID.estudanteA, papel: "DOCENTE" });
+    await api.entrar(ID.docente2);
+  }
+  it("S-18/S-19 D-34: outro docente não vê, não aprova, não descarta o rascunho do colega", async () => {
+    await docente2NoEstudanteA();
+    const visiveis = await api.listarMateriais(ID.estudanteA);
+    expect(visiveis.every((m) => m.statusAprovacao === "APROVADO")).toBe(true);
+    await esperaNegado(api.obterMaterial(ID.materialRascunho), "NAO_ENCONTRADO");
+    await esperaNegado(api.aprovarMaterial(ID.materialRascunho));
+    await esperaNegado(api.descartarMaterial(ID.materialRascunho));
+  });
+  it("S-23: desfecho só pelo docente autor do material", async () => {
+    await docente2NoEstudanteA();
+    await esperaNegado(api.registrarDesfecho(ID.materialAprovado, "ALCANCADO"));
+  });
+  it("M-01/S-25 D-35: aprovar deixa UMA versão vigente; a anterior vira SUBSTITUIDA", async () => {
+    await api.entrar(ID.docente);
+    const ciclo = await api.obterCicloAberto(ID.estudanteA);
+    await api.registrarObservacao(ciclo!.id, { dimensao: "FADIGA_TAREFA", valorEscala: "REDUZIDA" });
+    const { versao } = await api.fecharCiclo(ciclo!.id);
+    await api.entrar(ID.profissional);
+    await api.validarVersao(versao.id, "APROVAR");
+    const versoes = await api.listarVersoes(ID.estudanteA);
+    expect(versoes.filter((v) => v.statusValidacao === "VIGENTE").map((v) => v.id)).toEqual([versao.id]);
+    expect(versoes.find((v) => v.id === ID.versao3)?.statusValidacao).toBe("SUBSTITUIDA");
+  });
+  it("D-35: versão já decidida ou expirada não é decidida de novo", async () => {
+    await api.entrar(ID.docente);
+    const ciclo = await api.obterCicloAberto(ID.estudanteA);
+    await api.registrarObservacao(ciclo!.id, { dimensao: "FADIGA_TAREFA", valorEscala: "REDUZIDA" });
+    const { versao } = await api.fecharCiclo(ciclo!.id);
+    await api.entrar(ID.profissional);
+    await api.validarVersao(versao.id, "AJUSTE", "Rever a fadiga.");
+    await esperaNegado(api.validarVersao(versao.id, "APROVAR"), "CONFLITO");
+  });
+});
+
+describe("Reformulação R4 — privacidade (D-30/D-34)", () => {
+  it("docente vê só o próprio vínculo; responsável vê todos, com nome", async () => {
+    await api.entrar(ID.docente);
+    expect(await api.listarVinculos(ID.estudanteA)).toHaveLength(1);
+    await api.entrar(ID.responsavel);
+    const todos = await api.listarVinculos(ID.estudanteA);
+    expect(todos.length).toBeGreaterThan(1);
+    expect(todos.every((v) => typeof v.nomeUsuario === "string")).toBe(true);
+  });
+  it("leitura de nota clínica entra na trilha: responsável vê quem leu; coordenação não vê o evento clínico", async () => {
+    await api.entrar(ID.profissional);
+    await api.listarNotasClinicas(ID.estudanteA);
+    await api.entrar(ID.responsavel);
+    const daFamilia = await api.listarAuditoria(ID.estudanteA);
+    expect(daFamilia.find((e) => e.evento === "LEITURA_NOTA_CLINICA")?.autorNome).toBe("Camila (fictícia)");
+    await api.entrar(ID.coordenacao);
+    expect((await api.listarAuditoria(ID.estudanteA)).some((e) => e.evento === "LEITURA_NOTA_CLINICA")).toBe(false);
+  });
+});
+
+describe("Reformulação R4.4/R4.7 — profissional confirmado pela família; notificações (D-24, D-28)", () => {
+  it("S-11 negado: ninguém vincula a si mesmo; família só propõe profissional de saúde", async () => {
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.vincular({ usuarioId: ID.coordenacao, estudanteId: ID.estudanteA, papel: "DOCENTE" }));
+    await api.entrar(ID.responsavel);
+    await esperaNegado(api.vincular({ usuarioId: ID.docente2, estudanteId: ID.estudanteA, papel: "DOCENTE" }));
+  });
+  it("S-14 negado: coordenação não encerra o vínculo do responsável", async () => {
+    await api.entrar(ID.coordenacao);
+    const resp = (await api.listarVinculos(ID.estudanteA)).find((v) => v.papel === "RESPONSAVEL")!;
+    await esperaNegado(api.desativarVinculo(resp.id));
+  });
+  it("proposta da coordenação fica pendente, sem acesso, até a família confirmar; a família é notificada", async () => {
+    await api.entrar(ID.coordenacao);
+    const v = await api.vincular({ usuarioId: ID.fono, estudanteId: ID.estudanteA, papel: "PROFISSIONAL_SAUDE", registroConselho: "CRFa-DEV-2" });
+    expect(v.status).toBe("PENDENTE_RESPONSAVEL");
+    await esperaNegado(api.confirmarVinculo(v.id, true)); // coordenação não confirma
+    await api.entrar(ID.fono);
+    await esperaNegado(api.obterEstudante(ID.estudanteA)); // pendente não vê nada
+    await api.entrar(ID.responsavel);
+    expect((await api.listarNotificacoes()).map((n) => n.tipo)).toContain("PROFISSIONAL_AGUARDANDO_CONFIRMACAO");
+    await api.confirmarVinculo(v.id, true);
+    await esperaNegado(api.confirmarVinculo(v.id, true), "CONFLITO");
+    await api.entrar(ID.fono);
+    expect((await api.obterEstudante(ID.estudanteA)).id).toBe(ID.estudanteA);
+    expect((await api.listarNotificacoes()).map((n) => n.tipo)).toContain("VINCULO_ATIVADO");
+  });
+  it("família recusa a proposta: ninguém ganha acesso; família pode remover profissional ativo", async () => {
+    await api.entrar(ID.coordenacao);
+    const v = await api.vincular({ usuarioId: ID.fono, estudanteId: ID.estudanteA, papel: "PROFISSIONAL_SAUDE", registroConselho: "CRFa-DEV-2" });
+    await api.entrar(ID.responsavel);
+    expect((await api.confirmarVinculo(v.id, false)).status).toBe("RECUSADO");
+    const camila = (await api.listarVinculos(ID.estudanteA)).find((x) => x.usuarioId === ID.profissional)!;
+    await api.desativarVinculo(camila.id);
+    await api.entrar(ID.profissional);
+    await esperaNegado(api.obterEstudante(ID.estudanteA));
+  });
+  it("F10: revogação avisa todos os vinculados, menos quem revogou; notificações são privadas e marcáveis", async () => {
+    await api.entrar(ID.responsavel);
+    await api.revogarConsentimento(ID.estudanteA);
+    expect((await api.listarNotificacoes()).some((n) => n.tipo === "CONSENTIMENTO_REVOGADO")).toBe(false);
+    await api.entrar(ID.docente);
+    const minhas = await api.listarNotificacoes();
+    expect(minhas.every((n) => n.usuarioId === ID.docente)).toBe(true);
+    expect(minhas.filter((n) => n.tipo === "CONSENTIMENTO_REVOGADO" && !n.lidaEm)).toHaveLength(1);
+    await api.marcarNotificacoesLidas();
+    expect((await api.listarNotificacoes()).every((n) => n.lidaEm)).toBe(true);
+  });
+});
+
+describe("Reformulação R4.5 — painel da escola (sem dado clínico)", () => {
+  it("negado a quem não é coordenação", async () => {
+    await api.entrar(ID.docente);
+    await esperaNegado(api.resumoEscola());
+    await api.entrar(ID.responsavel);
+    await esperaNegado(api.resumoEscola());
+  });
+  it("coordenação recebe só contagens e motivos — nenhum campo de conteúdo", async () => {
+    await api.entrar(ID.coordenacao);
+    const r = await api.resumoEscola();
+    expect(r.totalEstudantes).toBe(2);
+    expect(r.semConsentimento).toBe(1);
+    expect(r.pendencias.map((p) => p.motivo)).toContain("SEM_CONSENTIMENTO");
+    const texto = JSON.stringify(r);
+    for (const proibido of ["evidencia", "conteudo", "parametros", "textoOriginal", "laudo"]) expect(texto).not.toContain(proibido);
+  });
+});
+
+describe("R2.1 — convite por e-mail (coordenação)", () => {
+  it("negado a quem não é coordenação; responsável exige conferência; profissional exige registro", async () => {
+    await api.entrar(ID.docente);
+    await esperaNegado(api.convidar({ email: "novo@example.test", papel: "DOCENTE" }));
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.convidar({ email: "sem-arroba", papel: "DOCENTE" }), "VALIDACAO");
+    await esperaNegado(api.convidar({ email: "mae@example.test", papel: "RESPONSAVEL", estudanteId: ID.estudanteA }), "VALIDACAO");
+    await esperaNegado(api.convidar({ email: "fono@example.test", papel: "PROFISSIONAL_SAUDE", estudanteId: ID.estudanteA }), "VALIDACAO");
+  });
+  it("profissional convidado fica aguardando a família (D-24)", async () => {
+    await api.entrar(ID.coordenacao);
+    const r = await api.convidar({ email: "Fono.Nova@Example.TEST", nome: "Fono nova (fictícia)", papel: "PROFISSIONAL_SAUDE", estudanteId: ID.estudanteA, registroConselho: "CRFa-NOVO" });
+    expect(r.emailEnviado).toBe(true);
+    const v = (await api.listarVinculos(ID.estudanteA)).find((x) => x.nomeUsuario === "Fono nova (fictícia)");
+    expect(v?.status).toBe("PENDENTE_RESPONSAVEL");
+  });
+});

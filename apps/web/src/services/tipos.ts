@@ -14,19 +14,44 @@ export type { DimensaoObservada, EscalaObservacao, ParametrosAdaptacao, TextoAda
 
 export type Papel = "RESPONSAVEL" | "DOCENTE" | "PROFISSIONAL_SAUDE" | "COORDENACAO";
 export type StatusConsentimento = "ATIVO" | "REVOGADO" | "EXPIRADO";
-export type StatusValidacao = "PENDENTE" | "VIGENTE" | "EM_REVISAO" | "EXPIRADA";
+export type StatusValidacao = "PENDENTE" | "VIGENTE" | "EM_REVISAO" | "EXPIRADA" | "SUBSTITUIDA";
 export type StatusAprovacao = "RASCUNHO" | "APROVADO" | "DESCARTADO";
 export type StatusCiclo = "ABERTO" | "FECHADO";
-export type StatusVinculo = "ATIVO" | "INATIVO";
+/** D-24/D-36: profissional proposto pela coordenação aguarda a família. */
+export type StatusVinculo = "PENDENTE_RESPONSAVEL" | "ATIVO" | "RECUSADO" | "ENCERRADO";
 export type ResultadoDesfecho = "ALCANCADO" | "PARCIAL" | "NAO_ALCANCADO";
-export type EscopoConsentimento = "observacao_pedagogica" | "observacao_domiciliar" | "geracao_material";
+/** D-27: escopos com efeito real (validacao_clinica habilita profissional e IA, RN06). */
+export type EscopoConsentimento = "observacao_pedagogica" | "observacao_domiciliar" | "validacao_clinica" | "geracao_material";
 
 export interface Usuario {
   id: string;
   nome: string;
   email: string;
-  /** D-08: só COORDENACAO usa. */
+  /** D-08/D-23: COORDENACAO quando a pessoa coordena alguma escola. */
   papelInstitucional: Papel | null;
+  /** D-23: escola que a pessoa coordena (usada no cadastro de estudante). */
+  escolaId?: string | null;
+  /** D-32: profissional de saúde e coordenação só operam com segundo fator (aal2). */
+  exigeSegundoFator?: boolean;
+}
+
+/** D-32: nível de garantia da sessão (Supabase Auth). */
+export type NivelSessao = "aal1" | "aal2";
+
+export interface ResultadoEntrada {
+  usuario: Usuario;
+  /** Precisa do código do aplicativo autenticador antes de continuar. */
+  exigeSegundoFator: boolean;
+  /** Já tem um fator cadastrado (só verificar) ou precisa cadastrar o primeiro. */
+  temFatorCadastrado: boolean;
+}
+
+export interface CadastroSegundoFator {
+  fatorId: string;
+  /** Imagem do QR code (data URL SVG) para o aplicativo autenticador. */
+  qrCode: string;
+  /** Mesmo segredo em texto, para quem não consegue usar a câmera (alternativa acessível). */
+  segredo: string;
 }
 
 export interface Estudante {
@@ -47,6 +72,8 @@ export interface Vinculo {
   dataVinculo: string;
   status: StatusVinculo;
   registroConselho: string | null;
+  /** Nome da pessoa vinculada (D-34: o responsável vê quem tem acesso ao filho). */
+  nomeUsuario?: string;
 }
 
 export interface Consentimento {
@@ -140,7 +167,51 @@ export type EventoAuditoria =
   | "CICLO_FECHADO"
   | "EXPORTACAO"
   | "EXCLUSAO"
-  | "CADASTRO";
+  | "CADASTRO"
+  | "LEITURA_NOTA_CLINICA"
+  | "NOTA_CLINICA_REGISTRADA"
+  | "VINCULO_PROPOSTO"
+  | "VINCULO_CONFIRMADO"
+  | "VINCULO_RECUSADO"
+  | "VERSAO_PROPOSTA"
+  | "VERSAO_AJUSTADA"
+  | "VERSAO_VIGENTE_SEM_VALIDACAO"
+  | "VERSAO_EXPIRADA"
+  | "REGISTRO_VERIFICADO";
+
+/**
+ * R4.5 — painel da escola (coordenação): só contagens e motivos de pendência.
+ * Nenhum conteúdo de observação, nota, perfil ou material (prompt §6.5).
+ */
+export type MotivoPendenciaEscola = "SEM_CONSENTIMENTO" | "SEM_PROFISSIONAL" | "VALIDACAO_ATRASADA" | "CICLO_PARADO";
+export interface ResumoEscola {
+  totalEstudantes: number;
+  comConsentimento: number;
+  semConsentimento: number;
+  semProfissional: number;
+  validacoesAtrasadas: number;
+  ciclosParados: number;
+  pendencias: { estudanteId: string; nome: string; motivo: MotivoPendenciaEscola; desde: string | null }[];
+}
+
+/** D-28: conteúdo tipado — a frase é montada pelo app (utils/rotulos), sem texto livre. */
+export type TipoNotificacao =
+  | "CONSENTIMENTO_CONCEDIDO"
+  | "CONSENTIMENTO_REVOGADO"
+  | "PROFISSIONAL_AGUARDANDO_CONFIRMACAO"
+  | "VINCULO_ATIVADO"
+  | "VALIDACAO_PENDENTE"
+  | "REVISAO_SOLICITADA"
+  | "VALIDACAO_EXPIRADA";
+
+export interface Notificacao {
+  id: string;
+  usuarioId: string;
+  tipo: TipoNotificacao;
+  estudanteId: string | null;
+  criadaEm: string;
+  lidaEm: string | null;
+}
 
 export interface Auditoria {
   id: string;
@@ -148,19 +219,16 @@ export interface Auditoria {
   entidadeId: string;
   evento: EventoAuditoria;
   autorId: string | null;
+  /** Nome de quem fez (a RPC fn_listar_auditoria já devolve; "Sistema" quando automático). */
+  autorNome?: string;
   data: string;
   detalhes: Record<string, unknown>;
 }
 
 /** Diferença vigente → proposta, mostrada ao fechar o ciclo (HU-D.02). */
-export interface DiffParametro {
-  campo: keyof ParametrosAdaptacao;
-  antes: string;
-  depois: string;
-  mudou: boolean;
-  /** RN03: dimensão AMPLIADA há 1 ciclo só — aguarda o 2º para elevar. */
-  aguardandoSegundoCiclo: boolean;
-}
+/** Contrato único com a Edge Function fechar-ciclo (D-31). */
+export type { DiffParametro } from "@pei-vivo/contratos";
+import type { DiffParametro } from "@pei-vivo/contratos";
 
 export interface ResultadoFechamento {
   versao: VersaoPerfil;

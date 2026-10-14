@@ -6,7 +6,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros } from "../components/Feedback";
+import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPagina } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { TabelaDiff } from "./FecharCiclo";
@@ -42,7 +42,8 @@ export function ValidarParametros() {
     return { versoes, vigente, observacoes };
   }, [id, podeLer]);
 
-  const pendente = dados.dados?.versoes.find((v) => v.statusValidacao === "PENDENTE" || v.statusValidacao === "EM_REVISAO" || v.statusValidacao === "EXPIRADA");
+  // D-35: só a proposta PENDENTE é decidida; expirada ou em revisão aparece no histórico.
+  const pendente = dados.dados?.versoes.find((v) => v.statusValidacao === "PENDENTE");
 
   const validar = useMutacao(async (decisao: "APROVAR" | "AJUSTE") => {
     if (decisao === "AJUSTE" && !justificativa.trim()) {
@@ -58,13 +59,13 @@ export function ValidarParametros() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   if (ctx.dados.papel !== "PROFISSIONAL_SAUDE") {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Validar parâmetros" />
-        <Alerta tom="info" titulo="Só o profissional de saúde valida">A validação clínica incide sobre o conjunto de parâmetros do ciclo (RF06, RN07).</Alerta>
+        <Alerta tom="info" titulo="Só o profissional de saúde valida">A validação clínica incide sobre o conjunto de parâmetros do ciclo.</Alerta>
       </>
     );
   }
@@ -72,7 +73,7 @@ export function ValidarParametros() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Validar parâmetros" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Os dados deste estudante não estão disponíveis (RN01/RN08).</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">Os dados deste estudante não estão disponíveis.</Alerta>
       </>
     );
   }
@@ -93,13 +94,10 @@ export function ValidarParametros() {
       {dados.dados && pendente && (
         <>
           <Card>
-            <div className="chips" style={{ marginBottom: "var(--esp-3)" }}>
+            <div className="chips chips--secao">
               <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>{STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>
               <span className="meta">Ciclo {pendente.numeroCiclo} · proposta gerada em {formatarDataHora(pendente.createdAt)}</span>
             </div>
-            {pendente.statusValidacao === "EXPIRADA" && (
-              <Alerta tom="aviso" titulo="Prazo de 7 dias vencido">Os parâmetros anteriores foram mantidos (RN05). Você ainda pode validar esta versão agora.</Alerta>
-            )}
             {pendente.justificativaRevisao && (
               <Alerta tom="info" titulo="Ajuste solicitado anteriormente">{pendente.justificativaRevisao}</Alerta>
             )}
@@ -108,14 +106,14 @@ export function ValidarParametros() {
 
           <h2>Observações que geraram a proposta</h2>
           <ul className="lista-simples" aria-label="Observações do ciclo">
-            {dados.dados.observacoes.filter((o) => o.cicloId === pendente.cicloOrigemId).length === 0 && <li className="meta">Sem observações vinculadas a este ciclo.</li>}
+            {dados.dados.observacoes.filter((o) => o.cicloId === pendente.cicloOrigemId).length === 0 && <li className="texto-apoio">Sem observações vinculadas a este ciclo.</li>}
             {dados.dados.observacoes
               .filter((o) => o.cicloId === pendente.cicloOrigemId)
               .map((o) => (
                 <li key={o.id}>
                   <div>
                     <strong>{DIMENSAO[o.dimensao].titulo}</strong>: {ESCALA[o.valorEscala]}
-                    {o.evidencia && <div className="meta">“{o.evidencia}”</div>}
+                    {o.evidencia && <div className="texto-apoio">“{o.evidencia}”</div>}
                   </div>
                   <Badge>{PAPEL[o.papelAutor]}</Badge>
                 </li>

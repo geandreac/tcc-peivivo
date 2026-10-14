@@ -3,7 +3,7 @@ import { api, type Pendencia } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
 import { useSessao } from "../hooks/useSessao";
 import { useTitulo } from "../hooks/useTitulo";
-import { Badge, Carregando, ErroCarregamento, EstadoVazio } from "../components/Feedback";
+import { Badge, Esqueleto, ErroCarregamento, EstadoVazio } from "../components/Feedback";
 import { LinkBotao } from "../components/Botao";
 import { STATUS_VALIDACAO } from "../utils/rotulos";
 import { formatarDataHora } from "../utils/datas";
@@ -19,11 +19,11 @@ export function Pendencias() {
       <div className="cabecalho-pagina">
         <div>
           <h1>Pendências de validação</h1>
-          <p>Versões de perfil aguardando o profissional de saúde. Sem resposta em 7 dias, a versão anterior permanece vigente (RN05).</p>
+          <p>Versões de perfil aguardando o profissional de saúde. Sem resposta em 7 dias, a versão anterior permanece vigente.</p>
         </div>
       </div>
 
-      {pendencias.carregando && <Carregando />}
+      {pendencias.carregando && <Esqueleto texto="Carregando pendências…" />}
       {pendencias.erro && <ErroCarregamento erro={pendencias.erro} tentarNovamente={pendencias.recarregar} />}
       {pendencias.dados && pendencias.dados.length === 0 && (
         <EstadoVazio titulo="Nenhuma pendência">

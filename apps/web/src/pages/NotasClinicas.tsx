@@ -5,7 +5,7 @@ import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros } from "../components/Feedback";
+import { Alerta, Card, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { formatarDataHora } from "../utils/datas";
@@ -38,7 +38,7 @@ export function NotasClinicas() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const negado = ehErroApi(notas.erro) && notas.erro.codigo === "NEGADO";
 
@@ -49,13 +49,13 @@ export function NotasClinicas() {
       <Alerta tom="aviso" titulo="Só profissionais de saúde veem este conteúdo">
         <p>
           O que a escola precisa saber vai como <strong>observação</strong> (todos os vinculados leem). O raciocínio clínico fica aqui. Se o
-          responsável excluir os dados do estudante, estas notas também são apagadas — mantenha seu prontuário fora do sistema (D-05).
+          responsável excluir os dados do estudante, estas notas também são apagadas — mantenha seu prontuário fora do sistema.
         </p>
       </Alerta>
 
       {notas.carregando && <Carregando />}
       {negado && (
-        <Alerta tom="erro" titulo="Acesso negado (RN02)" vivo>
+        <Alerta tom="erro" titulo="Acesso negado" vivo>
           <p>{mensagemAmigavel(notas.erro)}</p>
           <div className="grupo-botoes">
             <LinkBotao to={`/estudantes/${id}`} variante="secundario">

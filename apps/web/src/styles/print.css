@@ -31,6 +31,14 @@
     break-inside: avoid;
     page-break-inside: avoid;
   }
+  .pictograma {
+    color: #000 !important;
+  }
+  .material__glossario {
+    background: #fff;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
   a[href]::after {
     content: "";
   }

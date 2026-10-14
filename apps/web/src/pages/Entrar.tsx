@@ -1,12 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
 import { useTitulo } from "../hooks/useTitulo";
 import { PERFIS_LOGIN } from "../utils/perfisLogin";
+import { api } from "../services";
+import { EntrarComSenha } from "./EntrarComSenha";
 
 /**
  * D-16 (revisão 14/09/2026) — porta de entrada: cada perfil tem a sua tela de
  * login (/entrar/<slug>) com a própria especificação. Aqui só a escolha.
  */
 export function Entrar() {
+  // Sistema real (R2): e-mail + senha. A porta por perfil fictício é só da demonstração (D-16).
+  if (api.modo === "real") return <EntrarComSenha />;
+  return <EntrarDemonstracao />;
+}
+
+function EntrarDemonstracao() {
   useTitulo("Entrar");
   const location = useLocation();
   const estado = location.state as { de?: string } | null;
@@ -38,7 +46,7 @@ export function Entrar() {
         ))}
       </ul>
 
-      <p className="meta">
+      <p className="texto-apoio">
         Ainda não tem acesso? A coordenação da escola cadastra o estudante e convida a família, a docente e a equipe de saúde. Veja a{" "}
         <Link to="/ajuda">ajuda</Link>.
       </p>

@@ -8,7 +8,7 @@ import { useTitulo } from "../hooks/useTitulo";
 import { useEstudante } from "../hooks/useEstudante";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
 import { MaterialAdaptado } from "../components/MaterialAdaptado";
-import { Alerta, Badge, Carregando, ErroCarregamento } from "../components/Feedback";
+import { Alerta, Badge, Carregando, ErroCarregamento, FalhaPagina } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { Modal } from "../components/Modal";
@@ -56,7 +56,7 @@ export function RevisarMaterial() {
       </>
     );
   }
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const m = material.dados;
   if (m.statusAprovacao !== "RASCUNHO") {
@@ -77,9 +77,9 @@ export function RevisarMaterial() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo={`Revisar: ${m.titulo}`} descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar (RN04)." />
+      <CabecalhoEstudante contexto={ctx.dados} titulo={`Revisar: ${m.titulo}`} descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar." />
 
-      <div className="chips" style={{ marginBottom: "var(--esp-4)" }}>
+      <div className="chips chips--secao">
         <Badge tom="aviso">{STATUS_APROVACAO.RASCUNHO.texto}</Badge>
         <Badge>Gerado em {segundos(m.duracaoMs)}</Badge>
         <Badge tom={m.iaAplicada ? "info" : "neutro"}>{m.iaAplicada ? "Camada de IA aplicada" : "Só camada determinística"}</Badge>

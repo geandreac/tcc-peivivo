@@ -5,7 +5,8 @@ on:
     branches: [main, development]
     paths-ignore: ["docs/**", "**.md"]
   pull_request:
-    branches: [main, development]
+    # feature/** cobre PRs empilhados (ex.: R3 sobre R1) — senão ficariam sem CI.
+    branches: [main, development, "feature/**"]
     paths-ignore: ["docs/**", "**.md"]
 
 jobs:
@@ -21,6 +22,7 @@ jobs:
       - run: npm ci
       - run: npm run db:validar
       - run: npm run typecheck -w packages/motor-adaptacao
+      - run: npm run typecheck -w packages/politicas
       - run: npm run test:coverage -w packages/motor-adaptacao
       - uses: actions/upload-artifact@v4
         if: always()
@@ -29,17 +31,50 @@ jobs:
           path: packages/motor-adaptacao/coverage/lcov.info
 
   db:
-    # Valida as migrations num Postgres real a cada push. O runner tem Docker;
-    # a máquina dos desenvolvedores não precisa ter (ver plano, P0.3).
-    name: migrations (supabase db reset)
+    # Valida as migrations e as políticas no Postgres do Supabase a cada push.
+    # O runner tem Docker; a máquina da dupla não roda Docker (lá, PGlite).
+    name: migrations + políticas RLS (Supabase real)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Políticas no PGlite (mesma suíte do desenvolvimento local)
+        run: npm test -w packages/politicas
       - uses: supabase/setup-cli@v1
         with:
           version: latest
       - run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,storage-api
       - run: supabase db reset
+      - name: Edge Functions locais (gerar-material, fechar-ciclo, convidar)
+        run: |
+          eval "$(supabase status -o env | grep -E '^(API_URL|ANON_KEY)=' | sed 's/^/export /')"
+          nohup supabase functions serve > funcoes.log 2>&1 &
+          # viva = responde 400 (corpo inválido) a um POST autenticado; a 1ª chamada baixa as dependências npm
+          for i in $(seq 1 90); do
+            codigo=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Authorization: Bearer $ANON_KEY" -H "Content-Type: application/json" -d '{}' "$API_URL/functions/v1/fechar-ciclo" || true)
+            [ "$codigo" = "400" ] && break
+            sleep 2
+          done
+          echo "fechar-ciclo respondeu $codigo"
+          test "$codigo" = "400" || { cat funcoes.log; exit 1; }
+      - name: Implantação de escola (scripts/implantar-escola.mjs) — fumaça
+        run: |
+          eval "$(supabase status -o env | grep -E '^(API_URL|SERVICE_ROLE_KEY)=' | sed 's/^/export /')"
+          SUPABASE_URL="$API_URL" SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"             node scripts/implantar-escola.mjs --escola "Escola fictícia CI" --email coordenacao.ci@example.test --nome "Coordenação CI (fictícia)"
+      - name: Políticas no Supabase real — SQL, HTTP (Auth + PostgREST + TOTP) e contrato do supabaseApi (com Edge Functions)
+        run: |
+          eval "$(supabase status -o env | grep -E '^(DB_URL|API_URL|ANON_KEY|SERVICE_ROLE_KEY)=' | sed 's/^/export /')"
+          export DATABASE_URL="$DB_URL" SUPABASE_URL="$API_URL" SUPABASE_ANON_KEY="$ANON_KEY" SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          for v in DATABASE_URL SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
+            test -n "${!v}" || { echo "$v vazio: parte da suíte seria pulada"; exit 1; }
+          done
+          npm test -w packages/politicas
+      - name: Linter de segurança do Supabase
+        run: supabase db lint --level warning --fail-on warning
       - name: Sanidade do seed (cenário A)
         run: |
           psql "$(supabase status -o env | grep DB_URL | cut -d= -f2- | tr -d '"')" -v ON_ERROR_STOP=1 -c "
@@ -47,8 +82,55 @@ jobs:
             select count(*) as politicas from pg_policies where schemaname='public';
             select nome, status_validacao from estudantes e join versoes_perfil v on v.estudante_id=e.id;
           "
+      - if: failure()
+        run: cat funcoes.log 2>/dev/null | tail -80 || true
       - if: always()
         run: supabase stop
+
+  funcoes:
+    # Edge Functions (R3): casos de uso em TS puro + cópia Deno sempre em dia + deno check.
+    name: edge functions (Vitest + cópia Deno + deno check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck -w packages/contratos -w packages/funcoes
+      - run: npm run test:coverage -w packages/funcoes
+      - name: Cópia para Deno em dia (scripts/sincronizar-funcoes.mjs)
+        run: node scripts/sincronizar-funcoes.mjs --verificar
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.1.4
+      - name: Tipos das Edge Functions
+        working-directory: supabase/functions
+        run: deno check gerar-material/index.ts fechar-ciclo/index.ts
+
+  e2e:
+    # R5.1: navegador real (Chromium) em 390 e 1280 px; axe com contraste renderizado;
+    # acesso indevido por URL; medição do fluxo de observação (R4.8).
+    name: e2e (Playwright + axe com contraste real)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run test:e2e
+        env:
+          CI: "true"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: relatorio-e2e
+          path: apps/web/playwright-report
 
   web:
     name: apps/web (typecheck + Vitest/axe + build + contraste)

@@ -9,7 +9,7 @@ export function NaoEncontrada() {
   const { pathname } = useLocation();
   const { usuario } = useSessao();
   return (
-    <div className="estado-vazio" style={{ textAlign: "left" }}>
+    <div className="estado-vazio estado-vazio--esquerda">
       <h1>Página não encontrada</h1>
       <p>
         O endereço <code>{pathname}</code> não existe ou foi movido. Verifique o link ou use uma das opções abaixo.

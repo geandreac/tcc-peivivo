@@ -6,7 +6,7 @@ import { useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
-import { Alerta, Card, Carregando, ErroCarregamento } from "../components/Feedback";
+import { Alerta, Card, Carregando, FalhaPagina } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { Modal } from "../components/Modal";
@@ -41,7 +41,7 @@ export function DadosLgpd() {
   });
 
   if (ctx.carregando) return <Carregando />;
-  if (ctx.erro || !ctx.dados) return <ErroCarregamento erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
+  if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
 
   const { estudante, papel } = ctx.dados;
   if (papel !== "RESPONSAVEL" && papel !== "COORDENACAO") {
@@ -60,7 +60,7 @@ export function DadosLgpd() {
       <Card titulo="Exportar">
         <p>
           Gera um arquivo com estudante, vínculos, consentimentos, ciclos, observações, versões de perfil, materiais aprovados, desfechos e
-          auditoria. <strong>Não inclui</strong> notas clínicas — elas não pertencem ao responsável (D-05).
+          auditoria. <strong>Não inclui</strong> notas clínicas — elas não pertencem ao responsável.
         </p>
         {exportar.erro && (
           <Alerta tom="erro" vivo>
@@ -73,9 +73,9 @@ export function DadosLgpd() {
           </Botao>
         </div>
         {exportacao && (
-          <details open style={{ marginTop: "var(--esp-4)" }}>
+          <details open className="u-mt-4">
             <summary>Conteúdo exportado ({new Date(exportacao.geradoEm).toLocaleString("pt-BR")})</summary>
-            <pre aria-label="Dados exportados em JSON" tabIndex={0} style={{ maxHeight: "24rem", overflow: "auto" }}>
+            <pre aria-label="Dados exportados em JSON" tabIndex={0} className="codigo-rolagem">
               {JSON.stringify(exportacao, null, 2)}
             </pre>
           </details>
