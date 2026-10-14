@@ -23,7 +23,8 @@ export function NotasClinicas() {
   const [erros, setErros] = useState<{ campo: string; mensagem: string }[]>([]);
   const id = ctx.dados?.estudante.id;
 
-  const notas = useConsulta<NotaClinica[]>(async () => (id ? api.listarNotasClinicas(id) : []), [id]);
+  // Sem id ainda → null (não []): uma lista vazia "fantasma" mostraria o formulário a quem foi negado.
+  const notas = useConsulta<NotaClinica[] | null>(async () => (id ? api.listarNotasClinicas(id) : null), [id]);
 
   const salvar = useMutacao(async () => {
     if (!conteudo.trim()) {
@@ -66,7 +67,7 @@ export function NotasClinicas() {
       )}
       {notas.erro && !negado && <ErroCarregamento erro={notas.erro} tentarNovamente={notas.recarregar} />}
 
-      {notas.dados && (
+      {notas.dados && !notas.erro && (
         <>
           <form
             noValidate

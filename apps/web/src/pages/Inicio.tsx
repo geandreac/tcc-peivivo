@@ -31,7 +31,7 @@ const PAPEIS = [
 const CONFIANCA = [
   { Icone: FileX2, titulo: "Laudo não é armazenado", texto: "O sistema não guarda diagnóstico nem CID. O perfil descreve o que funciona, não um rótulo." },
   { Icone: KeyRound, titulo: "A família tem a chave", texto: "Sem autorização, ninguém registra nada. É a família quem confirma o profissional de saúde." },
-  { Icone: EyeOff, titulo: "Cada um vê só o necessário", texto: "A professora nunca lê as notas da terapia. A coordenação vê números, não observações." },
+  { Icone: EyeOff, titulo: "Cada um vê só o necessário", texto: "A professora nunca lê as notas da terapia. A coordenação acompanha a escola por números; observações, só no histórico do PEI." },
   { Icone: ScrollText, titulo: "Todo acesso deixa rastro", texto: "A família vê quem leu as notas clínicas e quando, numa trilha que ninguém apaga." },
 ];
 

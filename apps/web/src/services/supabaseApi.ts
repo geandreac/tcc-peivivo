@@ -16,6 +16,7 @@ import type { CorpoErro, RespostaFecharCiclo, RespostaGerarMaterial } from "@pei
 import type { ObservacaoHistorica, ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
 import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, PeiVivoApi, RespostaConvite } from "./api";
 import { ErroApi, type CodigoErro } from "./erros";
+import { STATUS_PENDENTES } from "./tipos";
 import type {
   Auditoria,
   Ciclo,
@@ -504,7 +505,7 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
     },
     listarPendencias: async () => {
       const linhas = await exec<Linha[]>(
-        sb.from("versoes_perfil").select(`${COL_VERSAO}, estudantes(${COL_ESTUDANTE})`).in("status_validacao", ["PENDENTE", "EM_REVISAO", "EXPIRADA"]).order("created_at"),
+        sb.from("versoes_perfil").select(`${COL_VERSAO}, estudantes(${COL_ESTUDANTE})`).in("status_validacao", [...STATUS_PENDENTES]).order("created_at"),
       );
       const agora = Date.now();
       return linhas
