@@ -1,176 +1,205 @@
-# Guia de uso do PEI Vivo — para quem vai usar o sistema
+# Guia de uso do PEI Vivo — pelo site publicado
 
-**Versão:** 1.0 — 21/09/2026 · **Para quem:** famílias, professores, equipe de saúde e coordenação — e para a banca, que pode seguir este roteiro do começo ao fim.
-Este guia não exige conhecimento técnico. Se você quer instalar o sistema na sua máquina ou mexer no código, use `docs/guia-de-uso.md`.
+**Versão:** 2.0 — 14/10/2026 · **Para quem:** a dupla, a orientadora e a banca (pré-banca), e quem for usar o sistema.
+**Endereço:** <https://tcc-peivivo.vercel.app>
 
-> **Importante:** nesta versão de demonstração todas as pessoas e todos os estudantes são **fictícios** e **não há senha**. Nunca digite dados de um aluno real aqui.
+Este guia foi refeito **navegando no site publicado na Vercel**, perfil por perfil, em 14/10/2026. Cada funcionalidade descrita aqui foi aberta e usada de verdade; os acessos proibidos foram testados digitando a URL direto. O resultado está na seção 7, e os problemas encontrados, na seção 8.
+Para instalar o sistema na sua máquina ou mexer no código, use `docs/guia-de-uso.md`.
+
+> **Importante:** o site publicado é a **demonstração**: todas as pessoas e todos os estudantes são **fictícios** e **não há senha**. Nunca digite dados de um aluno real aqui. O banco real (Supabase) já está na nuvem, mas o site publicado ainda não está ligado a ele (ver seção 9).
 
 ---
 
-## 1. Primeiro acesso
+## 1. Antes de começar
 
-### 1.1 Como abrir o sistema
+### 1.1 Abrir o sistema
+Abra <https://tcc-peivivo.vercel.app> no navegador do computador ou do celular. A página inicial apresenta o problema (adaptar um texto à mão leva cerca de 40 minutos), mostra um exemplo do mesmo texto antes e depois da adaptação para o Miguel e explica o ciclo **observar → validar → adaptar → retroalimentar**. No topo: **Início · Ajuda · Acessibilidade · Entrar**.
 
-Abra o endereço do PEI Vivo no navegador do celular ou do computador (na demonstração, `http://localhost:5173`). A primeira tela apresenta o que o sistema faz: o ciclo *observar → validar → adaptar → retroalimentar*. No menu superior há **Início · Ajuda · Acessibilidade · Entrar**.
+### 1.2 Entrar com um perfil
+Toque em **Entrar**. Aparecem quatro portas: **Família**, **Professores**, **Equipe de saúde** e **Coordenação**. Ao tocar numa porta, a tela mostra **o que você faz aqui**, **o que você vê** e **o que você nunca vê**, e os perfis fictícios daquela porta:
 
-### 1.2 Como identificar o seu perfil
+| Porta | Perfil fictício | Para que serve na demonstração |
+|---|---|---|
+| Família | **Rosa** | Responsável do Miguel e do Estudante B (o B começa sem consentimento) |
+| Professores | **Márcia** | Docente do Miguel: perfil vigente, ciclo aberto e um rascunho para revisar |
+| Professores | **Paulo** | Docente **sem vínculo**: painel vazio e acesso negado por URL |
+| Equipe de saúde | **Camila** | Terapeuta ocupacional do Miguel: tem notas reservadas e valida ciclos |
+| Equipe de saúde | **Beatriz** | Fonoaudióloga **sem vínculo**: a coordenação a vincula e a família confirma |
+| Coordenação | **Coordenação** | Cadastra, vincula, acompanha números e pendências |
 
-Toque em **Entrar**. Você verá quatro "portas", cada uma com um pequeno texto dizendo para quem ela é:
+Você também pode ir direto pela URL: `/entrar/familia`, `/entrar/docente`, `/entrar/saude`, `/entrar/coordenacao`.
 
-| Porta | Para quem |
+### 1.3 Sair e trocar de perfil
+No canto superior direito, ao lado do nome, toque em **Sair**. Para trocar de perfil, saia e entre por outra porta. Se você tentar abrir uma página interna sem estar logado (ex.: `/painel`), o sistema leva para **Entrar**.
+
+### 1.4 Os dados da demonstração ficam no seu navegador
+Tudo o que você faz (autorizar, observar, aprovar…) fica salvo **no seu navegador**, não no servidor. Por isso:
+- outra pessoa, em outro computador, vê a demonstração no estado original;
+- para voltar ao começo, abra **Ajuda → Restaurar dados da demonstração**. Faça isso **antes de apresentar**.
+
+Na mesma página há **Simular falha de rede**, para mostrar a tela de erro.
+
+---
+
+## 2. Coordenação
+
+**Entrar:** *Entrar → Coordenação → Coordenação (fictícia)*.
+
+| Funcionalidade | Onde | O que acontece |
+|---|---|---|
+| **Painel da escola** | Tela inicial (*Meus estudantes*) | Cinco números: estudantes acompanhados, aguardando a família, sem profissional de saúde, validações atrasadas e quinzenas paradas. Em "O que precisa de você", as pendências (ex.: Estudante B aguardando autorização). O painel mostra **só contagens**, nunca observações ou notas. |
+| **Cadastrar estudante** | Botão *Cadastrar estudante* | Nome, nascimento, turma e, se houver, **só a data** em que o laudo foi apresentado. O laudo em si nunca é guardado. |
+| **Ficha do estudante** | Card do estudante | Perfil de aprendizagem vigente em linguagem simples, materiais aprovados e a data do laudo. |
+| **Vínculos** | Ficha → *Gerenciar vínculos* | Lista quem tem acesso e com que papel; **Desativar** remove o acesso na hora (troca de professora). |
+| ↳ Convidar por e-mail | Vínculos → *Convidar alguém novo* | Nome, e-mail e papel (docente, responsável, profissional). No sistema real, a pessoa recebe um link válido por 7 dias. |
+| ↳ Vincular quem já tem conta | Vínculos → *Vincular quem já tem conta* | Escolha a pessoa e o papel. Para **profissional de saúde**, o registro no conselho é **obrigatório** (o formulário avisa se faltar). O profissional fica **"Aguardando confirmação"** até a família permitir. |
+| **Histórico do PEI** | Ficha → *Abrir histórico* | Linha do tempo por ciclo: observações de todos, versões do perfil, materiais e desfechos, trilha de auditoria. Botão **Exportar para a reunião**. Nunca mostra a nota clínica. |
+| **Pendências** | Menu lateral | Versões de perfil aguardando o profissional de saúde, com dias em aberto. |
+| **Exportar dados** | `/estudantes/<id>/dados` | Coordenação pode exportar; só o responsável pode excluir. |
+
+**Teste feito:** vincular Beatriz como fonoaudióloga do Miguel → apareceu "Aguardando confirmação"; a notificação chegou para a Rosa.
+
+---
+
+## 3. Família (responsável legal)
+
+**Entrar:** *Entrar → Família → Rosa*.
+
+| Funcionalidade | Onde | O que acontece |
+|---|---|---|
+| **Meus estudantes** | Tela inicial | Cada estudante com o selo **Consentimento ativo** ou **Aguardando consentimento** e o botão *Privacidade e autorização*. |
+| **Consentimento** | Ficha → *Abrir consentimento* | Termo em cinco blocos simples (o que é registrado, o que não é, quem vê, por quanto tempo, seus direitos). Escolha o que autoriza (observações da escola, de casa, validação pelo profissional, geração de material), marque **"Li e entendi"** e toque em **Autorizo**. Se esquecer de marcar, o formulário avisa. |
+| **Revogar** | Consentimento → *Revogar consentimento* | Abre uma confirmação: marque **"Entendo as consequências e quero revogar"** e toque em **Sim, revogar agora** (o botão fica inativo até marcar). Efeito imediato: a professora e o profissional deixam de ver e registrar. |
+| **Privacidade** | Ficha → *Abrir privacidade* | (1) **Aguardando a sua decisão**: profissional proposto pela escola, com **Permitir** ou **Recusar**. (2) **Quem tem acesso agora**, com *Remover acesso* para profissionais. (3) Tabela **o que cada pessoa vê**. (4) **Quem leu as notas do profissional**, com data e hora. (5) Histórico de acessos e mudanças. |
+| **Observação de casa** | Ficha → *Registrar observação* | Seis dimensões (atenção, compreensão de enunciados, autonomia com palavras, interesse, sensibilidade visual, cansaço), cada uma com *Reduzida / Estável / Ampliada* e um exemplo opcional. Não precisa responder todas. |
+| **Histórico** | Ficha → *Ver histórico* | O mesmo histórico da coordenação. |
+| **Meus dados (LGPD)** | Ficha → *Exportar ou excluir* | **Exportar dados** (arquivo legível, sem notas clínicas) e **Excluir todos os dados** (definitivo, só o responsável). |
+| **Notificações** | Sino no topo | Ex.: "Um profissional de saúde foi proposto para Miguel e aguarda a sua confirmação." |
+
+**Testes feitos:** permitir a Beatriz → "Beatriz agora tem acesso"; autorizar o Estudante B; registrar observação de casa (apareceu no fechamento de ciclo da professora); revogar o B → a professora ficou bloqueada na hora.
+
+---
+
+## 4. Professores (docente regente)
+
+**Entrar:** *Entrar → Professores → Márcia*.
+
+| Funcionalidade | Onde | O que acontece |
+|---|---|---|
+| **Meus estudantes** | Tela inicial | Alunos vinculados; o botão **Gerar material** só aparece com consentimento ativo. |
+| **Ficha do estudante** | Card | Perfil vigente, ciclo aberto, materiais (inclusive **rascunhos**, marcados "só você vê"). A professora **não** vê a data do laudo. |
+| **Observação quinzenal** | Ficha → *Registrar observação* | As mesmas seis dimensões da família. |
+| **Fechar o ciclo** | Ficha → *Fechar ciclo* | Mostra as observações do ciclo e a tabela **vigente → proposto**. Regras visíveis na tela: **reduzir é imediato** (ex.: blocos 8 → 6 por cansaço) e **elevar exige dois ciclos seguidos** ("Aguardando 2º ciclo para elevar"). Confirmação → "Enviado para validação clínica". |
+| **Gerar material** | Ficha → *Gerar material* | Título + texto da aula (ou *Usar texto de exemplo*) → **Adaptar para Miguel**. Gera em menos de 1 segundo. |
+| **Revisar** | Abre sozinho depois de gerar | **Original e adaptado lado a lado**. O adaptado vem em trechos com botão **Ouvir**, e as instruções em passos numerados ("Leia o texto." / "Sublinhe…" / "Explique…"). Ações: **Aprovar**, **Editar o texto adaptado**, **Descartar rascunho**. Nada chega ao estudante sem **Aprovar**. |
+| **Material aprovado** | Depois de aprovar | Versão final com selo **Aprovado**, **Ouvir** por trecho e **Imprimir ou salvar em PDF**. |
+| **Desfecho** | Material → *Registrar desfecho* | **Alcançado / Parcial / Não alcançado** + observação opcional. Alimenta o próximo ciclo. |
+
+**Paulo (sem vínculo):** painel vazio ("Nenhum estudante vinculado a você"); qualquer URL de estudante ou material mostra "Você não está vinculado a este estudante".
+
+---
+
+## 5. Equipe de saúde
+
+**Entrar:** *Entrar → Equipe de saúde → Camila*.
+
+| Funcionalidade | Onde | O que acontece |
+|---|---|---|
+| **Meus estudantes** | Tela inicial | Botão principal **Validar parâmetros**. |
+| **Pendências** | Menu lateral | Versões aguardando a sua validação, com dias em aberto. |
+| **Validar parâmetros** | Ficha → *Abrir validação* | Tabela vigente → proposto, as observações que geraram a proposta e duas decisões: **Aprovar o conjunto de parâmetros** ou **Solicitar ajuste** (com justificativa). Valida-se o **ciclo inteiro**, nunca um material. Depois de aprovar, a versão vira **Vigente**. |
+| **Notas clínicas reservadas** | Ficha → *Abrir notas* | Só profissionais de saúde vinculados leem. Ao ler, fica registrado, e a família vê "quem leu e quando". Há também **Registrar como observação (todos veem)**, para o que a escola precisa saber. |
+| **Ficha e histórico** | Card | Perfil vigente com a explicação de cada parâmetro, materiais aprovados, data do laudo. **Não** vê rascunhos. |
+
+**Teste feito:** aprovar o ciclo 4 → passou a "Vigente"; a leitura das notas apareceu na Privacidade da família às 19:15.
+
+---
+
+## 6. Recursos para todos os perfis
+
+- **Ajuda** (`/ajuda`): o que é o PEI Vivo, quem faz o quê, o fluxo em 60 segundos, por que a professora não vê o laudo, o que a IA faz e não faz, e as ferramentas da demonstração.
+- **Acessibilidade** (`/acessibilidade`): tema **claro/escuro**, **leitura facilitada** (fonte e espaçamento para dislexia), **alto contraste**, **tamanho do texto** (16, 19 ou 22 px) e **sem animações**. As escolhas ficam salvas no aparelho. A página traz a declaração de acessibilidade (WCAG 2.2 AA) e os atalhos de teclado.
+- **Teclado:** Tab / Shift+Tab, Enter, Espaço, setas nos grupos de opção, Esc fecha confirmações.
+- **Conta e segurança** (ícone de pessoa no topo): na demonstração, só explica o que existirá no sistema real (troca de senha, autenticador, sair de todos os dispositivos).
+
+---
+
+## 7. Verificação dos acessos (feita no site publicado em 14/10/2026)
+
+**Legenda:** ✅ = funcionou como esperado; ⛔ = acesso negado, como deveria.
+
+### 7.1 O que cada perfil pode fazer
+
+| Ação | Coordenação | Família | Docente | Saúde |
+|---|---|---|---|---|
+| Ver painel com contagens da escola | ✅ | — | — | — |
+| Vincular pessoa / exigir registro do profissional | ✅ | — | — | — |
+| Permitir profissional proposto | — | ✅ | — | — |
+| Autorizar e revogar consentimento | — | ✅ | — | — |
+| Registrar observação | — | ✅ | ✅ | ✅ |
+| Fechar ciclo (RN03 visível na tela) | — | — | ✅ | — |
+| Validar o conjunto de parâmetros | — | — | — | ✅ |
+| Gerar → revisar → aprovar → desfecho | — | — | ✅ | — |
+| Ler notas clínicas (com registro de leitura) | — | — | — | ✅ |
+| Ver "quem leu as notas" | — | ✅ | — | — |
+
+### 7.2 O que cada perfil NÃO pode fazer (URL digitada direto)
+
+| Tentativa | Resultado |
 |---|---|
-| **Família** | Pai, mãe ou responsável legal pelo estudante |
-| **Professores** | Professora ou professor regente da turma |
-| **Equipe de saúde** | Terapeuta ocupacional, fonoaudióloga(o), psicopedagoga(o) ou psicóloga(o) que acompanha o estudante |
-| **Coordenação** | Coordenação pedagógica da escola |
-
-Escolha a porta que descreve você. Se tiver dúvida, a página **Ajuda** explica quem faz o quê.
-
-### 1.3 Como acessar o login adequado
-
-Ao tocar numa porta, a tela mostra, na sua linguagem, **o que você faz aqui**, **o que você vê** e **o que você nunca vê** (por exemplo, a professora nunca vê a nota clínica). Leia — é isso que garante que você está no lugar certo.
-
-### 1.4 Como preencher os campos
-
-- **Na demonstração:** não há campos; toque no cartão com o nome da pessoa fictícia que você quer "ser" (ex.: *Rosa*, na porta Família). Cada cartão explica o que aquele perfil demonstra.
-- **No sistema real (em breve):** informe o e-mail e a senha que a coordenação da escola enviou. Você pode colar a senha do seu gerenciador; não há códigos nem quebra-cabeças para resolver.
-
-### 1.5 Como identificar mensagens de erro
-
-- Uma mensagem em **vermelho, com título e ícone**, aparece no topo do formulário e diz **o que aconteceu e como corrigir** ("Há 2 problemas no formulário"). Cada item é um link que leva ao campo com problema.
-- Se o sistema não conseguir entrar ("Não foi possível entrar. Tente novamente."), você continua na mesma tela — basta tentar de novo.
-- Se você abrir um endereço que não existe, verá **"Página não encontrada"** com dois botões para voltar.
-- Mensagens de erro nunca somem sozinhas; as de sucesso (verdes) aparecem por alguns segundos, mas a informação fica na tela.
-
-### 1.6 Como recuperar o acesso
-
-- **Demonstração:** não há senha. Se algo ficou estranho, abra **Ajuda → "Restaurar dados da demonstração"**; tudo volta ao começo.
-- **Sistema real (em breve):** na tela de login, toque em **"Esqueci a senha"**, informe o e-mail e siga o link que chegar (vale por 1 hora). Se o e-mail mudou, fale com a coordenação da escola.
-
-### 1.7 Como sair do sistema
-
-No canto superior direito, ao lado do seu nome, toque em **Sair**. Você volta à página inicial e uma mensagem confirma "Você saiu da sua conta". Faça isso sempre que usar um aparelho compartilhado.
+| Coordenação abre notas clínicas e tenta gravar uma nota | ⛔ "Acesso negado" + "Seu perfil não tem permissão" ao gravar |
+| Família abre notas clínicas | ⛔ Acesso negado |
+| Família abre o rascunho da professora (`/materiais/m-0041/revisar`) | ⛔ "Material não encontrado" |
+| Família tenta gerar material | ⛔ "Só a docente gera material" |
+| Docente abre notas clínicas, Privacidade, Vínculos, Validar, Dados | ⛔ todas bloqueadas, cada uma com explicação |
+| Docente sem vínculo (Paulo) abre estudante, histórico ou material | ⛔ "Você não está vinculado a este estudante" |
+| Docente gera ou observa depois que a família revogou | ⛔ "Geração bloqueada" / "Sem consentimento ativo" (RN08) |
+| Visitante sem login abre `/painel` | ⛔ volta para Entrar |
+| Profissional de saúde vê rascunho | ⛔ não aparece na lista |
 
 ---
 
-## 2. Fluxo da família (responsável legal)
+## 8. Problemas encontrados (14/10/2026)
 
-1. **Entrar:** *Entrar → Família → Rosa*. Você chega em **Meus estudantes**.
-2. **Área inicial:** a lista mostra cada estudante com a idade, a turma e se o **consentimento** está ativo ou aguardando. O botão principal é **Ver consentimento**.
-3. **Consentimento — a sua primeira e mais importante ação:**
-   - Toque em **Ver consentimento**. Leia o termo, escrito em cinco perguntas simples: *o que autorizo, o que não, quem vê, por quanto tempo, meus direitos*.
-   - Marque o que você autoriza (observação na escola, observação em casa, geração de material).
-   - Marque **"Li e entendi o termo"** e toque em **Autorizar**. O selo muda para **Ativo** e a linha do tempo registra a data.
-   - Sem o seu consentimento, **nada** é registrado nem gerado para o estudante.
-4. **Consultar informações:** toque no nome do estudante. Você vê o perfil vigente (explicado em palavras simples), os **materiais aprovados** e se **funcionaram** (desfecho), e o **histórico** completo por ciclo. Você **nunca** vê a nota clínica nem rascunhos.
-5. **Registrar o que percebe em casa:** *Registrar observação* — escolha, para cada dimensão, se está *reduzida*, *estável* ou *ampliada* nas últimas duas semanas e, se quiser, escreva um exemplo.
-6. **Seus direitos (LGPD):** em *Dados do estudante* você pode **Exportar** tudo (um arquivo) ou **Excluir** tudo — a exclusão pede que você digite o nome do estudante exatamente como aparece.
-7. **Revogar o consentimento:** a qualquer momento, em *Consentimento → Revogar*. O sistema pede uma confirmação ("Entendo as consequências"). A escola para de registrar e gerar imediatamente.
-8. **Buscar ajuda:** menu **Ajuda** (perguntas frequentes) ou **Acessibilidade** (texto maior, contraste).
-9. **Encerrar:** **Sair**.
-
----
-
-## 3. Fluxo do professor (docente regente)
-
-1. **Entrar:** *Entrar → Professores → Márcia*. (O perfil *Paulo* mostra como fica o painel de quem ainda não tem estudante vinculado.)
-2. **Dashboard:** **Meus estudantes** lista seus alunos com o selo de consentimento. O botão principal é **Gerar material** — ele só aparece quando a família já autorizou.
-3. **Consultar informações educacionais:** toque no nome do estudante. Você vê o **perfil vigente** (linhas por bloco, formato do enunciado, vocabulário, contraste…), o ciclo aberto, os materiais e os desfechos. Você **não** vê laudo (o sistema não guarda) nem nota clínica.
-4. **Registrar dados — a cada 15 dias:**
-   - **Registrar observação:** para cada uma das seis dimensões, escolha *reduzida / estável / ampliada*. Há uma pergunta-guia em cada uma ("Cansa mais rápido que antes?"). Escreva exemplos se quiser. Toque em **Registrar observações**.
-   - **Fechar ciclo:** o sistema mostra uma tabela **"vigente → proposto"** com o que mudaria e por quê. Regras que você verá explicadas: para *aumentar* a dificuldade é preciso dois ciclos seguidos "ampliada"; para *reduzir*, basta um. Confirme. Se houver profissional de saúde vinculado, a proposta vai para validação; se não, passa a valer na hora (modo pedagógico).
-5. **Gerar, revisar e aprovar material (o momento principal):**
-   - **Gerar material:** dê um título, cole o texto da aula (ou toque em *Usar texto de exemplo*) e toque em **Adaptar para [nome]**.
-   - **Revisar:** a tela mostra o **original** e o **adaptado lado a lado** (no celular, um abaixo do outro). Você pode **editar** o texto adaptado. Nada chega ao estudante sem o seu **Aprovar**. Também pode **Descartar** ou **Decidir depois**.
-   - **Material:** depois de aprovado, abra o material em versão acessível e toque em **Imprimir ou salvar em PDF** (sai só o material, sem menus).
-6. **Visualizar resultados — depois da aula:** no material, toque em **Registrar desfecho** e escolha *Alcançado*, *Parcial* ou *Não alcançado*, com um comentário opcional. Dois toques. Isso alimenta o próximo ciclo.
-7. **Buscar ajuda:** **Ajuda** (fluxo em 60 segundos, por que você não vê o laudo, o que a IA faz ou não faz) e **Acessibilidade**.
-8. **Sair:** botão **Sair**.
-
----
-
-## 4. Fluxo do terapeuta (equipe de saúde)
-
-1. **Entrar:** *Entrar → Equipe de saúde → Camila* (terapeuta ocupacional do Miguel). *Beatriz* mostra o caso de quem ainda não foi vinculada pela coordenação.
-2. **Área profissional:** **Meus estudantes** com o botão principal **Validar parâmetros**. No menu, **Pendências** lista tudo o que aguarda a sua decisão e há quantos dias.
-3. **Consultar informações do estudante:** toque no nome. Você vê observações de todos (escola e casa), o histórico de versões do perfil, materiais aprovados e desfechos, e a data em que o laudo foi apresentado à escola (só a data).
-4. **Validar o ciclo (sua responsabilidade central):**
-   - Abra **Validar parâmetros**. A tela mostra o conjunto proposto, o que mudou e as observações que originaram a proposta.
-   - **Aprovar o conjunto de parâmetros** — passa a valer para os próximos materiais; ou **Solicitar ajuste**, escrevendo a justificativa para a professora (obrigatória).
-   - Você valida o **conjunto do ciclo**, nunca um material específico. Sem resposta em 7 dias, continuam valendo os parâmetros anteriores (a tela avisa "Expirada").
-5. **Registrar acompanhamentos:**
-   - **Notas clínicas:** espaço **reservado** — só profissionais de saúde vinculados ao estudante leem. Nem a família, nem a escola, nem a coordenação.
-   - **Registrar observação:** estratégias que a escola pode aplicar, em linguagem operacional (essas todos veem).
-6. **Acessar dados relevantes:** **Histórico** do PEI por ciclo, com desfechos reais em sala.
-7. **Buscar ajuda:** **Ajuda** e **Acessibilidade**.
-8. **Sair:** botão **Sair**.
-
----
-
-## 5. Fluxo da coordenação (perfil institucional)
-
-1. **Entrar:** *Entrar → Coordenação*.
-2. **Cadastrar estudante:** menu **Cadastrar estudante** — nome, data de nascimento, turma e, se houver, **só a data** em que o laudo foi apresentado (o laudo em si nunca é anexado).
-3. **Vínculos:** na tela do estudante, **Vínculos** — escolha a pessoa, o papel (família, docente, profissional) e, para profissional de saúde, o registro no conselho. Ao trocar de professora, **desative** o vínculo antigo: o acesso some na hora.
-4. **Acompanhar:** **Pendências** (validações em aberto) e **Histórico** de cada estudante, com opção de exportar para a reunião de PEI.
-5. **Sair.**
-
----
-
-## 6. Recursos de acessibilidade
-
-### 6.1 Navegar pelo teclado
-
-Tudo no PEI Vivo funciona sem mouse:
-
-| Tecla | O que faz |
-|---|---|
-| **Tab** | Vai para o próximo botão, link ou campo. Na primeira vez, aparece o link **"Pular para o conteúdo principal"**. |
-| **Shift + Tab** | Volta para o anterior. |
-| **Enter** | Ativa o link ou botão em foco; envia o formulário quando o foco está num campo de texto. |
-| **Espaço** | Ativa o botão em foco; marca/desmarca caixas de seleção. |
-| **Setas ↑ ↓ ← →** | Trocam a opção dentro de um grupo (ex.: reduzida / estável / ampliada). |
-| **Esc** | Fecha a janela de confirmação e devolve o foco ao botão que a abriu. |
-
-### 6.2 Identificar o foco
-
-O elemento em foco recebe um **contorno azul-escuro de 3 pixels** ao redor, com um pequeno espaço. Nos cartões de opção, o contorno envolve o cartão inteiro. Ao mudar de tela, o foco vai para o título da tela e o leitor de tela anuncia o novo nome da página.
-
-### 6.3 Usar o zoom e ajustar a leitura
-
-- **Zoom do navegador:** Ctrl + (Windows) ou Cmd + (Mac) até 400 % — a tela se reorganiza em uma coluna, sem rolagem horizontal (só as tabelas rolam de lado).
-- **Página Acessibilidade** (menu ou rodapé): **Contraste** (padrão ou alto contraste), **Tamanho do texto** (16, 19 ou 22 px) e **Movimento** ("Animações leves" ou "Sem animações"). As escolhas ficam salvas no seu aparelho e valem para todas as telas.
-- **Material adaptado:** o contraste vem do perfil do estudante (fundo creme suave ou preto no branco) e a impressão sai limpa.
-
-### 6.4 Leitores de tela
-
-O sistema foi construído com HTML nativo (botões, links, listas, tabelas com cabeçalho, campos com rótulo) e anuncia mensagens de carregamento, sucesso e erro sem mover o foco. Funciona com NVDA (Windows), VoiceOver (Mac/iPhone) e TalkBack (Android). A verificação manual completa com NVDA está planejada para antes do piloto.
-
-### 6.5 Encontrar a página de acessibilidade
-
-Link **Acessibilidade** no menu superior e no rodapé de todas as telas.
-
-### 6.6 Reportar problemas de acessibilidade
-
-Se algo não funcionou com teclado, leitor de tela, zoom ou contraste:
-
-1. Anote a tela, o que tentou fazer, o aparelho/navegador e a tecnologia assistiva usada.
-2. Registre em <https://github.com/geandreac/tcc-peivivo/issues> (rótulo *acessibilidade*) ou avise a coordenação da escola, que repassa à equipe.
-3. Problemas que impedem uma tarefa são tratados como prioridade máxima (resposta em até 1 dia útil — ver `docs/itil-servicos.md`).
-
-**Nunca inclua dados reais de estudante no relato.**
-
----
-
-## 7. Roteiro rápido para a banca (10 minutos)
-
-| Passo | Perfil | Ação | O que observar |
+| # | Gravidade | Problema | Situação |
 |---|---|---|---|
-| 1 | Família (Rosa) | Consentimento do *Estudante B* → Autorizar | Termo simples; resumo de erros se não marcar "li" |
-| 2 | Professores (Márcia) | Miguel → Registrar observação → Fechar ciclo | Tabela vigente → proposto; "Aguardando 2º ciclo" (RN03) |
-| 3 | Equipe de saúde (Camila) | Pendências → Validar → Aprovar | Versão passa a VIGENTE |
-| 4 | Professores (Márcia) | Gerar material (texto de exemplo) → Revisar → Aprovar → Imprimir → Desfecho | Original × adaptado; nada chega sem aprovar |
-| 5 | Professores (Márcia) | Digitar `/estudantes/e-0010/notas-clinicas` na barra de endereço | **"Acesso negado (RN02)"** — permissão no dado |
-| 6 | Família (Rosa) | Digitar `/materiais/m-0041` | "Material não encontrado" — rascunho é privado |
-| 7 | Qualquer | Sair → tentar `/painel` | Volta para Entrar; após entrar, volta ao destino |
-| 8 | Qualquer | Tab, Tab, Tab… + Acessibilidade → alto contraste | Foco visível; tudo pelo teclado |
+| 1 | **Alta** | Abrir qualquer página interna pela URL, recarregar a página ou clicar no link do convite (`/definir-senha`) dava **404 da Vercel**. | **Corrigido** no mesmo dia (`apps/web/vercel.json`); conferido no site. |
+| 2 | Média | Os trechos do material adaptado são cortados **no meio da frase** ("Quando o magma chega à \| superfície…") e, na tela, o 1º trecho ocupa cerca de 6 linhas, embora o perfil diga "até 4 linhas". Para dislexia/TEA, isso atrapalha. O mesmo aparece no exemplo da página inicial. | Aberto |
+| 3 | Média | **Pendências** lista versões antigas do Miguel (ciclos 1 e 2, já "substituídas") como "prazo vencido", enquanto o painel diz "Validações atrasadas: 0". | Aberto |
+| 4 | Média | A página inicial diz "A coordenação vê números, não observações", mas a coordenação vê as observações no Histórico, e a tabela da Privacidade confirma ("Só vê"). O texto da página inicial está errado, ou o acesso é largo demais. | Aberto (decidir qual dos dois) |
+| 5 | Baixa | Nas notas clínicas, quem não tem acesso vê "Acesso negado" **e também** o formulário "Nova nota". A gravação é barrada, mas o formulário não deveria aparecer. | Aberto |
+| 6 | Baixa | A âncora de interesse vira a frase inteira ("engajamento espontâneo com dinossauros") depois do ciclo 4. A causa está nos dados fictícios: a evidência do ciclo 3 é uma frase, e não o tema. | Aberto (ajustar o seed) |
+| 7 | Baixa | Siglas internas aparecem na tela: "(HU-C.02)" em Vínculos e "(RN06)" na porta da equipe de saúde. | Aberto |
+| 8 | Baixa | A família e a docente veem "Pendências" no menu, mas só a saúde e a coordenação usam. | Aberto |
+| 9 | Baixa | O perfil diz "Palavras simples; termos difíceis vêm explicados", mas com a IA desligada o vocabulário não muda (a tela de revisão avisa isso). | Aberto |
+| 10 | Baixa | A notificação "profissional proposto" continua como "Nova" depois que a família já permitiu. | Aberto |
+
+Nenhum problema de **segurança** foi encontrado: todo acesso proibido foi barrado.
+
+---
+
+## 9. O que o site publicado ainda não mostra
+
+- **Login real:** o site da Vercel roda em modo demonstração. O banco real na nuvem já tem as migrations 0001–0008, as 3 Edge Functions e a primeira escola ("Escola Piloto PEI Vivo"), mas o site publicado ainda não está ligado a ele. Para mostrar o modo real, rode localmente com `VITE_API=supabase` (ver `docs/reformulacao/IMPLANTACAO.md` §7) ou mostre os testes do CI contra o Supabase real.
+- **IA:** desligada por decisão de projeto; só a camada determinística roda (trechos, etapas, contraste).
+
+---
+
+## 10. Roteiro para a pré-banca (cerca de 12 minutos)
+
+Antes de começar: **Ajuda → Restaurar dados da demonstração**.
+
+| Passo | Perfil | Ação | O que mostrar |
+|---|---|---|---|
+| 1 | — | Página inicial | O problema (~40 min por texto) e o antes/depois do Miguel |
+| 2 | Coordenação | Painel → Miguel → Vínculos → vincular Beatriz (sem registro, depois com `CRFa-DEV-123`) | Só contagens no painel; registro obrigatório; "Aguardando confirmação" |
+| 3 | Família (Rosa) | Sino → Privacidade → **Permitir** Beatriz; Estudante B → Consentimento → Autorizar | A família tem a chave; termo em linguagem simples |
+| 4 | Docente (Márcia) | Miguel → Fechar ciclo → confirmar | Tabela vigente → proposto; "reduzir é imediato, elevar exige 2 ciclos" |
+| 5 | Saúde (Camila) | Pendências → Validar → Aprovar | Valida o ciclo, não o material; versão vira Vigente |
+| 6 | Docente (Márcia) | Gerar material (texto de exemplo) → Revisar → Aprovar → Desfecho | Original × adaptado em menos de 1 s; nada chega sem aprovar |
+| 7 | Docente (Márcia) | Digitar `/estudantes/e-0010/notas-clinicas` | "Acesso negado": a permissão está no dado, não na tela |
+| 8 | Família (Rosa) | Privacidade → "Quem leu as notas" | A leitura da Camila com data e hora |
+| 9 | Família (Rosa) | Estudante B → Revogar; depois Márcia tenta gerar | Bloqueio imediato |
+| 10 | Qualquer | Acessibilidade → leitura facilitada / alto contraste; navegar com Tab | Acessibilidade de verdade |
+
+Evite mostrar, enquanto os problemas 2 e 3 da seção 8 não forem corrigidos: a tela **Pendências** da coordenação e o material gerado com textos longos (prefira o texto de exemplo).
