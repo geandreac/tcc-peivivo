@@ -166,6 +166,20 @@ describe("D3/D-24 · acesso clínico só com confirmação do responsável", () 
     expect(ok(s[2]).length).toBeGreaterThan(0); // confirmado + aal2 → lê
     expect(ok(s[3])).toHaveLength(0); // sem segundo fator → não lê
   });
+  it("PERMITIDO: decidida a proposta, o aviso 'aguardando confirmação' deixa de ser novo para os responsáveis (0009)", async () => {
+    const vinc = `(select id from vinculos_usuario_estudante where usuario_id = '${usuarioId("profissionalNovo")}')`;
+    const avisosNovos = `select count(*)::int as n from notificacoes
+      where tipo = 'PROFISSIONAL_AGUARDANDO_CONFIRMACAO' and estudante_id = '${ID.e1}' and lida_em is null`;
+    const r = await db.fluxo([
+      { ator: "coordenacao", sql: `select fn_propor_vinculo('${ID.e1}','${usuarioId("profissionalNovo")}','PROFISSIONAL_SAUDE','CONSELHO-NOVO')` },
+      { ator: "sistema", sql: avisosNovos },
+      { ator: "responsavel", sql: `select fn_confirmar_vinculo(${vinc}, false)` },
+      { ator: "sistema", sql: avisosNovos },
+    ]);
+    expect(ok(r[1])[0]?.n).toBe(2);
+    ok(r[2]);
+    expect(ok(r[3])[0]?.n).toBe(0);
+  });
   it("PERMITIDO: profissional proposto pelo próprio responsável já nasce ativo", async () => {
     const r = await db.fluxo([
       { ator: "responsavel", sql: `select fn_propor_vinculo('${ID.e1}','${usuarioId("profissionalNovo")}','PROFISSIONAL_SAUDE','CONSELHO-NOVO')` },

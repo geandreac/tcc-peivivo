@@ -45,7 +45,7 @@ insert into observacoes (ciclo_id, autor_id, papel_autor, dimensao, valor_escala
   ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000001', 'DOCENTE',
    'COMPREENSAO_ENUNCIADOS', 'REDUZIDA', 'Trava em instruções com mais de uma etapa.'),
   ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000002', 'RESPONSAVEL',
-   'INTERESSE_MANIFESTO', 'AMPLIADA', 'Engajamento espontâneo com dinossauros.');
+   'INTERESSE_MANIFESTO', 'AMPLIADA', 'Dinossauros.');
 
 insert into versoes_perfil (id, estudante_id, ciclo_origem_id, numero_ciclo, parametros, status_validacao, validador_id, data_vigencia) values
   ('00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-000000000010',

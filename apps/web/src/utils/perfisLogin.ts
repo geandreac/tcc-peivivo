@@ -81,7 +81,7 @@ export const PERFIS_LOGIN: EspecificacaoLogin[] = [
     ],
     ve: ["Observações de todos", "Histórico completo de versões do perfil", "Materiais aprovados e desfechos", "Data em que o laudo foi apresentado", "Notas clínicas de outros profissionais do mesmo estudante"],
     nuncaVe: ["Rascunhos de material"],
-    acessoReal: ["Conta criada pela coordenação com registro no conselho profissional obrigatório (CREFITO, CRFa, CRP…)", "E-mail + senha", "Se não houver profissional vinculado, o sistema opera em modo pedagógico (RN06)"],
+    acessoReal: ["Conta criada pela coordenação com registro no conselho profissional obrigatório (CREFITO, CRFa, CRP…)", "E-mail + senha", "Se não houver profissional vinculado, o sistema opera em modo pedagógico: o perfil é ajustado sem validação clínica"],
     demo: [
       { usuarioId: ID.profissional, mostra: "Terapeuta ocupacional do Miguel (fictício): há notas reservadas e o próximo ciclo virá para validação." },
       { usuarioId: ID.fono, mostra: "Fonoaudióloga SEM vínculo: use a coordenação para vinculá-la e veja o acesso aparecer." },

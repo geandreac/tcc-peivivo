@@ -361,6 +361,8 @@ describe("Reformulação R4.4/R4.7 — profissional confirmado pela família; no
     expect((await api.listarNotificacoes()).map((n) => n.tipo)).toContain("PROFISSIONAL_AGUARDANDO_CONFIRMACAO");
     await api.confirmarVinculo(v.id, true);
     await esperaNegado(api.confirmarVinculo(v.id, true), "CONFLITO");
+    const aviso = (await api.listarNotificacoes()).find((n) => n.tipo === "PROFISSIONAL_AGUARDANDO_CONFIRMACAO");
+    expect(aviso?.lidaEm).not.toBeNull(); // decidido → o aviso deixa de ser novo (0009)
     await api.entrar(ID.fono);
     expect((await api.obterEstudante(ID.estudanteA)).id).toBe(ID.estudanteA);
     expect((await api.listarNotificacoes()).map((n) => n.tipo)).toContain("VINCULO_ATIVADO");

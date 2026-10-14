@@ -137,7 +137,7 @@ export const OBSERVACOES: ObservacaoRegistro[] = [
   // ciclo 3 (origem da versão vigente — cenário A)
   obs(ID.ciclo3, 3, ID.docente, "DOCENTE", "ATENCAO_SUSTENTADA", "REDUZIDA", "Perde o fio em blocos de texto acima de 5 linhas.", 22),
   obs(ID.ciclo3, 3, ID.docente, "DOCENTE", "COMPREENSAO_ENUNCIADOS", "REDUZIDA", "Trava em instruções com mais de uma etapa.", 22),
-  obs(ID.ciclo3, 3, ID.responsavel, "RESPONSAVEL", "INTERESSE_MANIFESTO", "AMPLIADA", "Engajamento espontâneo com dinossauros.", 21),
+  obs(ID.ciclo3, 3, ID.responsavel, "RESPONSAVEL", "INTERESSE_MANIFESTO", "AMPLIADA", "Dinossauros.", 21),
   obs(ID.ciclo3, 3, ID.responsavel, "RESPONSAVEL", "SENSIBILIDADE_VISUAL", "AMPLIADA", "Ruído e luz forte desorganizam.", 21),
   // ciclo 4 (aberto) — já tem 2 observações; a tela "observar" completa o resto
   obs(ID.ciclo4, 4, ID.profissional, "PROFISSIONAL_SAUDE", "AUTONOMIA_LEXICAL", "AMPLIADA", "Leu sozinho 'evaporação' na sessão — 1º ciclo de melhora.", 6),

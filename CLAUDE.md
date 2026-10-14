@@ -23,7 +23,7 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (44) + funções (31) + políticas RLS (113, PGlite) + web (117, axe) — 100%
+npm test                                    # motor (44) + funções (31) + políticas RLS (114, PGlite) + web (119, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
 npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
@@ -124,7 +124,7 @@ da escola (só contagens), notificações tipadas, tema escuro e leitura facilit
 (D-45). **Tudo integrado (14/10):** a pilha #98–#108 entrou em `development` e `main`; branches
 de feature apagadas, só restam `main` e `development`. Push em `main` publica sozinho na Vercel
 (`https://tcc-peivivo.vercel.app`). **Nuvem (14/10):** projeto `tcc-peivivo` (ref `xjjuugpybbxifwfxjigu`,
-sa-east-1, plano gratuito) com 0001–0008, RLS em 15/15 tabelas, cron RN05 e as 3 EFs republicadas (v2).
+sa-east-1, plano gratuito) com 0001–0009 (0009: aviso de proposta de profissional marcado como lido ao decidir), RLS em 15/15 tabelas, cron RN05 e as 3 EFs republicadas (v2).
 Auth configurado no painel (cadastro aberto desligado, senha ≥ 10, Site URL/redirect na Vercel). Primeira
 escola "Escola Piloto PEI Vivo" com "Coordenação Piloto" (convite pendente de aceite). Limites do plano
 gratuito: sem limite de sessão e sem modelo de e-mail em português (exige SMTP próprio). **Nunca** rode

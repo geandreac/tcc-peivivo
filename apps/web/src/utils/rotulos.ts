@@ -142,7 +142,7 @@ export function descreverPerfil(p: ParametrosAdaptacao): string[] {
   const frases = [
     `Textos em trechos curtos, de até ${p.maxLinhasPorBloco} linhas.`,
     p.formatoEnunciado === "ETAPA_UNICA" ? "Uma instrução por vez, em passos numerados." : "Instruções podem ter mais de uma etapa.",
-    { BASICO: "Palavras simples; termos difíceis vêm explicados.", INTERMEDIARIO: "Vocabulário do dia a dia, com poucas palavras difíceis.", ORIGINAL: "Vocabulário do texto original." }[p.nivelVocabulario],
+    { BASICO: "Palavras simples (aplicado quando a camada de IA estiver ligada).", INTERMEDIARIO: "Vocabulário do dia a dia (aplicado quando a camada de IA estiver ligada).", ORIGINAL: "Vocabulário do texto original." }[p.nivelVocabulario],
     `No máximo ${p.blocosPorMaterial} trechos por atividade, para não cansar.`,
     p.contrasteMinimo === 7 ? "Letras bem escuras sobre fundo claro (contraste reforçado)." : "Contraste de leitura padrão.",
   ];

@@ -7,7 +7,7 @@ Em 14/10 toda a pilha (PRs #98–#108) foi integrada em `development` (`e79747d`
 | Passo | Situação |
 |---|---|
 | 1–2 Projeto e CLI ligada | ✅ |
-| 3 Migrations 0001–0008 | ✅ 0001–0007 em 12/10 (15 tabelas, todas com RLS; `privado` fora da API; anônimo recebe 42501); **0008 (endurecimento, D-46) aplicada em 14/10** com `db push` após `db:validar` |
+| 3 Migrations 0001–0009 | ✅ 0001–0007 em 12/10 (15 tabelas, todas com RLS; `privado` fora da API; anônimo recebe 42501); **0008 (endurecimento, D-46) e 0009 (aviso de proposta resolvido) aplicadas em 14/10** com `db push` após `db:validar` |
 | 3 cron RN05 | ✅ `pei-vivo-expirar-validacoes` às 3h |
 | 4 Email ligado, TOTP ligado, confirmar e-mail ligado | ✅ |
 | 4 Allow new users to sign up | ✅ **desligado** em 14/10 (estava ligado: qualquer um criava conta) |
@@ -36,7 +36,7 @@ npx supabase link --project-ref SEU_REF   # pede a senha do banco
 ## 3. Banco: migrations (sem seed)
 ```bash
 npm run db:validar                        # garante localmente (PGlite) antes de subir
-npx supabase db push                      # aplica 0001…0008 no projeto
+npx supabase db push                      # aplica 0001…0009 no projeto
 ```
 **Não** rode o `seed.sql` na nuvem: ele é para desenvolvimento e CI.
 

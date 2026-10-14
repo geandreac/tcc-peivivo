@@ -168,19 +168,19 @@ Na mesma página há **Simular falha de rede**, para mostrar a tela de erro.
 | 3 | Média | **Pendências** lista versões antigas do Miguel (ciclos 1 e 2, já "substituídas") como "prazo vencido", enquanto o painel diz "Validações atrasadas: 0". | **Corrigido**: Pendências mostra só versões pendentes ou em revisão (as que ainda podem ser decididas), no mock e no Supabase. |
 | 4 | Média | A página inicial diz "A coordenação vê números, não observações", mas a coordenação vê as observações no Histórico, e a tabela da Privacidade confirma ("Só vê"). Pela decisão registrada em `docs/reformulacao/DECISOES.md`, a coordenação lê observações só no histórico (obrigação legal). | **Corrigido**: o texto da página inicial agora diz isso. |
 | 5 | Baixa | Nas notas clínicas, quem não tem acesso vê "Acesso negado" **e também** o formulário "Nova nota". A gravação é barrada, mas o formulário não deveria aparecer. | **Corrigido**: o formulário só aparece para quem tem acesso. |
-| 6 | Baixa | A âncora de interesse vira a frase inteira ("engajamento espontâneo com dinossauros") depois do ciclo 4. A causa está nos dados fictícios: a evidência do ciclo 3 é uma frase, e não o tema. | Aberto (ajustar o seed) |
-| 7 | Baixa | Siglas internas aparecem na tela: "(HU-C.02)" em Vínculos e "(RN06)" na porta da equipe de saúde. | Aberto |
-| 8 | Baixa | A família e a docente veem "Pendências" no menu, mas só a saúde e a coordenação usam. | Aberto |
-| 9 | Baixa | O perfil diz "Palavras simples; termos difíceis vêm explicados", mas com a IA desligada o vocabulário não muda (a tela de revisão avisa isso). | Aberto |
-| 10 | Baixa | A notificação "profissional proposto" continua como "Nova" depois que a família já permitiu. | Aberto |
+| 6 | Baixa | A âncora de interesse vira a frase inteira ("engajamento espontâneo com dinossauros") depois do ciclo 4. A causa estava nos dados fictícios: a evidência do ciclo 3 era uma frase, e não o tema. | **Corrigido**: a evidência agora é só o tema ("Dinossauros."), no mock e no `seed.sql`. |
+| 7 | Baixa | Siglas internas apareciam na tela: "(HU-C.02)" em Vínculos e "(RN06)" na porta da equipe de saúde. | **Corrigido**, com teste que procura siglas nessas telas. |
+| 8 | Baixa | A família e a docente viam "Pendências" no menu, mas só a saúde e a coordenação usam. | **Corrigido**: o item só aparece para coordenação e profissional de saúde. |
+| 9 | Baixa | O perfil dizia "Palavras simples; termos difíceis vêm explicados", mas com a IA desligada o vocabulário não muda. | **Corrigido**: o texto agora diz que o vocabulário é aplicado quando a camada de IA estiver ligada. |
+| 10 | Baixa | A notificação "profissional proposto" continuava como "Nova" depois que a família já tinha decidido. | **Corrigido** no mock e no banco (migration `0009`): decidida a última proposta, o aviso é marcado como lido. |
 
-Nenhum problema de **segurança** foi encontrado: todo acesso proibido foi barrado.
+Nenhum problema de **segurança** foi encontrado: todo acesso proibido foi barrado. Os 10 itens foram corrigidos no mesmo dia, cada um com teste.
 
 ---
 
 ## 9. O que o site publicado ainda não mostra
 
-- **Login real:** o site da Vercel roda em modo demonstração. O banco real na nuvem já tem as migrations 0001–0008, as 3 Edge Functions e a primeira escola ("Escola Piloto PEI Vivo"), mas o site publicado ainda não está ligado a ele. Para mostrar o modo real, rode localmente com `VITE_API=supabase` (ver `docs/reformulacao/IMPLANTACAO.md` §7) ou mostre os testes do CI contra o Supabase real.
+- **Login real:** o site da Vercel roda em modo demonstração. O banco real na nuvem já tem as migrations 0001–0009, as 3 Edge Functions e a primeira escola ("Escola Piloto PEI Vivo"), mas o site publicado ainda não está ligado a ele. Para mostrar o modo real, rode localmente com `VITE_API=supabase` (ver `docs/reformulacao/IMPLANTACAO.md` §7) ou mostre os testes do CI contra o Supabase real.
 - **IA:** desligada por decisão de projeto; só a camada determinística roda (trechos, etapas, contraste).
 
 ---
@@ -202,4 +202,4 @@ Antes de começar: **Ajuda → Restaurar dados da demonstração**.
 | 9 | Família (Rosa) | Estudante B → Revogar; depois Márcia tenta gerar | Bloqueio imediato |
 | 10 | Qualquer | Acessibilidade → leitura facilitada / alto contraste; navegar com Tab | Acessibilidade de verdade |
 
-Os problemas 1 a 5 da seção 8 já foram corrigidos; os demais são de baixa gravidade e não atrapalham o roteiro.
+Todos os problemas da seção 8 foram corrigidos em 14/10/2026.
