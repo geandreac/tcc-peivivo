@@ -121,9 +121,15 @@ leiga (nunca sigla RN/D na tela), Privacidade (família confirma profissional), 
 da escola (só contagens), notificações tipadas, tema escuro e leitura facilitada
 (pares em `scripts/contraste.mjs`). **Interface (12/10):** padrões Apple/Google/Microsoft
 (`docs/padroes-de-interface.md`, `docs/diagnostico-de-interface.md`, D-44), coordenação em violeta
-(D-45); PR #104 empilhado sobre o #103. **Nuvem (12/10):** projeto `tcc-peivivo` (sa-east-1)
-com 0001–0007, RLS em 15/15 tabelas, cron RN05 e 3 EFs (versão de 08/10 — republicar após
-o merge); faltam ajustes de Auth no painel e a primeira escola (`IMPLANTACAO.md` §0).
+(D-45). **Tudo integrado (14/10):** a pilha #98–#108 entrou em `development` e `main`; branches
+de feature apagadas, só restam `main` e `development`. Push em `main` publica sozinho na Vercel
+(`https://tcc-peivivo.vercel.app`). **Nuvem (14/10):** projeto `tcc-peivivo` (ref `xjjuugpybbxifwfxjigu`,
+sa-east-1, plano gratuito) com 0001–0008, RLS em 15/15 tabelas, cron RN05 e as 3 EFs republicadas (v2).
+Auth configurado no painel (cadastro aberto desligado, senha ≥ 10, Site URL/redirect na Vercel). Primeira
+escola "Escola Piloto PEI Vivo" com "Coordenação Piloto" (convite pendente de aceite). Limites do plano
+gratuito: sem limite de sessão e sem modelo de e-mail em português (exige SMTP próprio). **Nunca** rode
+`config push` com o `supabase/config.toml` do repositório (Site URL localhost). Estado e passos em
+`IMPLANTACAO.md` §0.
 **R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v3 (N1: até a
 Metodologia) em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera `Artigo_PEI_Vivo_v3.docx`; a v2 fica
 preservada). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`
