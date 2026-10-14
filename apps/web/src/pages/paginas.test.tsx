@@ -3,7 +3,7 @@
  * caminhos negados na UI — P4.19/P4.20 em jsdom). Cada tela passa no axe.
  */
 import { describe, it, expect } from "vitest";
-import { screen, waitFor, within } from "@testing-library/react";
+import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderizarApp, semViolacoesAxe } from "../test/utils";
 import { ID } from "../mocks/dados";
@@ -228,11 +228,31 @@ describe("Reformulação R4 — navegação, linguagem e privacidade", () => {
     await screen.findByRole("heading", { level: 1, name: "Meus estudantes" });
     const navs = screen.getAllByRole("navigation", { name: "Principal" });
     expect(navs).toHaveLength(1);
-    for (const nome of ["Estudantes", "Pendências", "Ajuda", "Acessibilidade"]) {
+    for (const nome of ["Estudantes", "Ajuda", "Acessibilidade"]) {
       expect(within(navs[0]!).getByRole("link", { name: nome })).toBeInTheDocument();
     }
     expect(within(navs[0]!).getByRole("link", { name: "Estudantes" })).toHaveAttribute("aria-current", "page");
     await semViolacoesAxe(container);
+  });
+
+  it("'Pendências' só aparece no menu de quem acompanha validações", async () => {
+    await renderizarApp("/painel", ID.docente);
+    await screen.findByRole("heading", { level: 1, name: "Meus estudantes" });
+    expect(within(screen.getByRole("navigation", { name: "Principal" })).queryByRole("link", { name: "Pendências" })).not.toBeInTheDocument();
+    cleanup();
+    await renderizarApp("/painel", ID.profissional);
+    await screen.findByRole("heading", { level: 1, name: "Meus estudantes" });
+    expect(await within(screen.getByRole("navigation", { name: "Principal" })).findByRole("link", { name: "Pendências" })).toBeInTheDocument();
+  });
+
+  it("nenhuma sigla interna (RN, HU, D-nn) nas telas de entrada e de vínculos", async () => {
+    await renderizarApp("/entrar/saude");
+    await screen.findByRole("heading", { level: 1 });
+    expect(screen.queryByText(/\b(RN0\d|HU-[A-Z]\.\d+|D-\d\d)\b/u)).not.toBeInTheDocument();
+    cleanup();
+    await renderizarApp(`/estudantes/${ID.estudanteA}/vinculos`, ID.coordenacao);
+    await screen.findByRole("heading", { level: 1, name: "Vínculos" });
+    expect(screen.queryByText(/\b(RN0\d|HU-[A-Z]\.\d+|D-\d\d)\b/u)).not.toBeInTheDocument();
   });
 
   it("UX-03/04: docente lê o perfil em frases leigas, sem siglas de regra", async () => {

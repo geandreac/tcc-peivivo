@@ -58,7 +58,7 @@ interface Estado {
   notificacoes: Notificacao[];
 }
 
-const CHAVE_ESTADO = "pei-vivo:demo:v2"; // v2: vínculos com ciclo de vida e notificações (R4)
+const CHAVE_ESTADO = "pei-vivo:demo:v3"; // v3: âncora do ciclo 3 só com o tema (navegadores com a demo antiga recebem os dados novos)
 const CHAVE_SESSAO = "pei-vivo:sessao";
 const DIAS_EXPIRACAO = 7; // RN05
 
@@ -395,6 +395,12 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         v.status = aceitar ? "ATIVO" : "RECUSADO";
         registrarAuditoria("vinculos_usuario_estudante", v.id, aceitar ? "VINCULO_CONFIRMADO" : "VINCULO_RECUSADO", { papel: v.papel });
         if (aceitar) notificarUsuario(v.usuarioId, "VINCULO_ATIVADO", v.estudanteId);
+        // 0009: decidida a última proposta, o aviso "aguardando confirmação" deixa de ser novo.
+        if (!estado.vinculos.some((x) => x.estudanteId === v.estudanteId && x.status === "PENDENTE_RESPONSAVEL")) {
+          for (const n of estado.notificacoes) {
+            if (n.estudanteId === v.estudanteId && n.tipo === "PROFISSIONAL_AGUARDANDO_CONFIRMACAO" && !n.lidaEm) n.lidaEm = agora();
+          }
+        }
         salvar();
         return v;
       }),

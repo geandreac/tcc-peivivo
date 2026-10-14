@@ -151,7 +151,7 @@ export function Vinculos() {
                 {mensagemAmigavel(vincular.erro)}
               </Alerta>
             )}
-            <Campo tipo="select" id="usuario" rotulo="Pessoa" dica="No sistema real, o responsável é convidado por e-mail (HU-C.02)." required value={usuarioId} onChange={(e) => setUsuarioId(e.target.value)} erro={erros.find((x) => x.campo === "usuario")?.mensagem ?? null}>
+            <Campo tipo="select" id="usuario" rotulo="Pessoa" dica="No sistema real, o responsável é convidado por e-mail." required value={usuarioId} onChange={(e) => setUsuarioId(e.target.value)} erro={erros.find((x) => x.campo === "usuario")?.mensagem ?? null}>
               <option value="">Escolha…</option>
               {dados.dados.usuarios
                 .filter((u) => !jaVinculados.has(u.id) && !u.papelInstitucional)

@@ -8,9 +8,9 @@ import { useInatividade } from "../hooks/useInatividade";
 import { api } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
 
-const ITENS_NAV: { rota: string; rotulo: string; Icone: LucideIcon }[] = [
+const ITENS_NAV: { rota: string; rotulo: string; Icone: LucideIcon; soQuemValida?: boolean }[] = [
   { rota: "/painel", rotulo: "Estudantes", Icone: UsersRound },
-  { rota: "/pendencias", rotulo: "Pendências", Icone: ClipboardCheck },
+  { rota: "/pendencias", rotulo: "Pendências", Icone: ClipboardCheck, soQuemValida: true },
   { rota: "/ajuda", rotulo: "Ajuda", Icone: CircleHelp },
   { rota: "/acessibilidade", rotulo: "Acessibilidade", Icone: Accessibility },
 ];
@@ -42,6 +42,15 @@ export function Layout() {
     [usuario?.id, location.pathname]
   );
   const contagem = naoLidas.dados ?? 0;
+
+  // "Pendências" só para quem acompanha validações: coordenação e profissional de saúde.
+  const acompanhaValidacoes = useConsulta<boolean>(async () => {
+    if (!usuario) return false;
+    if (usuario.papelInstitucional === "COORDENACAO") return true;
+    const papeis = await Promise.all((await api.listarEstudantes()).map((e) => api.meuPapel(e.id)));
+    return papeis.includes("PROFISSIONAL_SAUDE");
+  }, [usuario?.id]);
+  const itensNav = ITENS_NAV.filter((i) => !i.soQuemValida || acompanhaValidacoes.dados);
 
   // D-32: 30 min sem interação encerram a sessão de quem vê dado de saúde ou administra.
   useInatividade(api.modo === "real" && Boolean(usuario?.exigeSegundoFator), 30, async () => {
@@ -119,7 +128,7 @@ export function Layout() {
           /* Um único <nav>: lateral no desktop, barra inferior no celular (prompt §7.1). Só o CSS muda. */
           <nav className="nav-app" aria-label="Principal">
             <ul>
-              {ITENS_NAV.map(({ rota, rotulo, Icone }) => (
+              {itensNav.map(({ rota, rotulo, Icone }) => (
                 <li key={rota}>
                   <NavLink to={rota}>
                     <Icone aria-hidden="true" size={22} strokeWidth={2} />
