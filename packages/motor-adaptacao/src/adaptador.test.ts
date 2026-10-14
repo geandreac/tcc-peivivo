@@ -34,6 +34,24 @@ describe("P2.4 — adaptar (RF09, D-10)", () => {
     expect(a).toEqual(b);
   });
 
+  it("blocos terminam em fim de frase quando cada frase cabe no limite de linhas", () => {
+    const r = adaptar(TEXTO_CICLO_DA_AGUA, PERFIL_MIGUEL);
+    const textuais = [...r.blocos, ...r.blocosExcedentes].filter((b) => !/^\d+\.\s/u.test(b.linhas[0] ?? ""));
+    expect(textuais.length).toBeGreaterThan(1);
+    for (const bloco of textuais) {
+      expect(bloco.linhas.join(" ")).toMatch(/[.!?…]["”)]?$/u);
+    }
+  });
+
+  it("frase maior que o limite ainda é dividida, sem exceder maxLinhasPorBloco", () => {
+    const longa = Array.from({ length: 60 }, (_, i) => `palavra${i}`).join(" ") + ".";
+    const r = adaptar(longa, { ...PERFIL_MIGUEL, maxLinhasPorBloco: 2 });
+    for (const bloco of [...r.blocos, ...r.blocosExcedentes]) {
+      expect(bloco.linhas.length).toBeLessThanOrEqual(2);
+    }
+    expect(textoDoAdaptado(r).split(/\s+/u)).toEqual(longa.split(/\s+/u));
+  });
+
   it("nenhum bloco excede maxLinhasPorBloco e nenhuma linha excede ~60 caracteres", () => {
     const r = adaptar(TEXTO_CICLO_DA_AGUA, PERFIL_MIGUEL);
     for (const bloco of [...r.blocos, ...r.blocosExcedentes]) {

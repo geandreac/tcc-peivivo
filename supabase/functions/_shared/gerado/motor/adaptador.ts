@@ -8,6 +8,7 @@
  *
  * Garantias verificadas em `adaptador.test.ts`:
  * - nenhum bloco excede `maxLinhasPorBloco`;
+ * - blocos de texto terminam em fim de frase sempre que a frase cabe no limite;
  * - no máximo `blocosPorMaterial` blocos entram no material; o restante vai
  *   para `blocosExcedentes` — o texto original é recuperável por concatenação;
  * - com `formatoEnunciado = ETAPA_UNICA`, nenhum enunciado composto sobrevive
@@ -106,6 +107,42 @@ export function dividirEmEtapas(paragrafo: string): string[] {
   );
 }
 
+/** Divide um parágrafo em frases (fim em . ! ? … seguido de espaço e nova frase). */
+export function dividirEmFrases(paragrafo: string): string[] {
+  return paragrafo
+    .split(/(?<=[.!?…]["”)]?)\s+(?=["“(]?[A-ZÀ-Ý0-9])/u)
+    .map((f) => f.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Agrupa frases inteiras em blocos de até `maxLinhas` linhas, para o trecho
+ * não terminar no meio de uma frase (dislexia/TEA). Só uma frase que sozinha
+ * passa do limite é cortada por linhas — e o resto dela segue no bloco seguinte.
+ */
+function blocosDoParagrafo(paragrafo: string, maxLinhas: number): string[][] {
+  const blocos: string[][] = [];
+  let atual = "";
+  const fechar = () => {
+    if (atual) blocos.push(quebrarEmLinhas(atual));
+    atual = "";
+  };
+  for (const frase of dividirEmFrases(paragrafo)) {
+    const junto = atual ? `${atual} ${frase}` : frase;
+    if (quebrarEmLinhas(junto).length <= maxLinhas) {
+      atual = junto;
+      continue;
+    }
+    fechar();
+    const linhas = quebrarEmLinhas(frase);
+    let i = 0;
+    for (; linhas.length - i > maxLinhas; i += maxLinhas) blocos.push(linhas.slice(i, i + maxLinhas));
+    atual = linhas.slice(i).join(" ");
+  }
+  fechar();
+  return blocos;
+}
+
 function paragrafos(texto: string): string[] {
   return texto
     .replace(/\r\n?/gu, "\n")
@@ -134,10 +171,7 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
       }
       continue;
     }
-    const linhas = quebrarEmLinhas(paragrafo);
-    for (let i = 0; i < linhas.length; i += maxLinhas) {
-      blocos.push({ linhas: linhas.slice(i, i + maxLinhas) });
-    }
+    for (const linhas of blocosDoParagrafo(paragrafo, maxLinhas)) blocos.push({ linhas });
   }
 
   return {

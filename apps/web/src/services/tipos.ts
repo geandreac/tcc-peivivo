@@ -15,6 +15,8 @@ export type { DimensaoObservada, EscalaObservacao, ParametrosAdaptacao, TextoAda
 export type Papel = "RESPONSAVEL" | "DOCENTE" | "PROFISSIONAL_SAUDE" | "COORDENACAO";
 export type StatusConsentimento = "ATIVO" | "REVOGADO" | "EXPIRADO";
 export type StatusValidacao = "PENDENTE" | "VIGENTE" | "EM_REVISAO" | "EXPIRADA" | "SUBSTITUIDA";
+/** Versões que ainda aguardam alguém (profissional decide; em revisão, a docente ajusta). */
+export const STATUS_PENDENTES: readonly StatusValidacao[] = ["PENDENTE", "EM_REVISAO"];
 export type StatusAprovacao = "RASCUNHO" | "APROVADO" | "DESCARTADO";
 export type StatusCiclo = "ABERTO" | "FECHADO";
 /** D-24/D-36: profissional proposto pela coordenação aguarda a família. */

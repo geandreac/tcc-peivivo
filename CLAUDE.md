@@ -23,7 +23,7 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (42) + funções (31) + políticas RLS (113, PGlite) + web (116, axe) — 100%
+npm test                                    # motor (44) + funções (31) + políticas RLS (113, PGlite) + web (117, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
 npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)

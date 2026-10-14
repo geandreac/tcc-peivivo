@@ -181,6 +181,18 @@ describe("RF05–RF07 — fechar ciclo e validar (RN03, RN05, RN06)", () => {
     const pend = await api.listarPendencias();
     expect(pend.some((p) => p.versao.id === versao.id)).toBe(true);
   });
+  it("pendências só lista o que ainda pode ser decidido (nunca substituída, vigente ou expirada)", async () => {
+    await api.entrar(ID.coordenacao);
+    expect(await api.listarPendencias()).toEqual([]);
+    await api.entrar(ID.profissional);
+    expect(await api.listarPendencias()).toEqual([]);
+    await api.entrar(ID.docente);
+    const { versao } = await api.fecharCiclo(ID.ciclo4);
+    await api.entrar(ID.profissional);
+    const pend = await api.listarPendencias();
+    expect(pend.map((p) => p.versao.id)).toEqual([versao.id]);
+    expect(pend.every((p) => ["PENDENTE", "EM_REVISAO"].includes(p.versao.statusValidacao))).toBe(true);
+  });
 });
 
 describe("RF03/RF04 — observações (D-04)", () => {

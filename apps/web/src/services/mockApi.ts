@@ -40,6 +40,7 @@ import type {
   VersaoPerfil,
   Vinculo,
 } from "./tipos";
+import { STATUS_PENDENTES } from "./tipos";
 import * as semente from "../mocks/dados";
 
 interface Estado {
@@ -644,7 +645,8 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const ids = new Set(meus.map((v) => v.estudanteId));
         const lista: Pendencia[] = [];
         for (const v of estado.versoes) {
-          if (!ids.has(v.estudanteId) || v.statusValidacao === "VIGENTE") continue;
+          // Só o que ainda pode ser decidido: substituída e expirada não voltam (RN05, D-35).
+          if (!ids.has(v.estudanteId) || !STATUS_PENDENTES.includes(v.statusValidacao)) continue;
           lista.push({ versao: v, estudante: estudante(v.estudanteId), diasEmAberto: Math.floor((Date.now() - new Date(v.createdAt).getTime()) / 86_400_000) });
         }
         return lista.sort((a, b) => b.diasEmAberto - a.diasEmAberto);

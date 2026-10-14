@@ -143,6 +143,8 @@ describe("Caminhos negados na interface (P4.20)", () => {
     container.remove();
     await renderizarApp(`/estudantes/${ID.estudanteA}/notas-clinicas`, ID.docente);
     expect(await screen.findByText("Acesso negado")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Nova nota" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Conteúdo da nota")).not.toBeInTheDocument();
   });
 
   it("responsável não vê rascunho: rota direta do rascunho → 'Material não encontrado'", async () => {

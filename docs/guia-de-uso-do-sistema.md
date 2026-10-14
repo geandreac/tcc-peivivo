@@ -164,10 +164,10 @@ Na mesma página há **Simular falha de rede**, para mostrar a tela de erro.
 | # | Gravidade | Problema | Situação |
 |---|---|---|---|
 | 1 | **Alta** | Abrir qualquer página interna pela URL, recarregar a página ou clicar no link do convite (`/definir-senha`) dava **404 da Vercel**. | **Corrigido** no mesmo dia (`apps/web/vercel.json`); conferido no site. |
-| 2 | Média | Os trechos do material adaptado são cortados **no meio da frase** ("Quando o magma chega à \| superfície…") e, na tela, o 1º trecho ocupa cerca de 6 linhas, embora o perfil diga "até 4 linhas". Para dislexia/TEA, isso atrapalha. O mesmo aparece no exemplo da página inicial. | Aberto |
-| 3 | Média | **Pendências** lista versões antigas do Miguel (ciclos 1 e 2, já "substituídas") como "prazo vencido", enquanto o painel diz "Validações atrasadas: 0". | Aberto |
-| 4 | Média | A página inicial diz "A coordenação vê números, não observações", mas a coordenação vê as observações no Histórico, e a tabela da Privacidade confirma ("Só vê"). O texto da página inicial está errado, ou o acesso é largo demais. | Aberto (decidir qual dos dois) |
-| 5 | Baixa | Nas notas clínicas, quem não tem acesso vê "Acesso negado" **e também** o formulário "Nova nota". A gravação é barrada, mas o formulário não deveria aparecer. | Aberto |
+| 2 | Média | Os trechos do material adaptado eram cortados **no meio da frase** ("Quando o magma chega à \| superfície…"). O mesmo aparecia no exemplo da página inicial. | **Corrigido**: o motor agrupa frases inteiras; só uma frase maior que o limite é dividida. Observação: na tela, um trecho de "4 linhas" (≈ 60 caracteres cada) pode ocupar mais linhas num cartão estreito. |
+| 3 | Média | **Pendências** lista versões antigas do Miguel (ciclos 1 e 2, já "substituídas") como "prazo vencido", enquanto o painel diz "Validações atrasadas: 0". | **Corrigido**: Pendências mostra só versões pendentes ou em revisão (as que ainda podem ser decididas), no mock e no Supabase. |
+| 4 | Média | A página inicial diz "A coordenação vê números, não observações", mas a coordenação vê as observações no Histórico, e a tabela da Privacidade confirma ("Só vê"). Pela decisão registrada em `docs/reformulacao/DECISOES.md`, a coordenação lê observações só no histórico (obrigação legal). | **Corrigido**: o texto da página inicial agora diz isso. |
+| 5 | Baixa | Nas notas clínicas, quem não tem acesso vê "Acesso negado" **e também** o formulário "Nova nota". A gravação é barrada, mas o formulário não deveria aparecer. | **Corrigido**: o formulário só aparece para quem tem acesso. |
 | 6 | Baixa | A âncora de interesse vira a frase inteira ("engajamento espontâneo com dinossauros") depois do ciclo 4. A causa está nos dados fictícios: a evidência do ciclo 3 é uma frase, e não o tema. | Aberto (ajustar o seed) |
 | 7 | Baixa | Siglas internas aparecem na tela: "(HU-C.02)" em Vínculos e "(RN06)" na porta da equipe de saúde. | Aberto |
 | 8 | Baixa | A família e a docente veem "Pendências" no menu, mas só a saúde e a coordenação usam. | Aberto |
@@ -202,4 +202,4 @@ Antes de começar: **Ajuda → Restaurar dados da demonstração**.
 | 9 | Família (Rosa) | Estudante B → Revogar; depois Márcia tenta gerar | Bloqueio imediato |
 | 10 | Qualquer | Acessibilidade → leitura facilitada / alto contraste; navegar com Tab | Acessibilidade de verdade |
 
-Evite mostrar, enquanto os problemas 2 e 3 da seção 8 não forem corrigidos: a tela **Pendências** da coordenação e o material gerado com textos longos (prefira o texto de exemplo).
+Os problemas 1 a 5 da seção 8 já foram corrigidos; os demais são de baixa gravidade e não atrapalham o roteiro.
