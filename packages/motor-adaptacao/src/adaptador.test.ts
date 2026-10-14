@@ -36,7 +36,7 @@ describe("P2.4 — adaptar (RF09, D-10)", () => {
 
   it("blocos terminam em fim de frase quando cada frase cabe no limite de linhas", () => {
     const r = adaptar(TEXTO_CICLO_DA_AGUA, PERFIL_MIGUEL);
-    const textuais = [...r.blocos, ...r.blocosExcedentes].filter((b) => !/^\d+\.\s/u.test(b.linhas[0]));
+    const textuais = [...r.blocos, ...r.blocosExcedentes].filter((b) => !/^\d+\.\s/u.test(b.linhas[0] ?? ""));
     expect(textuais.length).toBeGreaterThan(1);
     for (const bloco of textuais) {
       expect(bloco.linhas.join(" ")).toMatch(/[.!?…]["”)]?$/u);
