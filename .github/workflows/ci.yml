@@ -6,8 +6,9 @@ on:
     paths-ignore: ["docs/**", "**.md"]
   pull_request:
     # feature/** cobre PRs empilhados (ex.: R3 sobre R1) — senão ficariam sem CI.
+    # Sem paths-ignore: a main exige os 5 checks, e um PR só de documentação
+    # ficaria travado esperando um CI que nunca roda.
     branches: [main, development, "feature/**"]
-    paths-ignore: ["docs/**", "**.md"]
 
 jobs:
   motor:
