@@ -28,6 +28,8 @@
 .botao:hover {
   --botao-fundo: var(--cor-primaria-escura);
   --botao-borda: var(--cor-primaria-escura);
+  /* `a.botao`: sem isto, `a:hover` (base.css) pinta o texto com a cor do fundo e ele some. */
+  color: var(--botao-texto);
 }
 .botao:active {
   transform: translateY(1px);
