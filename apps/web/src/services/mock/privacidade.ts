@@ -91,7 +91,15 @@ export function privacidade(ctx: ContextoMock) {
         ctx.estado.materiais = ctx.estado.materiais.filter((x) => x.estudanteId !== estudanteId);
         ctx.estado.desfechos = ctx.estado.desfechos.filter((x) => !idsMat.has(x.materialId));
         ctx.estado.notas = ctx.estado.notas.filter((x) => x.estudanteId !== estudanteId); // D-05: inclui notas clínicas
-        ctx.estado.auditoria.push({ id: uuid(), entidade: "estudantes", entidadeId: estudanteId, evento: "EXCLUSAO", autorId: ctx.sessaoId, data: ctx.agora(), detalhes: {} });
+        ctx.estado.auditoria.push({
+          id: uuid(),
+          entidade: "estudantes",
+          entidadeId: estudanteId,
+          evento: "EXCLUSAO",
+          autorId: ctx.sessaoId,
+          data: ctx.agora(),
+          detalhes: {},
+        });
         ctx.salvar();
       }),
 

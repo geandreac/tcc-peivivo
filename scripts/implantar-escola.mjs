@@ -26,7 +26,9 @@ const nome = argumento("nome")?.trim() ?? "";
 const site = (argumento("site") ?? "http://localhost:5173").replace(/\/$/u, "");
 
 if (!url || !chave || !escola || !email) {
-  console.error("Uso: SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/implantar-escola.mjs --escola \"Nome\" --email coord@… [--nome \"…\"] [--site https://…]");
+  console.error(
+    'Uso: SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/implantar-escola.mjs --escola "Nome" --email coord@… [--nome "…"] [--site https://…]',
+  );
   process.exit(1);
 }
 
@@ -61,7 +63,11 @@ if (convite.error) {
 // 3. usuário + membro COORDENACAO + registro do convite (criado_por = null: implantação)
 let { data: u } = await sb.from("usuarios").select("id").eq("email", email).maybeSingle();
 if (!u) {
-  const r = await sb.from("usuarios").insert({ auth_user_id: authId, nome: nome || email.split("@")[0], email }).select("id").single();
+  const r = await sb
+    .from("usuarios")
+    .insert({ auth_user_id: authId, nome: nome || email.split("@")[0], email })
+    .select("id")
+    .single();
   if (r.error) falhar("criar usuário", r.error);
   u = r.data;
 }

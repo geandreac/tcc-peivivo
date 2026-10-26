@@ -22,7 +22,10 @@
   font-weight: var(--peso-negrito);
   text-decoration: none;
   cursor: pointer;
-  transition: background-color var(--duracao), border-color var(--duracao), transform var(--duracao);
+  transition:
+    background-color var(--duracao),
+    border-color var(--duracao),
+    transform var(--duracao);
   text-align: center;
 }
 .botao:hover {

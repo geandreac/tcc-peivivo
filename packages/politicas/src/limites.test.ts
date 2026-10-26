@@ -23,8 +23,10 @@ const recusado = (r: Resultado) => {
   expect(r.codigo, r.mensagem).toBe(VIOLA_CHECK);
 };
 const aceito = (r: Resultado) => expect(r.ok, r.mensagem).toBe(true);
-const observacao = (n: number) => `insert into observacoes (ciclo_id, dimensao, valor_escala, evidencia) values ('${ID.cicloE1}','FADIGA_TAREFA','REDUZIDA', repeat('x', ${n}))`;
-const desfecho = (n: number) => `insert into desfechos (material_id, resultado, observacao_livre) values ('${ID.aprovadoDocente}','PARCIAL', repeat('x', ${n}))`;
+const observacao = (n: number) =>
+  `insert into observacoes (ciclo_id, dimensao, valor_escala, evidencia) values ('${ID.cicloE1}','FADIGA_TAREFA','REDUZIDA', repeat('x', ${n}))`;
+const desfecho = (n: number) =>
+  `insert into desfechos (material_id, resultado, observacao_livre) values ('${ID.aprovadoDocente}','PARCIAL', repeat('x', ${n}))`;
 const nota = (n: number) => `select fn_registrar_nota_clinica('${ID.e1}', repeat('x', ${n}))`;
 
 describe("0010 · texto livre acima do limite é recusado pelo banco (negado primeiro)", () => {

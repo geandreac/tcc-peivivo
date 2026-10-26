@@ -77,7 +77,11 @@ export function RevisarMaterial() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo={`Revisar: ${m.titulo}`} descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo={`Revisar: ${m.titulo}`}
+        descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar."
+      />
 
       <div className="chips chips--secao">
         <Badge tom="aviso">{STATUS_APROVACAO.RASCUNHO.texto}</Badge>
@@ -87,7 +91,8 @@ export function RevisarMaterial() {
 
       {!m.iaAplicada && (
         <Alerta tom="info" titulo="A camada de IA não foi aplicada">
-          Você recebeu blocos, etapas e contraste conforme o perfil. Vocabulário e exemplos (âncora de interesse) só mudam com a IA ligada — que, ainda assim, nunca aprova nada.
+          Você recebeu blocos, etapas e contraste conforme o perfil. Vocabulário e exemplos (âncora de interesse) só mudam com a IA ligada — que, ainda assim,
+          nunca aprova nada.
         </Alerta>
       )}
 
@@ -105,7 +110,15 @@ export function RevisarMaterial() {
         <section className="comparacao__painel" aria-labelledby="titulo-adaptado">
           <h2 id="titulo-adaptado">Adaptado</h2>
           {editando ? (
-            <Campo tipo="area" id="texto-editado" rotulo="Texto adaptado (editável)" dica="Separe blocos com uma linha em branco. Etapas numeradas viram lista." rows={16} value={texto} onChange={(e) => setTextoEditado(e.target.value)} />
+            <Campo
+              tipo="area"
+              id="texto-editado"
+              rotulo="Texto adaptado (editável)"
+              dica="Separe blocos com uma linha em branco. Etapas numeradas viram lista."
+              rows={16}
+              value={texto}
+              onChange={(e) => setTextoEditado(e.target.value)}
+            />
           ) : (
             m.textoAdaptado && <MaterialAdaptado adaptado={m.textoAdaptado} mostrarExcedentes />
           )}

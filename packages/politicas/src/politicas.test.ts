@@ -64,12 +64,22 @@ describe("Base: anônimo, pessoa sem vínculo e higiene das funções", () => {
 // =============================================================================
 describe("RN01 · consentimento só pelo responsável, só por RPC", () => {
   it("S-04 docente não insere consentimento direto", async () => {
-    negado(await db.como("docente", `insert into consentimentos (estudante_id, responsavel_id, escopos, versao_termo)
-      values ('${ID.e2}','${usuarioId("docente")}',${ESCOPOS},'v')`));
+    negado(
+      await db.como(
+        "docente",
+        `insert into consentimentos (estudante_id, responsavel_id, escopos, versao_termo)
+      values ('${ID.e2}','${usuarioId("docente")}',${ESCOPOS},'v')`,
+      ),
+    );
   });
   it("S-05 pessoa sem vínculo não insere consentimento", async () => {
-    negado(await db.como("estranho", `insert into consentimentos (estudante_id, responsavel_id, escopos, versao_termo)
-      values ('${ID.e2}','${usuarioId("estranho")}',${ESCOPOS},'v')`));
+    negado(
+      await db.como(
+        "estranho",
+        `insert into consentimentos (estudante_id, responsavel_id, escopos, versao_termo)
+      values ('${ID.e2}','${usuarioId("estranho")}',${ESCOPOS},'v')`,
+      ),
+    );
   });
   it("S-06 docente não concede pela RPC (e por isso não libera geração)", async () => {
     negado(await db.como("docente", `select fn_conceder_consentimento('${ID.e2}', ${ESCOPOS}, 'v')`));
@@ -127,16 +137,23 @@ describe("D3/D-24 · acesso clínico só com confirmação do responsável", () 
   });
   it("S-12 ninguém escreve vínculo direto", async () => {
     negado(await db.como("coordenacao", `update vinculos_usuario_estudante set papel = 'PROFISSIONAL_SAUDE'`));
-    negado(await db.como("coordenacao", `insert into vinculos_usuario_estudante (usuario_id, estudante_id, papel)
-      values ('${usuarioId("estranho")}','${ID.e1}','DOCENTE')`));
+    negado(
+      await db.como(
+        "coordenacao",
+        `insert into vinculos_usuario_estudante (usuario_id, estudante_id, papel)
+      values ('${usuarioId("estranho")}','${ID.e1}','DOCENTE')`,
+      ),
+    );
   });
   it("S-13 coordenação não lê nota clínica, nem por SELECT nem pela RPC", async () => {
     negado(await db.como("coordenacao", `select * from notas_clinicas`));
     negado(await db.como("coordenacao", `select * from fn_ler_notas_clinicas('${ID.e1}')`));
   });
   it("S-14 coordenação não encerra o vínculo do responsável legal", async () => {
-    const v = ok(await db.sistema(`select id from vinculos_usuario_estudante
-      where usuario_id = '${usuarioId("responsavel")}' and estudante_id = '${ID.e1}'`))[0]?.id;
+    const v = ok(
+      await db.sistema(`select id from vinculos_usuario_estudante
+      where usuario_id = '${usuarioId("responsavel")}' and estudante_id = '${ID.e1}'`),
+    )[0]?.id;
     negado(await db.como("coordenacao", `select fn_encerrar_vinculo('${v}')`));
   });
   it("docente não propõe profissional; proposta sem registro no conselho é inválida", async () => {
@@ -272,15 +289,24 @@ describe("RN04/D-34 · materiais: rascunho só do autor; decisão só pelo autor
     negado(await db.como("docente", `select fn_decidir_material('${ID.rascunhoDocente2}', 'APROVAR')`));
   });
   it("S-20 cliente não insere nem altera material direto (só a Edge Function gerar-material)", async () => {
-    negado(await db.como("docente", `insert into materiais_adaptados (estudante_id, versao_perfil_id, docente_id, texto_original)
-      values ('${ID.e1}','${ID.vigenteE1}','${usuarioId("docente")}','x')`));
+    negado(
+      await db.como(
+        "docente",
+        `insert into materiais_adaptados (estudante_id, versao_perfil_id, docente_id, texto_original)
+      values ('${ID.e1}','${ID.vigenteE1}','${usuarioId("docente")}','x')`,
+      ),
+    );
     negado(await db.como("docente2", `update materiais_adaptados set status_aprovacao = 'APROVADO'`));
   });
   it("S-21/S-22 nem o servidor grava material com versão pendente ou de outro estudante", async () => {
-    conflito(await db.sistema(`insert into materiais_adaptados (estudante_id, versao_perfil_id, docente_id, texto_original)
-      values ('${ID.e1}','${ID.pendenteE1}','${usuarioId("docente")}','x')`));
-    invalido(await db.sistema(`insert into materiais_adaptados (estudante_id, versao_perfil_id, docente_id, texto_original)
-      values ('${ID.e1}','${ID.vigenteE2}','${usuarioId("docente")}','x')`));
+    conflito(
+      await db.sistema(`insert into materiais_adaptados (estudante_id, versao_perfil_id, docente_id, texto_original)
+      values ('${ID.e1}','${ID.pendenteE1}','${usuarioId("docente")}','x')`),
+    );
+    invalido(
+      await db.sistema(`insert into materiais_adaptados (estudante_id, versao_perfil_id, docente_id, texto_original)
+      values ('${ID.e1}','${ID.vigenteE2}','${usuarioId("docente")}','x')`),
+    );
   });
   it("S-23 desfecho só em material aprovado e só pelo autor", async () => {
     negado(await db.como("docente2", `insert into desfechos (material_id, resultado) values ('${ID.rascunhoDocente2}','ALCANCADO')`));
@@ -381,16 +407,29 @@ describe("RF03/RF04/D-04 · observações e ciclos", () => {
   });
   it("coordenação não observa; ninguém observa em ciclo fechado", async () => {
     negado(await db.como("coordenacao", `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloE1}','ATENCAO_SUSTENTADA','ESTAVEL')`));
-    negado(await db.como("docente", `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloFechadoE1}','ATENCAO_SUSTENTADA','ESTAVEL')`));
+    negado(
+      await db.como("docente", `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloFechadoE1}','ATENCAO_SUSTENTADA','ESTAVEL')`),
+    );
   });
   it("cliente não escolhe a autoria (autor_id não é gravável)", async () => {
-    negado(await db.como("docente", `insert into observacoes (ciclo_id, autor_id, dimensao, valor_escala)
-      values ('${ID.cicloE1}','${usuarioId("docente2")}','ATENCAO_SUSTENTADA','ESTAVEL')`));
+    negado(
+      await db.como(
+        "docente",
+        `insert into observacoes (ciclo_id, autor_id, dimensao, valor_escala)
+      values ('${ID.cicloE1}','${usuarioId("docente2")}','ATENCAO_SUSTENTADA','ESTAVEL')`,
+      ),
+    );
   });
   it("PERMITIDO: docente e responsável observam; autoria e papel vêm do servidor", async () => {
     const r = await db.fluxo([
-      { ator: "docente", sql: `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloE1}','ATENCAO_SUSTENTADA','ESTAVEL') returning autor_id, papel_autor` },
-      { ator: "responsavel", sql: `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloE1}','INTERESSE_MANIFESTO','AMPLIADA') returning papel_autor` },
+      {
+        ator: "docente",
+        sql: `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloE1}','ATENCAO_SUSTENTADA','ESTAVEL') returning autor_id, papel_autor`,
+      },
+      {
+        ator: "responsavel",
+        sql: `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloE1}','INTERESSE_MANIFESTO','AMPLIADA') returning papel_autor`,
+      },
     ]);
     expect(ok(r[0])[0]).toEqual({ autor_id: usuarioId("docente"), papel_autor: "DOCENTE" });
     expect(ok(r[1])[0]?.papel_autor).toBe("RESPONSAVEL");

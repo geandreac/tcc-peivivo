@@ -11,12 +11,7 @@
 export type NivelVocabulario = "BASICO" | "INTERMEDIARIO" | "ORIGINAL";
 export type FormatoEnunciado = "ETAPA_UNICA" | "MULTIPLAS_ETAPAS";
 export type DimensaoObservada =
-  | "ATENCAO_SUSTENTADA"
-  | "COMPREENSAO_ENUNCIADOS"
-  | "AUTONOMIA_LEXICAL"
-  | "INTERESSE_MANIFESTO"
-  | "SENSIBILIDADE_VISUAL"
-  | "FADIGA_TAREFA";
+  "ATENCAO_SUSTENTADA" | "COMPREENSAO_ENUNCIADOS" | "AUTONOMIA_LEXICAL" | "INTERESSE_MANIFESTO" | "SENSIBILIDADE_VISUAL" | "FADIGA_TAREFA";
 export type EscalaObservacao = "REDUZIDA" | "ESTAVEL" | "AMPLIADA";
 
 export const DIMENSOES: readonly DimensaoObservada[] = [

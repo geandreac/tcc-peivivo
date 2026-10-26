@@ -82,8 +82,8 @@ export function VerificacaoDuasEtapas() {
     <div className="pagina-estreita">
       <h1>Verificação em duas etapas</h1>
       <p>
-        Como você acessa dados de saúde ou administra a escola, pedimos um segundo passo além da senha: um código que muda a cada 30
-        segundos no seu celular. Assim, mesmo que alguém descubra sua senha, não entra.
+        Como você acessa dados de saúde ou administra a escola, pedimos um segundo passo além da senha: um código que muda a cada 30 segundos no seu celular.
+        Assim, mesmo que alguém descubra sua senha, não entra.
       </p>
 
       {precisaCadastrar && (
@@ -108,7 +108,13 @@ export function VerificacaoDuasEtapas() {
       {cadastro && (
         <>
           <h2>Leia o código QR</h2>
-          <img src={cadastro.qrCode} alt="Código QR para cadastrar o PEI Vivo no aplicativo autenticador. Se não puder ler, use a chave em texto abaixo." width={200} height={200} className="qr-code" />
+          <img
+            src={cadastro.qrCode}
+            alt="Código QR para cadastrar o PEI Vivo no aplicativo autenticador. Se não puder ler, use a chave em texto abaixo."
+            width={200}
+            height={200}
+            className="qr-code"
+          />
           <p>
             Não consegue usar a câmera? No aplicativo, escolha “inserir chave” e digite: <code className="segredo">{cadastro.segredo}</code>
           </p>

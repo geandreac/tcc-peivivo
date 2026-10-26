@@ -92,7 +92,9 @@ export function escola(c: Contexto) {
 
     // ---- notificações
     listarNotificacoes: async () =>
-      (await paginado<Linha>((de, ate) => sb.from("notificacoes").select(COL_NOTIF).order("criada_em", { ascending: false }).order("id").range(de, ate))).map(paraNotificacao),
+      (await paginado<Linha>((de, ate) => sb.from("notificacoes").select(COL_NOTIF).order("criada_em", { ascending: false }).order("id").range(de, ate))).map(
+        paraNotificacao,
+      ),
     marcarNotificacoesLidas: async (ids) => {
       let q = sb.from("notificacoes").update({ lida_em: new Date().toISOString() }).is("lida_em", null);
       if (ids) q = q.in("id", ids);

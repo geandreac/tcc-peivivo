@@ -26,8 +26,8 @@ function EntrarDemonstracao() {
         <div>
           <h1>Entrar</h1>
           <p>
-            Cada perfil tem a sua própria porta de entrada, com o que pode fazer e o que nunca vê. Escolha quem você é. Nesta demonstração os
-            perfis são <strong>fictícios</strong> e não há senha.
+            Cada perfil tem a sua própria porta de entrada, com o que pode fazer e o que nunca vê. Escolha quem você é. Nesta demonstração os perfis são{" "}
+            <strong>fictícios</strong> e não há senha.
           </p>
         </div>
       </div>

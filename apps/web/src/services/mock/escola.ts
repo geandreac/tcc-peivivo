@@ -52,7 +52,15 @@ export function escola(ctx: ContextoMock) {
           createdAt: ctx.agora(),
         };
         ctx.estado.estudantes.push(novo);
-        ctx.estado.vinculos.push({ id: uuid(), usuarioId: u.id, estudanteId: novo.id, papel: "COORDENACAO", dataVinculo: ctx.agora(), status: "ATIVO", registroConselho: null });
+        ctx.estado.vinculos.push({
+          id: uuid(),
+          usuarioId: u.id,
+          estudanteId: novo.id,
+          papel: "COORDENACAO",
+          dataVinculo: ctx.agora(),
+          status: "ATIVO",
+          registroConselho: null,
+        });
         ctx.registrarAuditoria("estudantes", novo.id, "CADASTRO");
         ctx.salvar();
         return novo;
@@ -70,7 +78,11 @@ export function escola(ctx: ContextoMock) {
         if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim()) {
           throw new ErroApi("VALIDACAO", "Profissional de saúde precisa do registro no conselho.");
         }
-        if (ctx.estado.vinculos.some((v) => v.usuarioId === dados.usuarioId && v.estudanteId === dados.estudanteId && (v.status === "ATIVO" || v.status === "PENDENTE_RESPONSAVEL"))) {
+        if (
+          ctx.estado.vinculos.some(
+            (v) => v.usuarioId === dados.usuarioId && v.estudanteId === dados.estudanteId && (v.status === "ATIVO" || v.status === "PENDENTE_RESPONSAVEL"),
+          )
+        ) {
           throw new ErroApi("CONFLITO", "Esta pessoa já tem um vínculo ativo com o estudante.");
         }
         const pendente = dados.papel === "PROFISSIONAL_SAUDE" && meu === "COORDENACAO";
@@ -138,14 +150,17 @@ export function escola(ctx: ContextoMock) {
         if (dados.papel === "RESPONSAVEL" && !dados.conferidoPresencialmente) {
           throw new ErroApi("VALIDACAO", "Confirme que o vínculo legal foi conferido presencialmente, com documento.");
         }
-        if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim()) throw new ErroApi("VALIDACAO", "Informe o registro no conselho profissional.");
+        if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim())
+          throw new ErroApi("VALIDACAO", "Informe o registro no conselho profissional.");
         let pessoa = ctx.estado.usuarios.find((x) => x.email === email);
         if (!pessoa) {
           pessoa = { id: uuid(), nome: dados.nome?.trim() || email.split("@")[0]!, email, papelInstitucional: null };
           ctx.estado.usuarios.push(pessoa);
         }
         if (dados.papel !== "DOCENTE" && dados.estudanteId) {
-          const ja = ctx.estado.vinculos.some((v) => v.usuarioId === pessoa!.id && v.estudanteId === dados.estudanteId && (v.status === "ATIVO" || v.status === "PENDENTE_RESPONSAVEL"));
+          const ja = ctx.estado.vinculos.some(
+            (v) => v.usuarioId === pessoa!.id && v.estudanteId === dados.estudanteId && (v.status === "ATIVO" || v.status === "PENDENTE_RESPONSAVEL"),
+          );
           if (!ja) {
             const pendente = dados.papel === "PROFISSIONAL_SAUDE";
             const v: Vinculo = {

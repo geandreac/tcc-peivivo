@@ -40,7 +40,9 @@ main > .container > .lista-simples li {
 /* colunas: .grade-cards (componentes.css); aqui só o retorno visual de cartão clicável */
 .grade-cards--acoes > .card {
   margin-bottom: 0;
-  transition: box-shadow var(--duracao-curta) var(--curva-padrao), border-color var(--duracao-curta) var(--curva-padrao),
+  transition:
+    box-shadow var(--duracao-curta) var(--curva-padrao),
+    border-color var(--duracao-curta) var(--curva-padrao),
     background-color var(--duracao-curta) var(--curva-padrao);
 }
 .grade-cards--acoes > .card:hover,
@@ -78,7 +80,9 @@ main > .container > .lista-simples li {
   border-left: 4px solid var(--papel);
   border-radius: var(--raio-lg);
   box-shadow: var(--sombra-1);
-  transition: box-shadow var(--duracao-curta) var(--curva-padrao), background-color var(--duracao-curta) var(--curva-padrao);
+  transition:
+    box-shadow var(--duracao-curta) var(--curva-padrao),
+    background-color var(--duracao-curta) var(--curva-padrao);
 }
 .cartao-estudante:hover,
 .cartao-estudante:focus-within {

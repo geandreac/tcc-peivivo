@@ -71,7 +71,13 @@ export function criarContexto(sb: SupabaseClient): Contexto {
       if (resposta.status === 401) throw new ErroApi("NAO_AUTENTICADO", "Sua sessão expirou. Entre novamente.");
       try {
         const { erro } = (await resposta.json()) as CorpoErro;
-        const mapa: Record<string, CodigoErro> = { NEGADO: "NEGADO", CONFLITO: "CONFLITO", VALIDACAO: "VALIDACAO", NAO_AUTENTICADO: "NAO_AUTENTICADO", INTERNO: "REDE" };
+        const mapa: Record<string, CodigoErro> = {
+          NEGADO: "NEGADO",
+          CONFLITO: "CONFLITO",
+          VALIDACAO: "VALIDACAO",
+          NAO_AUTENTICADO: "NAO_AUTENTICADO",
+          INTERNO: "REDE",
+        };
         throw new ErroApi(mapa[erro.codigo] ?? "REDE", erro.mensagem);
       } catch (e) {
         if (e instanceof ErroApi) throw e;

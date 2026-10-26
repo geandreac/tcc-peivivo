@@ -39,7 +39,7 @@ export function Layout() {
   // Contagem de não lidas: recarrega a cada troca de tela (sem polling, sem push).
   const naoLidas = useConsulta<number>(
     async () => (usuario ? (await api.listarNotificacoes()).filter((n) => !n.lidaEm).length : 0),
-    [usuario?.id, location.pathname]
+    [usuario?.id, location.pathname],
   );
   const contagem = naoLidas.dados ?? 0;
 
@@ -78,7 +78,11 @@ export function Layout() {
           </NavLink>
           {usuario ? (
             <div className="sessao">
-              <NavLink to="/notificacoes" className="sino" aria-label={contagem > 0 ? `Notificações, ${contagem} não lida${contagem > 1 ? "s" : ""}` : "Notificações"}>
+              <NavLink
+                to="/notificacoes"
+                className="sino"
+                aria-label={contagem > 0 ? `Notificações, ${contagem} não lida${contagem > 1 ? "s" : ""}` : "Notificações"}
+              >
                 <Bell aria-hidden="true" size={22} />
                 {contagem > 0 && (
                   <span className="sino__contagem" aria-hidden="true">

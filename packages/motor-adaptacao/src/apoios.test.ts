@@ -4,8 +4,7 @@ import { adaptar, VERBOS_DE_COMANDO } from "./adaptador";
 import { VOCABULARIO } from "./vocabulario";
 import { PARAMETROS_PADRAO } from "./tipos";
 
-const AGUA =
-  "O ciclo da água é o movimento contínuo da água na Terra. A água evapora com o calor do sol e sobe em forma de vapor. Depois vem a precipitação.";
+const AGUA = "O ciclo da água é o movimento contínuo da água na Terra. A água evapora com o calor do sol e sobe em forma de vapor. Depois vem a precipitação.";
 
 describe("D-43 — pictograma da etapa", () => {
   it("reconhece o verbo de comando, com numeração e no plural", () => {
@@ -69,7 +68,10 @@ describe("D-43 — apoios derivam dos parâmetros validados (RN07)", () => {
 
   it("juntar glossários: regras primeiro, IA só acrescenta termo novo", () => {
     const regras = [{ termo: "ciclo", explicacao: "das regras" }];
-    const ia = [{ termo: "Ciclo", explicacao: "da IA" }, { termo: "nuvem", explicacao: "da IA" }];
+    const ia = [
+      { termo: "Ciclo", explicacao: "da IA" },
+      { termo: "nuvem", explicacao: "da IA" },
+    ];
     expect(juntarGlossarios(regras, ia, undefined)).toEqual([regras[0], ia[1]]);
   });
 });

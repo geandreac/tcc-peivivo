@@ -46,7 +46,7 @@ export function AnuncioProvider({ children }: { children: ReactNode }) {
         setTimeout(() => fechar(id), 6000);
       }
     },
-    [fechar]
+    [fechar],
   );
 
   const valor = useMemo(() => ({ anunciar, toasts, fechar, polite, assertive }), [anunciar, toasts, fechar, polite, assertive]);

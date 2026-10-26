@@ -19,8 +19,7 @@ const pacotes = [
   { de: "packages/funcoes/src", para: "funcoes", nome: "@pei-vivo/funcoes" },
 ];
 const ZOD = "npm:zod@4.6.7";
-const CABECALHO = (origem) =>
-  `// GERADO por scripts/sincronizar-funcoes.mjs a partir de ${origem} — NÃO EDITE.\n`;
+const CABECALHO = (origem) => `// GERADO por scripts/sincronizar-funcoes.mjs a partir de ${origem} — NÃO EDITE.\n`;
 
 function reescrever(codigo) {
   return codigo.replace(/(from\s+|import\s*\(\s*)(["'])([^"']+)\2/gu, (todo, prefixo, aspas, alvo) => {

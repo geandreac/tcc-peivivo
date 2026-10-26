@@ -81,7 +81,7 @@ export function useMutacao<A extends unknown[], R>(fn: (...args: A) => Promise<R
         setOcupado(false);
       }
     },
-    [fn]
+    [fn],
   );
 
   return { executar, ocupado, erro, limparErro: () => setErro(null) };

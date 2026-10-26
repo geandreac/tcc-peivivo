@@ -42,10 +42,46 @@ const CONECTORES = [
 
 /** Verbos de comando reconhecidos (imperativo, 3ª pessoa). Cada um tem pictograma (`apoios.ts`). */
 export const VERBOS_DE_COMANDO = [
-  "leia", "escreva", "circule", "marque", "pinte", "responda", "complete", "copie", "desenhe", "observe",
-  "sublinhe", "ligue", "calcule", "escolha", "anote", "recorte", "cole", "conte", "explique", "resuma",
-  "procure", "compare", "identifique", "descreva", "monte", "separe", "organize", "assinale", "numere", "risque",
-  "encontre", "preencha", "grife", "destaque", "relacione", "indique", "justifique", "cite", "elabore", "construa",
+  "leia",
+  "escreva",
+  "circule",
+  "marque",
+  "pinte",
+  "responda",
+  "complete",
+  "copie",
+  "desenhe",
+  "observe",
+  "sublinhe",
+  "ligue",
+  "calcule",
+  "escolha",
+  "anote",
+  "recorte",
+  "cole",
+  "conte",
+  "explique",
+  "resuma",
+  "procure",
+  "compare",
+  "identifique",
+  "descreva",
+  "monte",
+  "separe",
+  "organize",
+  "assinale",
+  "numere",
+  "risque",
+  "encontre",
+  "preencha",
+  "grife",
+  "destaque",
+  "relacione",
+  "indique",
+  "justifique",
+  "cite",
+  "elabore",
+  "construa",
   "classifique",
 ] as const;
 
@@ -54,10 +90,7 @@ const VERBOS = VERBOS_DE_COMANDO.join("|");
 const VERBO_INICIAL = new RegExp(`^(?:${VERBOS})m?\\b`, "iu");
 
 /** Divide antes de um verbo imperativo precedido por conector, "e" ou vírgula. */
-const DIVISOR_ETAPAS = new RegExp(
-  `\\s*,?\\s*(?:\\b(?:${CONECTORES.join("|")})\\b|\\be\\b|,)\\s*(?=(?:${VERBOS})m?\\b)`,
-  "giu"
-);
+const DIVISOR_ETAPAS = new RegExp(`\\s*,?\\s*(?:\\b(?:${CONECTORES.join("|")})\\b|\\be\\b|,)\\s*(?=(?:${VERBOS})m?\\b)`, "giu");
 
 /** Quebra um parágrafo em linhas de até `largura` caracteres, sem cortar palavras. */
 export function quebrarEmLinhas(paragrafo: string, largura = CARACTERES_POR_LINHA): string[] {
@@ -87,7 +120,12 @@ function partesDoEnunciado(paragrafo: string): string[] {
   const semNumeracao = paragrafo.trim().replace(/^\d+[.)]\s*/u, "");
   return semNumeracao
     .split(DIVISOR_ETAPAS)
-    .map((p) => p.trim().replace(/[.;]+$/u, "").trim())
+    .map((p) =>
+      p
+        .trim()
+        .replace(/[.;]+$/u, "")
+        .trim(),
+    )
     .filter(Boolean);
 }
 
@@ -101,9 +139,7 @@ export function ehEnunciadoComposto(paragrafo: string): boolean {
  * imperativo, sem conector, com inicial maiúscula e ponto final.
  */
 export function dividirEmEtapas(paragrafo: string): string[] {
-  return partesDoEnunciado(paragrafo).map(
-    (e) => e.charAt(0).toUpperCase() + e.slice(1) + "."
-  );
+  return partesDoEnunciado(paragrafo).map((e) => e.charAt(0).toUpperCase() + e.slice(1) + ".");
 }
 
 /** Divide um parágrafo em frases (fim em . ! ? … seguido de espaço e nova frase). */
@@ -184,7 +220,5 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
 
 /** Reconstrói o texto (útil para o teste "nada se perde" e para impressão). */
 export function textoDoAdaptado(adaptado: TextoAdaptado): string {
-  return [...adaptado.blocos, ...adaptado.blocosExcedentes]
-    .map((b) => b.linhas.join("\n"))
-    .join("\n\n");
+  return [...adaptado.blocos, ...adaptado.blocosExcedentes].map((b) => b.linhas.join("\n")).join("\n\n");
 }

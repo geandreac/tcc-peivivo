@@ -22,7 +22,8 @@ export function materiais(ctx: ContextoMock) {
         const m = ctx.estado.materiais.find((x) => x.id === id);
         if (!m) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado.");
         const p = ctx.exigirLeitura(m.estudanteId);
-        if (m.statusAprovacao !== "APROVADO" && !(p === "DOCENTE" && m.docenteId === ctx.eu().id)) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado."); // D-34: 0 linhas
+        if (m.statusAprovacao !== "APROVADO" && !(p === "DOCENTE" && m.docenteId === ctx.eu().id))
+          throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado."); // D-34: 0 linhas
         return m;
       }),
     gerarMaterial: (estudanteId, titulo, texto) =>
@@ -34,7 +35,9 @@ export function materiais(ctx: ContextoMock) {
         const vigente = ctx.versaoVigente(estudanteId);
         if (!vigente) throw new ErroApi("CONFLITO", "Este estudante ainda não tem um perfil vigente. Feche um ciclo de observação primeiro.");
         const h = hash(t);
-        const emCache = ctx.estado.materiais.find((m) => m.estudanteId === estudanteId && m.hashTexto === h && m.versaoPerfilId === vigente.id && m.statusAprovacao !== "DESCARTADO");
+        const emCache = ctx.estado.materiais.find(
+          (m) => m.estudanteId === estudanteId && m.hashTexto === h && m.versaoPerfilId === vigente.id && m.statusAprovacao !== "DESCARTADO",
+        );
         if (emCache) return emCache; // P3.5: texto idêntico + mesma versão → não regera
         const inicio = performance.now();
         const adaptado = adaptar(t, vigente.parametros);

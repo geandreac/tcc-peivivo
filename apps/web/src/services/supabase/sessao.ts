@@ -59,7 +59,11 @@ export function sessao(c: Contexto) {
     },
     definirSenha: async (novaSenha, versaoTermosAceita) => {
       const { error } = await sb.auth.updateUser({ password: novaSenha });
-      if (error) throw new ErroApi("VALIDACAO", error.message.includes("characters") ? "A senha precisa ter pelo menos 10 caracteres." : "Não foi possível definir a senha.");
+      if (error)
+        throw new ErroApi(
+          "VALIDACAO",
+          error.message.includes("characters") ? "A senha precisa ter pelo menos 10 caracteres." : "Não foi possível definir a senha.",
+        );
       if (versaoTermosAceita) await exec(sb.rpc("fn_aceitar_termos", { p_versao: versaoTermosAceita }));
       await c.carregarPerfil();
     },

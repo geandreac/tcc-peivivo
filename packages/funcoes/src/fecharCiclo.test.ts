@@ -4,7 +4,12 @@ import { calcularFechamento, fecharCiclo, type DadosFechamento, type PortasFecha
 
 const CICLO = "50000000-0000-4000-8000-000000000001";
 const VIGENTE: ParametrosAdaptacao = { ...PARAMETROS_PADRAO, maxLinhasPorBloco: 5, nivelVocabulario: "INTERMEDIARIO" };
-const obs = (numeroCiclo: number, dimensao: ObservacaoHistorica["dimensao"], valorEscala: ObservacaoHistorica["valorEscala"], evidencia: string | null = null): ObservacaoHistorica => ({
+const obs = (
+  numeroCiclo: number,
+  dimensao: ObservacaoHistorica["dimensao"],
+  valorEscala: ObservacaoHistorica["valorEscala"],
+  evidencia: string | null = null,
+): ObservacaoHistorica => ({
   numeroCiclo,
   dimensao,
   valorEscala,

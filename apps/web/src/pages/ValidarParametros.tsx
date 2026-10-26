@@ -52,7 +52,12 @@ export function ValidarParametros() {
     }
     setErros([]);
     await api.validarVersao(pendente!.id, decisao, justificativa);
-    anunciar(decisao === "APROVAR" ? `Parâmetros do ciclo ${pendente!.numeroCiclo} validados. Já valem para os próximos materiais.` : "Ajuste solicitado. A docente verá sua justificativa; a versão anterior continua vigente.", "sucesso");
+    anunciar(
+      decisao === "APROVAR"
+        ? `Parâmetros do ciclo ${pendente!.numeroCiclo} validados. Já valem para os próximos materiais.`
+        : "Ajuste solicitado. A docente verá sua justificativa; a versão anterior continua vigente.",
+      "sucesso",
+    );
     setJustificativa("");
     setModoAjuste(false);
     dados.recarregar();
@@ -65,7 +70,9 @@ export function ValidarParametros() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Validar parâmetros" />
-        <Alerta tom="info" titulo="Só o profissional de saúde valida">A validação clínica incide sobre o conjunto de parâmetros do ciclo.</Alerta>
+        <Alerta tom="info" titulo="Só o profissional de saúde valida">
+          A validação clínica incide sobre o conjunto de parâmetros do ciclo.
+        </Alerta>
       </>
     );
   }
@@ -73,14 +80,20 @@ export function ValidarParametros() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Validar parâmetros" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Os dados deste estudante não estão disponíveis.</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">
+          Os dados deste estudante não estão disponíveis.
+        </Alerta>
       </>
     );
   }
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Validar parâmetros do ciclo" descricao="Você valida o conjunto de parâmetros, nunca um material individual. Sem resposta em 7 dias, a versão anterior permanece vigente." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Validar parâmetros do ciclo"
+        descricao="Você valida o conjunto de parâmetros, nunca um material individual. Sem resposta em 7 dias, a versão anterior permanece vigente."
+      />
 
       {dados.carregando && <Carregando />}
       {dados.erro && <ErroCarregamento erro={dados.erro} tentarNovamente={dados.recarregar} />}
@@ -95,18 +108,26 @@ export function ValidarParametros() {
         <>
           <Card>
             <div className="chips chips--secao">
-              <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>{STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>
-              <span className="meta">Ciclo {pendente.numeroCiclo} · proposta gerada em {formatarDataHora(pendente.createdAt)}</span>
+              <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>
+                {STATUS_VALIDACAO[pendente.statusValidacao].texto}
+              </Badge>
+              <span className="meta">
+                Ciclo {pendente.numeroCiclo} · proposta gerada em {formatarDataHora(pendente.createdAt)}
+              </span>
             </div>
             {pendente.justificativaRevisao && (
-              <Alerta tom="info" titulo="Ajuste solicitado anteriormente">{pendente.justificativaRevisao}</Alerta>
+              <Alerta tom="info" titulo="Ajuste solicitado anteriormente">
+                {pendente.justificativaRevisao}
+              </Alerta>
             )}
             <TabelaDiff diff={diffEntre(dados.dados.vigente?.parametros ?? null, pendente.parametros)} legenda="Vigente → proposto" />
           </Card>
 
           <h2>Observações que geraram a proposta</h2>
           <ul className="lista-simples" aria-label="Observações do ciclo">
-            {dados.dados.observacoes.filter((o) => o.cicloId === pendente.cicloOrigemId).length === 0 && <li className="texto-apoio">Sem observações vinculadas a este ciclo.</li>}
+            {dados.dados.observacoes.filter((o) => o.cicloId === pendente.cicloOrigemId).length === 0 && (
+              <li className="texto-apoio">Sem observações vinculadas a este ciclo.</li>
+            )}
             {dados.dados.observacoes
               .filter((o) => o.cicloId === pendente.cicloOrigemId)
               .map((o) => (
@@ -186,7 +207,9 @@ export function ValidarParametros() {
                 <span>
                   Ciclo {v.numeroCiclo} · {formatarDataHora(v.createdAt)}
                 </span>
-                <Badge tom={STATUS_VALIDACAO[v.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[v.statusValidacao].tom}>{STATUS_VALIDACAO[v.statusValidacao].texto}</Badge>
+                <Badge tom={STATUS_VALIDACAO[v.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[v.statusValidacao].tom}>
+                  {STATUS_VALIDACAO[v.statusValidacao].texto}
+                </Badge>
               </li>
             ))}
           </ul>

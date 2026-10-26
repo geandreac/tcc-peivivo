@@ -3,12 +3,7 @@
  * `supabase/migrations/0001_core_schema.sql` (+ revisões de `0004`, D-01…D-13),
  * em camelCase. `ParametrosAdaptacao` vem do motor (contrato único, CLAUDE.md).
  */
-import type {
-  DimensaoObservada,
-  EscalaObservacao,
-  ParametrosAdaptacao,
-  TextoAdaptado,
-} from "@pei-vivo/motor-adaptacao";
+import type { DimensaoObservada, EscalaObservacao, ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
 
 export type { DimensaoObservada, EscalaObservacao, ParametrosAdaptacao, TextoAdaptado };
 

@@ -56,7 +56,8 @@ export function Observar() {
     const lista: { campo: string; mensagem: string }[] = [];
     for (const d of DIMENSOES) {
       const r = respostas[d];
-      if (r?.evidencia?.trim() && !r.escala) lista.push({ campo: `dim-${d}`, mensagem: `${DIMENSAO[d].titulo}: escolha a escala para a evidência que você escreveu.` });
+      if (r?.evidencia?.trim() && !r.escala)
+        lista.push({ campo: `dim-${d}`, mensagem: `${DIMENSAO[d].titulo}: escolha a escala para a evidência que você escreveu.` });
     }
     setErros(lista);
     if (lista.length > 0) return;
@@ -64,7 +65,10 @@ export function Observar() {
       const r = respostas[d]!;
       await api.registrarObservacao(ciclo.dados!.aberto!.id, { dimensao: d, valorEscala: r.escala!, evidencia: r.evidencia });
     }
-    anunciar(`${preenchidas.length === 1 ? "1 observação registrada" : `${preenchidas.length} observações registradas`} no ciclo ${ciclo.dados!.aberto!.numero}.`, "sucesso");
+    anunciar(
+      `${preenchidas.length === 1 ? "1 observação registrada" : `${preenchidas.length} observações registradas`} no ciclo ${ciclo.dados!.aberto!.numero}.`,
+      "sucesso",
+    );
     navigate(`/estudantes/${id}`);
   });
 
@@ -83,7 +87,9 @@ export function Observar() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Registrar observação" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhuma observação pode ser registrada até o responsável autorizar.</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">
+          Nenhuma observação pode ser registrada até o responsável autorizar.
+        </Alerta>
       </>
     );
   }
@@ -91,7 +97,9 @@ export function Observar() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Registrar observação" />
-        <Alerta tom="info" titulo="A coordenação não registra observações">Quem alimenta o perfil são docente, família e profissional de saúde. Você lê tudo no histórico.</Alerta>
+        <Alerta tom="info" titulo="A coordenação não registra observações">
+          Quem alimenta o perfil são docente, família e profissional de saúde. Você lê tudo no histórico.
+        </Alerta>
       </>
     );
   }
@@ -105,7 +113,9 @@ export function Observar() {
 
       {ciclo.dados && !ciclo.dados.aberto && (
         <EstadoVazio titulo="Nenhum ciclo aberto">
-          <p>{papel === "DOCENTE" ? "Abra o próximo ciclo quinzenal para começar a registrar." : "Só a docente abre um ciclo. Peça a ela para abrir o próximo."}</p>
+          <p>
+            {papel === "DOCENTE" ? "Abra o próximo ciclo quinzenal para começar a registrar." : "Só a docente abre um ciclo. Peça a ela para abrir o próximo."}
+          </p>
           {papel === "DOCENTE" && (
             <div className="grupo-botoes grupo-botoes--centro">
               <Botao onClick={() => abrir.executar()} carregando={abrir.ocupado} textoCarregando="Abrindo…">
@@ -124,7 +134,8 @@ export function Observar() {
       {ciclo.dados?.aberto && (
         <>
           <p className="texto-apoio">
-            Ciclo <strong>{ciclo.dados.aberto.numero}</strong>, aberto em {formatarData(ciclo.dados.aberto.dataInicio)}. Suas respostas ficam registradas com seu nome e papel ({PAPEL[papel!]}).
+            Ciclo <strong>{ciclo.dados.aberto.numero}</strong>, aberto em {formatarData(ciclo.dados.aberto.dataInicio)}. Suas respostas ficam registradas com
+            seu nome e papel ({PAPEL[papel!]}).
           </p>
           <form
             noValidate
@@ -168,7 +179,11 @@ export function Observar() {
                   opcional
                   rows={2}
                   maxLength={LIMITE_EVIDENCIA}
-                  dica={d === "INTERESSE_MANIFESTO" ? "Escreva o tema (ex.: dinossauros). Ele vira a âncora de interesse do perfil." : "Um exemplo concreto do que você viu. Texto livre, nunca diagnóstico."}
+                  dica={
+                    d === "INTERESSE_MANIFESTO"
+                      ? "Escreva o tema (ex.: dinossauros). Ele vira a âncora de interesse do perfil."
+                      : "Um exemplo concreto do que você viu. Texto livre, nunca diagnóstico."
+                  }
                   value={respostas[d]?.evidencia ?? ""}
                   onChange={(e) => setRespostas((r) => ({ ...r, [d]: { escala: r[d]?.escala ?? null, evidencia: e.target.value } }))}
                 />

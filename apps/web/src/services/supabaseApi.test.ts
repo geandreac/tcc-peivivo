@@ -36,12 +36,17 @@ function clienteComFuncao(resposta: { data?: unknown; error?: unknown }) {
 }
 /** Erro como o functions-js devolve para status ≠ 2xx: a Response fica em `context`. */
 const erroHttp = (status: number, corpo: unknown) =>
-  Object.assign(new Error("Edge Function returned a non-2xx status code"), { name: "FunctionsHttpError", context: new Response(JSON.stringify(corpo), { status }) });
+  Object.assign(new Error("Edge Function returned a non-2xx status code"), {
+    name: "FunctionsHttpError",
+    context: new Response(JSON.stringify(corpo), { status }),
+  });
 
 describe("Edge Functions pelo supabaseApi · erros padronizados", () => {
   it("envia só o contrato da função (cicloId), nunca o docente", async () => {
     const { sb, invoke } = clienteComFuncao({ error: erroHttp(409, { erro: { codigo: "CONFLITO", mensagem: "x" } }) });
-    await criarSupabaseApi(sb).fecharCiclo("c1").catch(() => undefined);
+    await criarSupabaseApi(sb)
+      .fecharCiclo("c1")
+      .catch(() => undefined);
     expect(invoke).toHaveBeenCalledWith("fechar-ciclo", { body: { cicloId: "c1" } });
   });
 
@@ -62,7 +67,9 @@ describe("Edge Functions pelo supabaseApi · erros padronizados", () => {
 
   it("sem resposta (rede caiu / função fora do ar) → REDE", async () => {
     const { sb } = clienteComFuncao({ error: Object.assign(new Error("Failed to send a request"), { name: "FunctionsFetchError" }) });
-    const erro = await criarSupabaseApi(sb).fecharCiclo("c1").catch((e: unknown) => e);
+    const erro = await criarSupabaseApi(sb)
+      .fecharCiclo("c1")
+      .catch((e: unknown) => e);
     expect(erro).toBeInstanceOf(ErroApi);
     expect((erro as ErroApi).codigo).toBe("REDE");
   });
@@ -180,7 +187,10 @@ describe("supabaseApi · sessão e segundo fator", () => {
 
   it("senha errada → mensagem genérica (não revela se o e-mail existe)", async () => {
     const { sb } = clienteSimulado({ auth: { signInWithPassword: async () => ({ error: { message: "Invalid login credentials" } }) } });
-    await expect(criarSupabaseApi(sb).entrarComSenha("x@example.test", "errada")).rejects.toMatchObject({ codigo: "NAO_AUTENTICADO", message: "E-mail ou senha incorretos." });
+    await expect(criarSupabaseApi(sb).entrarComSenha("x@example.test", "errada")).rejects.toMatchObject({
+      codigo: "NAO_AUTENTICADO",
+      message: "E-mail ou senha incorretos.",
+    });
   });
 
   it("conta sem perfil no banco (não liberada) → NEGADO e a sessão local é encerrada", async () => {
@@ -199,7 +209,10 @@ describe("supabaseApi · sessão e segundo fator", () => {
   it("sessão aal2 com fator verificado dispensa o segundo fator", async () => {
     const c = clienteSimulado({
       rpcs: { fn_meu_perfil: PERFIL_COORD },
-      mfa: { getAuthenticatorAssuranceLevel: async () => ({ data: { currentLevel: "aal2" } }), listFactors: async () => ({ data: { totp: [{ id: "f1", status: "verified" }] } }) },
+      mfa: {
+        getAuthenticatorAssuranceLevel: async () => ({ data: { currentLevel: "aal2" } }),
+        listFactors: async () => ({ data: { totp: [{ id: "f1", status: "verified" }] } }),
+      },
     });
     const api = criarSupabaseApi(c.sb);
     expect(await api.entrarComSenha("coord@example.test", "senha-ficticia-123")).toMatchObject({ exigeSegundoFator: false, temFatorCadastrado: true });
@@ -253,41 +266,114 @@ describe("supabaseApi · sessão e segundo fator", () => {
 });
 
 describe("supabaseApi · consultas (colunas explícitas e mapeamento)", () => {
-  const ESTUDANTE = { id: "e1", nome: "Estudante Fictício", data_nascimento: "2017-03-01", turma: "4º A", escola_id: "esc-1", created_at: "2026-10-01T00:00:00Z" };
+  const ESTUDANTE = {
+    id: "e1",
+    nome: "Estudante Fictício",
+    data_nascimento: "2017-03-01",
+    turma: "4º A",
+    escola_id: "esc-1",
+    created_at: "2026-10-01T00:00:00Z",
+  };
 
   it("nenhuma consulta usa select * (GRANT por coluna, D-33)", async () => {
     const { api, consultas } = await apiLogada(PERFIL_COORD, { tabelas: { estudantes: [ESTUDANTE] }, rpcs: { fn_laudo_apresentado_em: null } });
-    await Promise.all([api.listarEstudantes(), api.obterEstudante("e1"), api.listarVinculos("e1"), api.listarCiclos("e1"), api.listarMateriais("e1"), api.listarVersoes("e1"), api.listarNotificacoes()]);
+    await Promise.all([
+      api.listarEstudantes(),
+      api.obterEstudante("e1"),
+      api.listarVinculos("e1"),
+      api.listarCiclos("e1"),
+      api.listarMateriais("e1"),
+      api.listarVersoes("e1"),
+      api.listarNotificacoes(),
+    ]);
     const selects = consultas.flatMap(colunas);
     expect(selects.length).toBeGreaterThan(5);
     for (const s of selects) expect(s).not.toMatch(/(^|,\s*)\*/u);
   });
 
   it("estudante: snake→camel; docente sem acesso à data do laudo vê null (D-01)", async () => {
-    const { api } = await apiLogada(PERFIL_DOCENTE, { tabelas: { estudantes: [ESTUDANTE] }, rpcErros: { fn_laudo_apresentado_em: { code: "42501", message: "negado" } } });
-    expect(await api.obterEstudante("e1")).toEqual({ id: "e1", nome: "Estudante Fictício", dataNascimento: "2017-03-01", turma: "4º A", laudoApresentadoEm: null, createdAt: "2026-10-01T00:00:00Z" });
+    const { api } = await apiLogada(PERFIL_DOCENTE, {
+      tabelas: { estudantes: [ESTUDANTE] },
+      rpcErros: { fn_laudo_apresentado_em: { code: "42501", message: "negado" } },
+    });
+    expect(await api.obterEstudante("e1")).toEqual({
+      id: "e1",
+      nome: "Estudante Fictício",
+      dataNascimento: "2017-03-01",
+      turma: "4º A",
+      laudoApresentadoEm: null,
+      createdAt: "2026-10-01T00:00:00Z",
+    });
   });
 
   it("estudante fora do alcance (RLS não devolve linha) → NEGADO; outro erro do laudo propaga", async () => {
     const { api } = await apiLogada(PERFIL_DOCENTE);
     await expect(api.obterEstudante("e9")).rejects.toMatchObject({ codigo: "NEGADO" });
-    const outro = await apiLogada(PERFIL_DOCENTE, { tabelas: { estudantes: [ESTUDANTE] }, rpcErros: { fn_laudo_apresentado_em: { code: "XX000", message: "x" } } });
+    const outro = await apiLogada(PERFIL_DOCENTE, {
+      tabelas: { estudantes: [ESTUDANTE] },
+      rpcErros: { fn_laudo_apresentado_em: { code: "XX000", message: "x" } },
+    });
     await expect(outro.api.obterEstudante("e1")).rejects.toMatchObject({ codigo: "REDE" });
   });
 
   it("vínculos trazem o nome da pessoa; consentimento, ciclo, versão, material, desfecho e notificação são convertidos", async () => {
     const { api } = await apiLogada(PERFIL_DOCENTE, {
       tabelas: {
-        vinculos_usuario_estudante: [{ id: "v1", usuario_id: "u2", estudante_id: "e1", papel: "PROFISSIONAL_SAUDE", data_vinculo: "d", status: "ATIVO", registro_conselho: "CRP 06/0000", usuarios: { nome: "Profissional (fictícia)" } }],
-        consentimentos: [{ id: "c1", estudante_id: "e1", responsavel_id: "u3", data_concessao: "d", escopos: ["geracao_material"], status: "ATIVO", data_revogacao: null }],
+        vinculos_usuario_estudante: [
+          {
+            id: "v1",
+            usuario_id: "u2",
+            estudante_id: "e1",
+            papel: "PROFISSIONAL_SAUDE",
+            data_vinculo: "d",
+            status: "ATIVO",
+            registro_conselho: "CRP 06/0000",
+            usuarios: { nome: "Profissional (fictícia)" },
+          },
+        ],
+        consentimentos: [
+          { id: "c1", estudante_id: "e1", responsavel_id: "u3", data_concessao: "d", escopos: ["geracao_material"], status: "ATIVO", data_revogacao: null },
+        ],
         ciclos_observacao: [{ id: "ci1", estudante_id: "e1", numero: 3, data_inicio: "2026-10-01", data_fim: null, status: "ABERTO" }],
-        versoes_perfil: [{ id: "vp1", estudante_id: "e1", ciclo_origem_id: null, numero_ciclo: 2, parametros: {}, status_validacao: "VIGENTE", validador_id: null, data_vigencia: null, justificativa: null, created_at: "d" }],
-        materiais_adaptados: [{ id: "m1", estudante_id: "e1", versao_perfil_id: "vp1", docente_id: "u-doc", titulo: "T", texto_original: "x", texto_adaptado: null, texto_revisado: null, data_geracao: "d", status_aprovacao: "APROVADO", ia_aplicada: 0, hash_texto: null }],
+        versoes_perfil: [
+          {
+            id: "vp1",
+            estudante_id: "e1",
+            ciclo_origem_id: null,
+            numero_ciclo: 2,
+            parametros: {},
+            status_validacao: "VIGENTE",
+            validador_id: null,
+            data_vigencia: null,
+            justificativa: null,
+            created_at: "d",
+          },
+        ],
+        materiais_adaptados: [
+          {
+            id: "m1",
+            estudante_id: "e1",
+            versao_perfil_id: "vp1",
+            docente_id: "u-doc",
+            titulo: "T",
+            texto_original: "x",
+            texto_adaptado: null,
+            texto_revisado: null,
+            data_geracao: "d",
+            status_aprovacao: "APROVADO",
+            ia_aplicada: 0,
+            hash_texto: null,
+          },
+        ],
         desfechos: [{ id: "d1", material_id: "m1", resultado: "ALCANCADO", observacao_livre: null, data_registro: "d" }],
         notificacoes: [{ id: "n1", usuario_id: "u-doc", tipo: "VALIDACAO_PENDENTE", estudante_id: null, criada_em: "d", lida_em: null }],
       },
     });
-    expect((await api.listarVinculos("e1"))[0]).toMatchObject({ papel: "PROFISSIONAL_SAUDE", registroConselho: "CRP 06/0000", nomeUsuario: "Profissional (fictícia)" });
+    expect((await api.listarVinculos("e1"))[0]).toMatchObject({
+      papel: "PROFISSIONAL_SAUDE",
+      registroConselho: "CRP 06/0000",
+      nomeUsuario: "Profissional (fictícia)",
+    });
     expect(await api.obterConsentimento("e1")).toMatchObject({ escopo: ["geracao_material"], status: "ATIVO", dataRevogacao: null });
     expect(await api.obterCicloAberto("e1")).toMatchObject({ numero: 3, dataFim: null });
     expect(await api.abrirCiclo("e1")).toMatchObject({ id: "ci1" }); // já havia ciclo aberto: não cria outro
@@ -307,11 +393,30 @@ describe("supabaseApi · consultas (colunas explícitas e mapeamento)", () => {
 
   it("observação: evidência vazia vira null; o número do ciclo vem do embed", async () => {
     const { api, consultas } = await apiLogada(PERFIL_DOCENTE, {
-      tabelas: { observacoes: [{ id: "o1", ciclo_id: "ci1", autor_id: "u-doc", papel_autor: "DOCENTE", dimensao: "FADIGA_TAREFA", valor_escala: "REDUZIDA", evidencia: null, data_registro: "d", ciclos_observacao: { numero: 3 } }] },
+      tabelas: {
+        observacoes: [
+          {
+            id: "o1",
+            ciclo_id: "ci1",
+            autor_id: "u-doc",
+            papel_autor: "DOCENTE",
+            dimensao: "FADIGA_TAREFA",
+            valor_escala: "REDUZIDA",
+            evidencia: null,
+            data_registro: "d",
+            ciclos_observacao: { numero: 3 },
+          },
+        ],
+      },
     });
     const o = await api.registrarObservacao("ci1", { dimensao: "FADIGA_TAREFA", valorEscala: "REDUZIDA", evidencia: "   " });
     expect(o).toMatchObject({ numeroCiclo: 3, evidencia: null });
-    expect(consultas.at(-1)!.ops.find(([n]) => n === "insert")![1]).toEqual({ ciclo_id: "ci1", dimensao: "FADIGA_TAREFA", valor_escala: "REDUZIDA", evidencia: null });
+    expect(consultas.at(-1)!.ops.find(([n]) => n === "insert")![1]).toEqual({
+      ciclo_id: "ci1",
+      dimensao: "FADIGA_TAREFA",
+      valor_escala: "REDUZIDA",
+      evidencia: null,
+    });
     await api.listarObservacoes("e1");
     expect(consultas.at(-1)!.ops).toContainEqual(["eq", "ciclos_observacao.estudante_id", "e1"]);
   });
@@ -325,22 +430,45 @@ describe("supabaseApi · consultas (colunas explícitas e mapeamento)", () => {
   });
 
   it("pendências: só as com estudante visível, da mais antiga para a mais nova", async () => {
-    const versao = (id: string, dias: number, estudantes: unknown) => ({ id, estudante_id: "e1", numero_ciclo: 1, parametros: {}, status_validacao: "PENDENTE", created_at: atras(dias), estudantes });
-    const { api } = await apiLogada(PERFIL_DOCENTE, { tabelas: { versoes_perfil: [versao("a", 1, ESTUDANTE), versao("b", 6, ESTUDANTE), versao("c", 9, null)] } });
+    const versao = (id: string, dias: number, estudantes: unknown) => ({
+      id,
+      estudante_id: "e1",
+      numero_ciclo: 1,
+      parametros: {},
+      status_validacao: "PENDENTE",
+      created_at: atras(dias),
+      estudantes,
+    });
+    const { api } = await apiLogada(PERFIL_DOCENTE, {
+      tabelas: { versoes_perfil: [versao("a", 1, ESTUDANTE), versao("b", 6, ESTUDANTE), versao("c", 9, null)] },
+    });
     const p = await api.listarPendencias();
-    expect(p.map((x) => [x.versao.id, x.diasEmAberto])).toEqual([["b", 6], ["a", 1]]);
+    expect(p.map((x) => [x.versao.id, x.diasEmAberto])).toEqual([
+      ["b", 6],
+      ["a", 1],
+    ]);
   });
 
   it("auditoria: eventos do banco viram o vocabulário do app; evento desconhecido é omitido", async () => {
     const { api } = await apiLogada(PERFIL_COORD, {
-      rpcs: { fn_listar_auditoria: [{ evento: "CONSENTIMENTO_REVOGADO", autor_nome: "Responsável", criado_em: "d", detalhes: null }, { evento: "EVENTO_INTERNO", autor_nome: "x", criado_em: "d" }] },
+      rpcs: {
+        fn_listar_auditoria: [
+          { evento: "CONSENTIMENTO_REVOGADO", autor_nome: "Responsável", criado_em: "d", detalhes: null },
+          { evento: "EVENTO_INTERNO", autor_nome: "x", criado_em: "d" },
+        ],
+      },
     });
-    expect(await api.listarAuditoria("e1")).toEqual([{ id: "e1-0", entidade: "", entidadeId: "e1", evento: "REVOGACAO", autorId: null, autorNome: "Responsável", data: "d", detalhes: {} }]);
+    expect(await api.listarAuditoria("e1")).toEqual([
+      { id: "e1-0", entidade: "", entidadeId: "e1", evento: "REVOGACAO", autorId: null, autorNome: "Responsável", data: "d", detalhes: {} },
+    ]);
   });
 
   it("notas clínicas só por RPC auditada; a minha aparece com o meu id", async () => {
     const { api, consultas, rpcsChamadas } = await apiLogada(PERFIL_DOCENTE, {
-      rpcs: { fn_ler_notas_clinicas: [{ id: "nc1", conteudo: "texto fictício", data_registro: "d", profissional_nome: "Outra", minha: true }], fn_registrar_nota_clinica: "nc2" },
+      rpcs: {
+        fn_ler_notas_clinicas: [{ id: "nc1", conteudo: "texto fictício", data_registro: "d", profissional_nome: "Outra", minha: true }],
+        fn_registrar_nota_clinica: "nc2",
+      },
     });
     expect((await api.listarNotasClinicas("e1"))[0]).toMatchObject({ profissionalId: "u-doc", conteudo: "texto fictício" });
     expect(await api.registrarNotaClinica("e1", "  nova nota  ")).toMatchObject({ id: "nc2", conteudo: "nova nota" });
@@ -349,12 +477,22 @@ describe("supabaseApi · consultas (colunas explícitas e mapeamento)", () => {
   });
 
   it("exportar dados: reúne tudo, só materiais aprovados com seus desfechos e nunca notas clínicas", async () => {
-    const material = (id: string, status: string) => ({ id, estudante_id: "e1", versao_perfil_id: "v", docente_id: "u", titulo: "T", texto_original: "x", data_geracao: "d", status_aprovacao: status });
+    const material = (id: string, status: string) => ({
+      id,
+      estudante_id: "e1",
+      versao_perfil_id: "v",
+      docente_id: "u",
+      titulo: "T",
+      texto_original: "x",
+      data_geracao: "d",
+      status_aprovacao: status,
+    });
     const { api, rpcsChamadas } = await apiLogada(PERFIL_COORD, {
       tabelas: {
         estudantes: [ESTUDANTE],
         materiais_adaptados: [material("m1", "APROVADO"), material("m2", "RASCUNHO")],
-        desfechos: (c) => (c.ops.some(([n, , v]) => n === "eq" && v === "m1") ? [{ id: "d1", material_id: "m1", resultado: "PARCIAL", data_registro: "d" }] : []),
+        desfechos: (c) =>
+          c.ops.some(([n, , v]) => n === "eq" && v === "m1") ? [{ id: "d1", material_id: "m1", resultado: "PARCIAL", data_registro: "d" }] : [],
       },
       rpcs: { fn_laudo_apresentado_em: "2026-01-10", fn_listar_auditoria: [] },
     });
@@ -381,24 +519,41 @@ describe("supabaseApi · escritas e guardas de papel", () => {
 
   it("coordenação: lista usuários sem ela mesma, cadastra pela RPC e convida pela Edge Function com a escola do perfil", async () => {
     const { api, rpcsChamadas, functions } = await apiLogada(PERFIL_COORD, {
-      tabelas: { usuarios: [{ id: "u-coord", nome: "Eu" }, { id: "u2", nome: "Outra pessoa" }], estudantes: [{ id: "e2", nome: "Novo", data_nascimento: "2017-01-01", created_at: "d" }] },
+      tabelas: {
+        usuarios: [
+          { id: "u-coord", nome: "Eu" },
+          { id: "u2", nome: "Outra pessoa" },
+        ],
+        estudantes: [{ id: "e2", nome: "Novo", data_nascimento: "2017-01-01", created_at: "d" }],
+      },
       rpcs: { fn_cadastrar_estudante: "e2", fn_laudo_apresentado_em: null },
       invoke: () => ({ emailEnviado: true, avisos: [] }),
     });
     expect((await api.listarUsuarios()).map((u) => u.id)).toEqual(["u2"]);
     await api.cadastrarEstudante({ nome: "Novo", dataNascimento: "2017-01-01", laudoApresentadoEm: "" });
-    expect(rpcsChamadas).toContainEqual(["fn_cadastrar_estudante", { p_escola: "esc-1", p_nome: "Novo", p_data_nascimento: "2017-01-01", p_turma: null, p_laudo_apresentado_em: null }]);
+    expect(rpcsChamadas).toContainEqual([
+      "fn_cadastrar_estudante",
+      { p_escola: "esc-1", p_nome: "Novo", p_data_nascimento: "2017-01-01", p_turma: null, p_laudo_apresentado_em: null },
+    ]);
     expect(await api.convidar({ email: "nova@example.test", papel: "DOCENTE", registroConselho: "  " })).toEqual({ emailEnviado: true, avisos: [] });
-    expect(functions.invoke).toHaveBeenCalledWith("convidar", { body: expect.objectContaining({ escolaId: "esc-1", registroConselho: null, conferidoPresencialmente: false, estudanteId: null }) });
+    expect(functions.invoke).toHaveBeenCalledWith("convidar", {
+      body: expect.objectContaining({ escolaId: "esc-1", registroConselho: null, conferidoPresencialmente: false, estudanteId: null }),
+    });
   });
 
   it("vínculos e consentimento: argumentos das RPCs e releitura do registro", async () => {
     const { api, rpcsChamadas } = await apiLogada(PERFIL_COORD, {
-      tabelas: { vinculos_usuario_estudante: [{ id: "v9", status: "PENDENTE_RESPONSAVEL" }], consentimentos: [{ id: "c9", status: "REVOGADO", escopos: null }] },
+      tabelas: {
+        vinculos_usuario_estudante: [{ id: "v9", status: "PENDENTE_RESPONSAVEL" }],
+        consentimentos: [{ id: "c9", status: "REVOGADO", escopos: null }],
+      },
       rpcs: { fn_propor_vinculo: "v9", fn_conceder_consentimento: "c9", fn_revogar_consentimento: "c9" },
     });
     expect(await api.vincular({ estudanteId: "e1", usuarioId: "u2", papel: "PROFISSIONAL_SAUDE", registroConselho: " CRP 1 " })).toMatchObject({ id: "v9" });
-    expect(rpcsChamadas).toContainEqual(["fn_propor_vinculo", { p_estudante: "e1", p_usuario: "u2", p_papel: "PROFISSIONAL_SAUDE", p_registro_conselho: "CRP 1", p_conferido_presencialmente: false }]);
+    expect(rpcsChamadas).toContainEqual([
+      "fn_propor_vinculo",
+      { p_estudante: "e1", p_usuario: "u2", p_papel: "PROFISSIONAL_SAUDE", p_registro_conselho: "CRP 1", p_conferido_presencialmente: false },
+    ]);
     await api.confirmarVinculo("v9", false);
     await api.desativarVinculo("v9");
     expect(rpcsChamadas.map(([n]) => n)).toEqual(expect.arrayContaining(["fn_confirmar_vinculo", "fn_encerrar_vinculo"]));
@@ -408,10 +563,28 @@ describe("supabaseApi · escritas e guardas de papel", () => {
   });
 
   it("ciclo: abre quando não há aberto; prévia do fechamento usa o motor sem gravar", async () => {
-    const vigente = { maxLinhasPorBloco: 4, nivelVocabulario: "BASICO", interesseAncora: null, formatoEnunciado: "ETAPA_UNICA", contrasteMinimo: 7, blocosPorMaterial: 8 };
+    const vigente = {
+      maxLinhasPorBloco: 4,
+      nivelVocabulario: "BASICO",
+      interesseAncora: null,
+      formatoEnunciado: "ETAPA_UNICA",
+      contrasteMinimo: 7,
+      blocosPorMaterial: 8,
+    };
     const { api, consultas } = await apiLogada(PERFIL_DOCENTE, {
-      tabelas: { ciclos_observacao: (c) => (c.ops.some(([n]) => n === "insert") ? [{ id: "novo", estudante_id: "e1", numero: 1, data_inicio: "d", status: "ABERTO" }] : []) },
-      rpcs: { fn_dados_fechamento: { estudanteId: "e1", numeroCiclo: 2, vigente: { parametros: vigente }, validacaoClinica: false, historico: [{ numeroCiclo: 2, dimensao: "FADIGA_TAREFA", valorEscala: "AMPLIADA", evidencia: null }] } },
+      tabelas: {
+        ciclos_observacao: (c) =>
+          c.ops.some(([n]) => n === "insert") ? [{ id: "novo", estudante_id: "e1", numero: 1, data_inicio: "d", status: "ABERTO" }] : [],
+      },
+      rpcs: {
+        fn_dados_fechamento: {
+          estudanteId: "e1",
+          numeroCiclo: 2,
+          vigente: { parametros: vigente },
+          validacaoClinica: false,
+          historico: [{ numeroCiclo: 2, dimensao: "FADIGA_TAREFA", valorEscala: "AMPLIADA", evidencia: null }],
+        },
+      },
     });
     expect(await api.abrirCiclo("e1")).toMatchObject({ id: "novo" });
     expect(consultas.at(-1)!.ops.find(([n]) => n === "insert")![1]).toEqual({ estudante_id: "e1" });
@@ -422,11 +595,27 @@ describe("supabaseApi · escritas e guardas de papel", () => {
 
   it("fechar ciclo, validar versão, gerar e decidir material, registrar desfecho", async () => {
     const versao = { id: "v2", estudante_id: "e1", numero_ciclo: 2, parametros: {}, status_validacao: "PENDENTE", created_at: "d" };
-    const material = { id: "m1", estudante_id: "e1", versao_perfil_id: "v2", docente_id: "u-doc", titulo: "T", texto_original: "x", data_geracao: "d", status_aprovacao: "APROVADO" };
+    const material = {
+      id: "m1",
+      estudante_id: "e1",
+      versao_perfil_id: "v2",
+      docente_id: "u-doc",
+      titulo: "T",
+      texto_original: "x",
+      data_geracao: "d",
+      status_aprovacao: "APROVADO",
+    };
     const { api, rpcsChamadas } = await apiLogada(PERFIL_DOCENTE, {
-      tabelas: { versoes_perfil: [versao], materiais_adaptados: [material], desfechos: [{ id: "d1", material_id: "m1", resultado: "ALCANCADO", data_registro: "d" }] },
+      tabelas: {
+        versoes_perfil: [versao],
+        materiais_adaptados: [material],
+        desfechos: [{ id: "d1", material_id: "m1", resultado: "ALCANCADO", data_registro: "d" }],
+      },
       rpcs: { fn_validar_versao: "v2" },
-      invoke: (nome) => (nome === "fechar-ciclo" ? { versaoId: "v2", diff: [], modoPedagogico: false } : { materialId: "m1", duracaoMs: 42, emCache: false, origem: "REGRAS", avisos: [] }),
+      invoke: (nome) =>
+        nome === "fechar-ciclo"
+          ? { versaoId: "v2", diff: [], modoPedagogico: false }
+          : { materialId: "m1", duracaoMs: 42, emCache: false, origem: "REGRAS", avisos: [] },
     });
     expect(await api.fecharCiclo("ci1")).toMatchObject({ versao: { id: "v2" }, modoPedagogico: false });
     await api.validarVersao("v2", "AJUSTE", "  ajustar  ");
@@ -444,7 +633,9 @@ describe("supabaseApi · escritas e guardas de papel", () => {
   it("meu papel: o banco responde; sem papel, a coordenação da escola do estudante é reconhecida", async () => {
     const docente = await apiLogada(PERFIL_DOCENTE, { rpcs: { fn_meu_papel: "DOCENTE" } });
     expect(await docente.api.meuPapel("e1")).toBe("DOCENTE");
-    const coord = await apiLogada(PERFIL_COORD, { tabelas: { estudantes: (c) => (c.ops.some(([, , v]) => v === "e1") ? [{ escola_id: "esc-1" }] : [{ escola_id: "outra" }]) } });
+    const coord = await apiLogada(PERFIL_COORD, {
+      tabelas: { estudantes: (c) => (c.ops.some(([, , v]) => v === "e1") ? [{ escola_id: "esc-1" }] : [{ escola_id: "outra" }]) },
+    });
     expect(await coord.api.meuPapel("e1")).toBe("COORDENACAO");
     expect(await coord.api.meuPapel("e2")).toBeNull();
     const semEscola = await apiLogada(PERFIL_DOCENTE);
@@ -454,7 +645,15 @@ describe("supabaseApi · escritas e guardas de papel", () => {
 
 describe("supabaseApi · painel da escola (só contagens)", () => {
   it("chama fn_resumo_escola com a escola do perfil e não baixa tabela nenhuma (D-48)", async () => {
-    const resumo = { totalEstudantes: 3, comConsentimento: 2, semConsentimento: 1, semProfissional: 1, validacoesAtrasadas: 1, ciclosParados: 1, pendencias: [] };
+    const resumo = {
+      totalEstudantes: 3,
+      comConsentimento: 2,
+      semConsentimento: 1,
+      semProfissional: 1,
+      validacoesAtrasadas: 1,
+      ciclosParados: 1,
+      pendencias: [],
+    };
     const { api, consultas, rpcsChamadas } = await apiLogada(PERFIL_COORD, { rpcs: { fn_resumo_escola: resumo } });
     expect(await api.resumoEscola()).toEqual(resumo);
     expect(rpcsChamadas).toContainEqual(["fn_resumo_escola", { p_escola: "esc-1" }]);
@@ -493,7 +692,12 @@ describe("supabaseApi · paginação (D-48)", () => {
   });
 
   it("listagens sem página (estudantes, vínculos, ciclos, versões, notificações) também buscam em lotes: 1.500 estudantes, nenhum cortado", async () => {
-    const ESTUDANTES = Array.from({ length: 1_500 }, (_, i) => ({ id: `e${i}`, nome: `Estudante fictício ${i}`, data_nascimento: "2017-01-01", created_at: "d" }));
+    const ESTUDANTES = Array.from({ length: 1_500 }, (_, i) => ({
+      id: `e${i}`,
+      nome: `Estudante fictício ${i}`,
+      data_nascimento: "2017-01-01",
+      created_at: "d",
+    }));
     const faixa = (lista: Linhas) => (c: Consulta) => {
       const r = c.ops.find(([n]) => n === "range") as [string, number, number] | undefined;
       return r ? lista.slice(r[1], Math.min(r[2] + 1, r[1] + 1000)) : lista.slice(0, 1000);
@@ -502,7 +706,10 @@ describe("supabaseApi · paginação (D-48)", () => {
     const todos = await api.listarEstudantes();
     expect(new Set(todos.map((e) => e.id)).size).toBe(1_500);
     const lotes = consultas.filter((c) => c.tabela === "estudantes");
-    expect(lotes.map((c) => c.ops.find(([n]) => n === "range"))).toEqual([["range", 0, 999], ["range", 1000, 1999]]);
+    expect(lotes.map((c) => c.ops.find(([n]) => n === "range"))).toEqual([
+      ["range", 0, 999],
+      ["range", 1000, 1999],
+    ]);
     expect(lotes[0]!.ops).toContainEqual(["order", "id"]); // desempate estável entre lotes
   });
 

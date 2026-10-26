@@ -57,35 +57,41 @@ export function Consentimento() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Consentimento" descricao="Sem a autorização do responsável legal, nenhum dado é registrado e nenhum material é gerado." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Consentimento"
+        descricao="Sem a autorização do responsável legal, nenhum dado é registrado e nenhum material é gerado."
+      />
 
       <Card titulo="O que este termo autoriza — em linguagem simples">
         <p>
-          <strong>O que será registrado.</strong> Observações sobre como {estudante.nome} lida com leitura, instruções e tarefas — pela escola, por
-          você e pelo profissional de saúde. Numa escala de três pontos, com um comentário livre opcional.
+          <strong>O que será registrado.</strong> Observações sobre como {estudante.nome} lida com leitura, instruções e tarefas — pela escola, por você e pelo
+          profissional de saúde. Numa escala de três pontos, com um comentário livre opcional.
         </p>
         <p>
-          <strong>O que NÃO será registrado.</strong> Laudo, diagnóstico ou CID. O sistema não guarda nada disso. A professora nunca vê a nota
-          clínica do profissional de saúde.
+          <strong>O que NÃO será registrado.</strong> Laudo, diagnóstico ou CID. O sistema não guarda nada disso. A professora nunca vê a nota clínica do
+          profissional de saúde.
         </p>
         <p>
-          <strong>Quem vê o quê.</strong> Todos os vinculados leem as observações. Só a professora vê rascunhos de material; você vê o que foi
-          aprovado e se funcionou. Só profissionais de saúde leem a nota clínica.
+          <strong>Quem vê o quê.</strong> Todos os vinculados leem as observações. Só a professora vê rascunhos de material; você vê o que foi aprovado e se
+          funcionou. Só profissionais de saúde leem a nota clínica.
         </p>
         <p>
-          <strong>Por quanto tempo.</strong> Enquanto o consentimento estiver ativo. Você pode revogar a qualquer momento: a geração de material
-          para imediatamente e a professora e o profissional deixam de acessar os dados. Você e a coordenação continuam vendo o histórico.
+          <strong>Por quanto tempo.</strong> Enquanto o consentimento estiver ativo. Você pode revogar a qualquer momento: a geração de material para
+          imediatamente e a professora e o profissional deixam de acessar os dados. Você e a coordenação continuam vendo o histórico.
         </p>
         <p>
-          <strong>Seus direitos.</strong> Exportar todos os dados em formato legível e excluir tudo definitivamente — inclusive as anotações do
-          profissional de saúde, que mantém o registro dele fora do sistema (LGPD, art. 18).
+          <strong>Seus direitos.</strong> Exportar todos os dados em formato legível e excluir tudo definitivamente — inclusive as anotações do profissional de
+          saúde, que mantém o registro dele fora do sistema (LGPD, art. 18).
         </p>
       </Card>
 
       {consentimento && (
         <Card titulo="Situação atual">
           <div className="chips chips--secao">
-            <Badge tom={consentimentoAtivo ? "sucesso" : "erro"}>{consentimentoAtivo ? "Ativo" : consentimento.status === "REVOGADO" ? "Revogado" : "Expirado"}</Badge>
+            <Badge tom={consentimentoAtivo ? "sucesso" : "erro"}>
+              {consentimentoAtivo ? "Ativo" : consentimento.status === "REVOGADO" ? "Revogado" : "Expirado"}
+            </Badge>
             <span className="meta">Concedido em {formatarDataHora(consentimento.dataConcessao)}</span>
             {consentimento.dataRevogacao && <span className="meta">· revogado em {formatarDataHora(consentimento.dataRevogacao)}</span>}
           </div>
@@ -141,7 +147,13 @@ export function Consentimento() {
             ))}
           </fieldset>
           <label className="opcao">
-            <input type="checkbox" id="li-termo" checked={liTermo} onChange={(e) => setLiTermo(e.target.checked)} aria-invalid={erros.some((x) => x.campo === "li-termo") || undefined} />
+            <input
+              type="checkbox"
+              id="li-termo"
+              checked={liTermo}
+              onChange={(e) => setLiTermo(e.target.checked)}
+              aria-invalid={erros.some((x) => x.campo === "li-termo") || undefined}
+            />
             <span className="opcao__texto">
               <span>Li e entendi o termo acima.</span>
               <span className="opcao__descricao">Você pode voltar aqui e revogar quando quiser.</span>
@@ -194,8 +206,8 @@ export function Consentimento() {
         }
       >
         <p>
-          A partir de agora, ninguém gera material nem registra observações sobre {estudante.nome}. A professora e o profissional de saúde deixam de
-          ver os dados. Você e a coordenação continuam vendo o histórico. Uma nova autorização reabre tudo.
+          A partir de agora, ninguém gera material nem registra observações sobre {estudante.nome}. A professora e o profissional de saúde deixam de ver os
+          dados. Você e a coordenação continuam vendo o histórico. Uma nova autorização reabre tudo.
         </p>
         {revogar.erro && (
           <Alerta tom="erro" vivo>
@@ -211,7 +223,8 @@ export function Consentimento() {
       </Modal>
 
       <p className="texto-apoio">
-        Só o {PAPEL.RESPONSAVEL.toLowerCase()} autoriza ou retira a autorização. A trilha acima só você e a coordenação veem; os demais vinculados sabem apenas se a autorização está ativa.
+        Só o {PAPEL.RESPONSAVEL.toLowerCase()} autoriza ou retira a autorização. A trilha acima só você e a coordenação veem; os demais vinculados sabem apenas
+        se a autorização está ativa.
       </p>
     </>
   );

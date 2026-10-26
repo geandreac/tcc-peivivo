@@ -34,9 +34,8 @@ export function Ajuda() {
 
       <Card titulo="O que é o PEI Vivo?">
         <p>
-          Uma plataforma que conecta professora, família e profissional de saúde em torno de um estudante com TEA, TDAH ou dislexia. As
-          observações de cada um viram <strong>parâmetros de adaptação</strong>; com eles, a professora gera material didático adaptado, revisa,
-          aprova e registra se funcionou.
+          Uma plataforma que conecta professora, família e profissional de saúde em torno de um estudante com TEA, TDAH ou dislexia. As observações de cada um
+          viram <strong>parâmetros de adaptação</strong>; com eles, a professora gera material didático adaptado, revisa, aprova e registra se funcionou.
         </p>
       </Card>
 
@@ -67,17 +66,15 @@ export function Ajuda() {
 
       <Card titulo="Por que a professora não vê o laudo?">
         <p>
-          Porque ela não precisa. Ela precisa saber que <em>instrução longa trava</em> — não o CID. O sistema não armazena laudo nem diagnóstico;
-          só a data em que o laudo foi apresentado à escola, visível à coordenação. Menos dado circulando é menos risco de rotulação e é o
-          princípio de minimização da LGPD.
+          Porque ela não precisa. Ela precisa saber que <em>instrução longa trava</em> — não o CID. O sistema não armazena laudo nem diagnóstico; só a data em
+          que o laudo foi apresentado à escola, visível à coordenação. Menos dado circulando é menos risco de rotulação e é o princípio de minimização da LGPD.
         </p>
       </Card>
 
       <Card titulo="A IA pode inventar conteúdo?">
         <p>
-          Neste protótipo a camada de IA está <strong>desligada</strong>: só a camada determinística roda (blocos, etapas, contraste). Quando ligada,
-          a IA atua apenas em vocabulário e exemplos, e <strong>nada é publicado sem a aprovação da docente</strong>, que revisa com o original ao
-          lado.
+          Neste protótipo a camada de IA está <strong>desligada</strong>: só a camada determinística roda (blocos, etapas, contraste). Quando ligada, a IA atua
+          apenas em vocabulário e exemplos, e <strong>nada é publicado sem a aprovação da docente</strong>, que revisa com o original ao lado.
         </p>
       </Card>
 

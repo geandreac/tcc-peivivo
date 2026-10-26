@@ -31,14 +31,22 @@ export function Historico() {
 
   const dados = useConsulta<Dados | null>(async () => {
     if (!id || !podeLer) return null;
-    const [ciclos, observacoes, versoes, materiais] = await Promise.all([api.listarCiclos(id), api.listarObservacoes(id), api.listarVersoes(id), api.listarMateriais(id)]);
+    const [ciclos, observacoes, versoes, materiais] = await Promise.all([
+      api.listarCiclos(id),
+      api.listarObservacoes(id),
+      api.listarVersoes(id),
+      api.listarMateriais(id),
+    ]);
     const desfechos: Record<string, Desfecho | null> = {};
     for (const m of materiais) desfechos[m.id] = await api.obterDesfecho(m.id);
     return { ciclos, observacoes, versoes, materiais, desfechos };
   }, [id, podeLer]);
   // D-48: a trilha cresce a cada leitura de nota clínica; vem em páginas (um a mais para saber se há outra).
   const [limiteEventos, setLimiteEventos] = useState(EVENTOS_POR_PAGINA);
-  const trilha = useConsulta<Auditoria[]>(async () => (id && veAuditoria ? api.listarAuditoria(id, { limite: limiteEventos + 1 }) : []), [id, veAuditoria, limiteEventos]);
+  const trilha = useConsulta<Auditoria[]>(
+    async () => (id && veAuditoria ? api.listarAuditoria(id, { limite: limiteEventos + 1 }) : []),
+    [id, veAuditoria, limiteEventos],
+  );
 
   if (ctx.carregando) return <Carregando />;
   if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
@@ -47,14 +55,20 @@ export function Historico() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Histórico" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">O histórico só fica disponível a docente e profissional com consentimento ativo.</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">
+          O histórico só fica disponível a docente e profissional com consentimento ativo.
+        </Alerta>
       </>
     );
   }
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Histórico do PEI" descricao="Tudo que aconteceu, em ordem: ciclos, observações de todos, versões do perfil, materiais aprovados e desfechos. Nunca a nota clínica." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Histórico do PEI"
+        descricao="Tudo que aconteceu, em ordem: ciclos, observações de todos, versões do perfil, materiais aprovados e desfechos. Nunca a nota clínica."
+      />
       {veAuditoria && (
         <div className="grupo-botoes grupo-botoes--topo nao-imprimir">
           <LinkBotao to={`/estudantes/${id}/dados`} variante="secundario">
@@ -99,7 +113,9 @@ export function Historico() {
                 <>
                   <h3>Versão do perfil</h3>
                   <div className="chips">
-                    <Badge tom={STATUS_VALIDACAO[versao.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[versao.statusValidacao].tom}>{STATUS_VALIDACAO[versao.statusValidacao].texto}</Badge>
+                    <Badge tom={STATUS_VALIDACAO[versao.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[versao.statusValidacao].tom}>
+                      {STATUS_VALIDACAO[versao.statusValidacao].texto}
+                    </Badge>
                     {versao.dataVigencia && <span className="meta">vigente desde {formatarDataHora(versao.dataVigencia)}</span>}
                   </div>
                 </>
@@ -140,7 +156,12 @@ export function Historico() {
             ))}
           </ol>
           {trilha.dados.length > limiteEventos && (
-            <Botao variante="secundario" carregando={trilha.carregando} textoCarregando="Carregando…" onClick={() => setLimiteEventos((n) => n + EVENTOS_POR_PAGINA)}>
+            <Botao
+              variante="secundario"
+              carregando={trilha.carregando}
+              textoCarregando="Carregando…"
+              onClick={() => setLimiteEventos((n) => n + EVENTOS_POR_PAGINA)}
+            >
               Carregar mais eventos
             </Botao>
           )}

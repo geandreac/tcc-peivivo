@@ -166,7 +166,7 @@ describe("Caminhos negados na interface (P4.20)", () => {
       expect(screen.queryByRole("button", { name: "Tentar novamente" })).not.toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Voltar para meus estudantes" })).toBeInTheDocument();
       await semViolacoesAxe(container);
-    }
+    },
   );
 
   it("desfecho de material inexistente/oculto também tem h1", async () => {

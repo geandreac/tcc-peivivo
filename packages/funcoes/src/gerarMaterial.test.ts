@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 import { ErroFuncao } from "./erros";
-import { AVISO_IA_INDISPONIVEL, AVISO_REVISAO, gerarMaterial, hashTexto, type MaterialParaRegistrar, type PortasGerarMaterial, type Preparo } from "./gerarMaterial";
+import {
+  AVISO_IA_INDISPONIVEL,
+  AVISO_REVISAO,
+  gerarMaterial,
+  hashTexto,
+  type MaterialParaRegistrar,
+  type PortasGerarMaterial,
+  type Preparo,
+} from "./gerarMaterial";
 import type { ProvedorIA } from "./ia";
 
 const ESTUDANTE = "40000000-0000-4000-8000-000000000001";
@@ -13,7 +21,14 @@ const PARAMS: ParametrosAdaptacao = {
   contrasteMinimo: 7,
   blocosPorMaterial: 8,
 };
-const PREPARO: Preparo = { docenteId: "doc-do-banco", estudanteId: ESTUDANTE, versaoId: "v1", parametros: PARAMS, iaPermitida: false, revisaoEmAndamento: false };
+const PREPARO: Preparo = {
+  docenteId: "doc-do-banco",
+  estudanteId: ESTUDANTE,
+  versaoId: "v1",
+  parametros: PARAMS,
+  iaPermitida: false,
+  revisaoEmAndamento: false,
+};
 const TEXTO = "O ciclo da água é o movimento contínuo da água na Terra (texto fictício).";
 
 function portas(extra: Partial<PortasGerarMaterial> = {}, preparo: Partial<Preparo> = {}) {
@@ -26,7 +41,13 @@ const erroBanco = (code: string, message = "msg do banco") => Object.assign(new 
 describe("gerar-material · caminho negado primeiro", () => {
   it("corpo inválido → 400 sem tocar no banco", async () => {
     const { p, preparar } = portas();
-    for (const corpo of [null, {}, { estudanteId: "x", texto: "a" }, { estudanteId: ESTUDANTE, texto: "   " }, { estudanteId: ESTUDANTE, texto: "a".repeat(20_001) }]) {
+    for (const corpo of [
+      null,
+      {},
+      { estudanteId: "x", texto: "a" },
+      { estudanteId: ESTUDANTE, texto: "   " },
+      { estudanteId: ESTUDANTE, texto: "a".repeat(20_001) },
+    ]) {
       await expect(gerarMaterial(corpo, p)).rejects.toMatchObject({ status: 400, codigo: "VALIDACAO" });
     }
     expect(preparar).not.toHaveBeenCalled();
@@ -37,7 +58,11 @@ describe("gerar-material · caminho negado primeiro", () => {
   });
   it("RN01/RN08: banco nega no preparo → 403 e nada é gravado", async () => {
     const { p, registrar } = portas({ preparar: vi.fn(async () => Promise.reject(erroBanco("42501", "A família não autorizou"))) });
-    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({ status: 403, codigo: "NEGADO", message: "A família não autorizou" });
+    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({
+      status: 403,
+      codigo: "NEGADO",
+      message: "A família não autorizou",
+    });
     expect(registrar).not.toHaveBeenCalled();
   });
   it("RN05: sem perfil vigente (PT409) → 409", async () => {
@@ -50,7 +75,10 @@ describe("gerar-material · caminho negado primeiro", () => {
   });
   it("erro inesperado do banco → 500 genérico, sem vazar detalhe", async () => {
     const { p } = portas({ preparar: vi.fn(async () => Promise.reject(erroBanco("XX000", "relation secreta não existe"))) });
-    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({ status: 500, message: expect.not.stringContaining("secreta") });
+    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({
+      status: 500,
+      message: expect.not.stringContaining("secreta"),
+    });
   });
   it("falha de rede ao falar com o banco → 500 genérico, nada é gravado", async () => {
     const { p, registrar } = portas({ preparar: vi.fn(async () => Promise.reject(new TypeError("fetch failed"))) });
@@ -129,7 +157,13 @@ describe("gerar-material · camada de IA (RN06, RNF08, prompt injection)", () =>
     expect(registrar.mock.calls[0]![0].textoAdaptado.glossario).toEqual(saidaOk.glossario);
   });
   it("D-43: o glossário da IA entra nos apoios de leitura sem repetir termo", async () => {
-    const ia = provedor(async () => ({ textoSimplificado: "O ciclo da água.", glossario: [{ termo: "Ciclo", explicacao: "da IA" }, { termo: "nuvem", explicacao: "da IA" }] }));
+    const ia = provedor(async () => ({
+      textoSimplificado: "O ciclo da água.",
+      glossario: [
+        { termo: "Ciclo", explicacao: "da IA" },
+        { termo: "nuvem", explicacao: "da IA" },
+      ],
+    }));
     const { p, registrar } = portas({ ia, iaHabilitada: true }, { iaPermitida: true, parametros: { ...PARAMS, nivelVocabulario: "BASICO" } });
     await gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p);
     const termos = registrar.mock.calls[0]![0].textoAdaptado.apoios!.glossario.map((i) => i.termo);

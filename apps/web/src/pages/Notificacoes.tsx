@@ -66,7 +66,11 @@ export function Notificacoes() {
           {dados.dados.lista.map((n) => (
             <li key={n.id} className={n.lidaEm ? undefined : "notificacao--nova"}>
               <div>
-                {n.estudanteId ? <Link to={DESTINO[n.tipo](n.estudanteId)}>{textoNotificacao(n.tipo, nome(n.estudanteId))}</Link> : textoNotificacao(n.tipo, "—")}
+                {n.estudanteId ? (
+                  <Link to={DESTINO[n.tipo](n.estudanteId)}>{textoNotificacao(n.tipo, nome(n.estudanteId))}</Link>
+                ) : (
+                  textoNotificacao(n.tipo, "—")
+                )}
                 <div className="meta">{formatarDataHora(n.criadaEm)}</div>
               </div>
               {!n.lidaEm && <Badge tom="info">Nova</Badge>}

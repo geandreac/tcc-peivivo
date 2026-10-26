@@ -30,7 +30,11 @@ export interface PortasFecharCiclo {
   /** `fn_dados_fechamento` com o JWT do docente. */
   dados(cicloId: string): Promise<DadosFechamento>;
   /** `fn_registrar_fechamento` com service role. */
-  registrar(docenteId: string, cicloId: string, parametros: ParametrosAdaptacao): Promise<{
+  registrar(
+    docenteId: string,
+    cicloId: string,
+    parametros: ParametrosAdaptacao,
+  ): Promise<{
     versaoId: string;
     statusValidacao: "PENDENTE" | "VIGENTE";
     modoPedagogico: boolean;

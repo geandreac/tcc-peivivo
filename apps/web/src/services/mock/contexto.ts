@@ -175,7 +175,7 @@ export function criarContextoMock(opcoes: OpcoesMock = {}) {
   /** D-28: espelha privado.notificar — vínculos ATIVOS com os papéis dados, menos quem causou. */
   function notificar(estudanteId: string, tipo: TipoNotificacao, papeis: Papel[]) {
     const destinatarios = new Set(
-      estado.vinculos.filter((v) => v.estudanteId === estudanteId && v.status === "ATIVO" && papeis.includes(v.papel)).map((v) => v.usuarioId)
+      estado.vinculos.filter((v) => v.estudanteId === estudanteId && v.status === "ATIVO" && papeis.includes(v.papel)).map((v) => v.usuarioId),
     );
     destinatarios.delete(sessaoId ?? "");
     for (const usuarioId of destinatarios) notificarUsuario(usuarioId, tipo, estudanteId);

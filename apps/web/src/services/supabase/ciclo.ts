@@ -15,7 +15,11 @@ export function ciclo(c: Contexto) {
   return {
     // ---- ciclos e observações
     listarCiclos: async (estudanteId) =>
-      (await paginado<Linha>((de, ate) => sb.from("ciclos_observacao").select(COL_CICLO).eq("estudante_id", estudanteId).order("numero").order("id").range(de, ate))).map(paraCiclo),
+      (
+        await paginado<Linha>((de, ate) =>
+          sb.from("ciclos_observacao").select(COL_CICLO).eq("estudante_id", estudanteId).order("numero").order("id").range(de, ate),
+        )
+      ).map(paraCiclo),
     obterCicloAberto: async (estudanteId) => {
       const r = await exec<Linha | null>(sb.from("ciclos_observacao").select(COL_CICLO).eq("estudante_id", estudanteId).eq("status", "ABERTO").maybeSingle());
       return r ? paraCiclo(r) : null;
@@ -54,18 +58,31 @@ export function ciclo(c: Contexto) {
     listarVersoes: async (estudanteId) =>
       (
         await paginado<Linha>((de, ate) =>
-          sb.from("versoes_perfil").select(COL_VERSAO).eq("estudante_id", estudanteId).order("numero_ciclo", { ascending: false }).order("created_at", { ascending: false }).order("id").range(de, ate),
+          sb
+            .from("versoes_perfil")
+            .select(COL_VERSAO)
+            .eq("estudante_id", estudanteId)
+            .order("numero_ciclo", { ascending: false })
+            .order("created_at", { ascending: false })
+            .order("id")
+            .range(de, ate),
         )
       ).map(paraVersao),
     obterVersaoVigente: async (estudanteId) => {
-      const r = await exec<Linha | null>(sb.from("versoes_perfil").select(COL_VERSAO).eq("estudante_id", estudanteId).eq("status_validacao", "VIGENTE").maybeSingle());
+      const r = await exec<Linha | null>(
+        sb.from("versoes_perfil").select(COL_VERSAO).eq("estudante_id", estudanteId).eq("status_validacao", "VIGENTE").maybeSingle(),
+      );
       return r ? paraVersao(r) : null;
     },
     preverFechamento: async (cicloId) => {
       // Mesmo cálculo da Edge Function (packages/funcoes), sem gravar nada.
-      const d = await exec<{ estudanteId: string; numeroCiclo: number; vigente: { parametros: ParametrosAdaptacao } | null; validacaoClinica: boolean; historico: ObservacaoHistorica[] }>(
-        sb.rpc("fn_dados_fechamento", { p_ciclo: cicloId }),
-      );
+      const d = await exec<{
+        estudanteId: string;
+        numeroCiclo: number;
+        vigente: { parametros: ParametrosAdaptacao } | null;
+        validacaoClinica: boolean;
+        historico: ObservacaoHistorica[];
+      }>(sb.rpc("fn_dados_fechamento", { p_ciclo: cicloId }));
       const { proposta, diff } = calcularFechamento(d.numeroCiclo, d.vigente?.parametros ?? null, d.historico);
       const versao: VersaoPerfil = {
         id: "previa",
@@ -87,24 +104,32 @@ export function ciclo(c: Contexto) {
     },
     validarVersao: async (versaoId, decisao, justificativa) => {
       const id = await exec<string>(
-        sb.rpc("fn_validar_versao", { p_versao: versaoId, p_decisao: decisao === "APROVAR" ? "APROVAR" : "REVISAO", p_justificativa: justificativa?.trim() || null }),
+        sb.rpc("fn_validar_versao", {
+          p_versao: versaoId,
+          p_decisao: decisao === "APROVAR" ? "APROVAR" : "REVISAO",
+          p_justificativa: justificativa?.trim() || null,
+        }),
       );
       return c.obterVersao(id);
     },
     listarPendencias: async () => {
       const linhas = await paginado<Linha>((de, ate) =>
-        sb.from("versoes_perfil").select(`${COL_VERSAO}, estudantes(${COL_ESTUDANTE})`).in("status_validacao", [...STATUS_PENDENTES]).order("created_at").order("id").range(de, ate),
+        sb
+          .from("versoes_perfil")
+          .select(`${COL_VERSAO}, estudantes(${COL_ESTUDANTE})`)
+          .in("status_validacao", [...STATUS_PENDENTES])
+          .order("created_at")
+          .order("id")
+          .range(de, ate),
       );
       const agora = Date.now();
       return linhas
         .filter((r) => r.estudantes)
-        .map(
-          (r): Pendencia => ({
-            versao: paraVersao(r),
-            estudante: paraEstudante(r.estudantes as Linha),
-            diasEmAberto: Math.floor((agora - new Date(String(r.created_at)).getTime()) / MS_POR_DIA),
-          }),
-        )
+        .map((r): Pendencia => ({
+          versao: paraVersao(r),
+          estudante: paraEstudante(r.estudantes as Linha),
+          diasEmAberto: Math.floor((agora - new Date(String(r.created_at)).getTime()) / MS_POR_DIA),
+        }))
         .sort((a, b) => b.diasEmAberto - a.diasEmAberto);
     },
     resumoEscola: async () => {

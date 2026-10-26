@@ -58,7 +58,10 @@ export function Estudante() {
   }, [id, podeLerDados]);
   // D-48: materiais em páginas; pede um a mais para saber se há outra página.
   const [limiteMateriais, setLimiteMateriais] = useState(MATERIAIS_POR_PAGINA);
-  const materiais = useConsulta<Material[] | null>(async () => (id && podeLerDados ? api.listarMateriais(id, { limite: limiteMateriais + 1 }) : null), [id, podeLerDados, limiteMateriais]);
+  const materiais = useConsulta<Material[] | null>(
+    async () => (id && podeLerDados ? api.listarMateriais(id, { limite: limiteMateriais + 1 }) : null),
+    [id, podeLerDados, limiteMateriais],
+  );
 
   if (ctx.carregando) return <Carregando texto="Carregando estudante…" />;
   if (ctx.erro || !ctx.dados) {
@@ -96,7 +99,10 @@ export function Estudante() {
       </div>
 
       {!consentimentoAtivo && (
-        <Alerta tom={papel === "RESPONSAVEL" ? "aviso" : "erro"} titulo={papel === "RESPONSAVEL" ? "Falta o seu consentimento" : "Aguardando consentimento do responsável"}>
+        <Alerta
+          tom={papel === "RESPONSAVEL" ? "aviso" : "erro"}
+          titulo={papel === "RESPONSAVEL" ? "Falta o seu consentimento" : "Aguardando consentimento do responsável"}
+        >
           <p>
             {papel === "RESPONSAVEL"
               ? "Nenhum perfil é criado e nenhum material é gerado sem a sua autorização. Leia o termo e decida."
@@ -154,7 +160,11 @@ export function Estudante() {
               </LinkBotao>
             </Card>
             <Card titulo="Observação quinzenal" nivel={3} className="card--acao">
-              <p>{dados.dados?.cicloAberto ? `Ciclo ${dados.dados.cicloAberto.numero} aberto desde ${formatarData(dados.dados.cicloAberto.dataInicio)}.` : "Abra o próximo ciclo e registre as seis dimensões."}</p>
+              <p>
+                {dados.dados?.cicloAberto
+                  ? `Ciclo ${dados.dados.cicloAberto.numero} aberto desde ${formatarData(dados.dados.cicloAberto.dataInicio)}.`
+                  : "Abra o próximo ciclo e registre as seis dimensões."}
+              </p>
               <LinkBotao to={`/estudantes/${estudante.id}/observar`} variante="secundario" pequeno>
                 Registrar observação
               </LinkBotao>
@@ -238,12 +248,14 @@ export function Estudante() {
                 <span className="meta">
                   Ciclo {dados.dados.vigente.numeroCiclo} · desde {formatarData(dados.dados.vigente.dataVigencia)}
                 </span>
-                {pendente && <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>Ciclo {pendente.numeroCiclo}: {STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>}
+                {pendente && (
+                  <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>
+                    Ciclo {pendente.numeroCiclo}: {STATUS_VALIDACAO[pendente.statusValidacao].texto}
+                  </Badge>
+                )}
               </div>
               <ParametrosLista parametros={dados.dados.vigente.parametros} tecnico={papel === "PROFISSIONAL_SAUDE"} />
-              <p className="texto-apoio u-mt-3">
-                {EXPLICA_RITMO_PERFIL}
-              </p>
+              <p className="texto-apoio u-mt-3">{EXPLICA_RITMO_PERFIL}</p>
             </Card>
           )}
 
@@ -261,7 +273,9 @@ export function Estudante() {
                 <li key={m.id}>
                   <div>
                     <Link to={m.statusAprovacao === "RASCUNHO" ? `/materiais/${m.id}/revisar` : `/materiais/${m.id}`}>{m.titulo}</Link>
-                    <div className="meta">Gerado em {formatarDataHora(m.dataGeracao)} · camada de IA {m.iaAplicada ? "aplicada" : "desligada"}</div>
+                    <div className="meta">
+                      Gerado em {formatarDataHora(m.dataGeracao)} · camada de IA {m.iaAplicada ? "aplicada" : "desligada"}
+                    </div>
                   </div>
                   <Badge tom={STATUS_APROVACAO[m.statusAprovacao].tom}>{STATUS_APROVACAO[m.statusAprovacao].texto}</Badge>
                 </li>
@@ -269,7 +283,12 @@ export function Estudante() {
             </ul>
           )}
           {materiais.dados && materiais.dados.length > limiteMateriais && (
-            <Botao variante="secundario" carregando={materiais.carregando} textoCarregando="Carregando…" onClick={() => setLimiteMateriais((n) => n + MATERIAIS_POR_PAGINA)}>
+            <Botao
+              variante="secundario"
+              carregando={materiais.carregando}
+              textoCarregando="Carregando…"
+              onClick={() => setLimiteMateriais((n) => n + MATERIAIS_POR_PAGINA)}
+            >
               Carregar mais materiais
             </Botao>
           )}

@@ -94,7 +94,9 @@ export function servir(nomeFuncao: string, caso: (corpo: unknown, clientes: Clie
       }
       // nome e código do erro (ex.: TimeoutError, 57014), nunca a mensagem: ela pode carregar dado pessoal
       const { name, code } = (e ?? {}) as { name?: string; code?: unknown };
-      console.error(JSON.stringify({ requestId, funcao: nomeFuncao, status: 500, tipo: name ?? "desconhecido", ...(typeof code === "string" ? { code } : {}) }));
+      console.error(
+        JSON.stringify({ requestId, funcao: nomeFuncao, status: 500, tipo: name ?? "desconhecido", ...(typeof code === "string" ? { code } : {}) }),
+      );
       return json(500, { erro: { codigo: "INTERNO", mensagem: "Algo deu errado do nosso lado. Tente de novo em instantes." } }, requestId);
     }
   });

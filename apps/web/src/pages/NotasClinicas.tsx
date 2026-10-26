@@ -46,12 +46,16 @@ export function NotasClinicas() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Notas clínicas reservadas" descricao="Espaço do profissional de saúde. Docente, família e coordenação não têm acesso — nem por chamada direta à API." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Notas clínicas reservadas"
+        descricao="Espaço do profissional de saúde. Docente, família e coordenação não têm acesso — nem por chamada direta à API."
+      />
 
       <Alerta tom="aviso" titulo="Só profissionais de saúde veem este conteúdo">
         <p>
-          O que a escola precisa saber vai como <strong>observação</strong> (todos os vinculados leem). O raciocínio clínico fica aqui. Se o
-          responsável excluir os dados do estudante, estas notas também são apagadas — mantenha seu prontuário fora do sistema.
+          O que a escola precisa saber vai como <strong>observação</strong> (todos os vinculados leem). O raciocínio clínico fica aqui. Se o responsável excluir
+          os dados do estudante, estas notas também são apagadas — mantenha seu prontuário fora do sistema.
         </p>
       </Alerta>
 

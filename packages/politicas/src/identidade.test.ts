@@ -91,7 +91,10 @@ describe("Convites — registrar (só service role)", () => {
     const r = await db.fluxo([
       { ator: "servico", sql: registrar(usuarioId("coordenacao"), "doc.novo@example.test", "DOCENTE") },
       { ator: "servico", sql: registrar(usuarioId("coordenacao"), "doc.novo@example.test", "DOCENTE") },
-      { ator: "sistema", sql: "select count(*) filter (where revogado_em is null)::int as ativos, count(*)::int as total from convites where email = 'doc.novo@example.test'" },
+      {
+        ator: "sistema",
+        sql: "select count(*) filter (where revogado_em is null)::int as ativos, count(*)::int as total from convites where email = 'doc.novo@example.test'",
+      },
       { ator: "sistema", sql: "select m.papel from membros_escola m join usuarios u on u.id = m.usuario_id where u.email = 'doc.novo@example.test'" },
     ]);
     expect(ok(r[2])[0]).toEqual({ ativos: 1, total: 2 });
@@ -101,7 +104,10 @@ describe("Convites — registrar (só service role)", () => {
     const r = await db.fluxo([
       { ator: "servico", sql: registrar(usuarioId("coordenacao"), "prof.novo@example.test", "PROFISSIONAL_SAUDE", `'${ID.e2}'`, "'CONSELHO-X'") },
       { ator: "servico", sql: registrar(usuarioId("coordenacao"), "resp.novo@example.test", "RESPONSAVEL", `'${ID.e2}'`, "null", "true") },
-      { ator: "sistema", sql: `select u.email, v.status, v.conferido_por is not null as conferido from vinculos_usuario_estudante v join usuarios u on u.id = v.usuario_id where v.estudante_id = '${ID.e2}' and u.email like '%.novo@example.test' order by u.email` },
+      {
+        ator: "sistema",
+        sql: `select u.email, v.status, v.conferido_por is not null as conferido from vinculos_usuario_estudante v join usuarios u on u.id = v.usuario_id where v.estudante_id = '${ID.e2}' and u.email like '%.novo@example.test' order by u.email`,
+      },
     ]);
     expect(ok(r[2])).toEqual([
       { email: "prof.novo@example.test", status: "PENDENTE_RESPONSAVEL", conferido: false },

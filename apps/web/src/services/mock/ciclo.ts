@@ -35,7 +35,10 @@ export function ciclo(ctx: ContextoMock) {
       ctx.chamada(() => {
         ctx.exigirLeitura(estudanteId);
         const ids = new Set(ctx.estado.ciclos.filter((c) => c.estudanteId === estudanteId).map((c) => c.id));
-        return ctx.paginar(ctx.estado.observacoes.filter((o) => ids.has(o.cicloId)).sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro)), pagina);
+        return ctx.paginar(
+          ctx.estado.observacoes.filter((o) => ids.has(o.cicloId)).sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro)),
+          pagina,
+        );
       }),
     registrarObservacao: (cicloId, dados) =>
       ctx.chamada(() => {
@@ -124,7 +127,14 @@ export function ciclo(ctx: ContextoMock) {
         ciclo.status = "FECHADO";
         ciclo.dataFim = ctx.agora().slice(0, 10);
         // abre o próximo ciclo (HU-D.01: "o sistema abre ao fechar o N-1")
-        ctx.estado.ciclos.push({ id: uuid(), estudanteId: ciclo.estudanteId, numero: ciclo.numero + 1, dataInicio: ctx.agora().slice(0, 10), dataFim: null, status: "ABERTO" });
+        ctx.estado.ciclos.push({
+          id: uuid(),
+          estudanteId: ciclo.estudanteId,
+          numero: ciclo.numero + 1,
+          dataInicio: ctx.agora().slice(0, 10),
+          dataFim: null,
+          status: "ABERTO",
+        });
         ctx.registrarAuditoria("ciclos_observacao", ciclo.id, "CICLO_FECHADO", { numero: ciclo.numero, status: versao.statusValidacao });
         if (versao.statusValidacao === "PENDENTE") ctx.notificar(ciclo.estudanteId, "VALIDACAO_PENDENTE", ["PROFISSIONAL_SAUDE"]);
         ctx.salvar();
@@ -159,13 +169,19 @@ export function ciclo(ctx: ContextoMock) {
       ctx.chamada(() => {
         const u = ctx.eu();
         ctx.aplicarExpiracao();
-        const meus = ctx.estado.vinculos.filter((v) => v.usuarioId === u.id && v.status === "ATIVO" && (v.papel === "PROFISSIONAL_SAUDE" || v.papel === "COORDENACAO"));
+        const meus = ctx.estado.vinculos.filter(
+          (v) => v.usuarioId === u.id && v.status === "ATIVO" && (v.papel === "PROFISSIONAL_SAUDE" || v.papel === "COORDENACAO"),
+        );
         const ids = new Set(meus.map((v) => v.estudanteId));
         const lista: Pendencia[] = [];
         for (const v of ctx.estado.versoes) {
           // Só o que ainda pode ser decidido: substituída e expirada não voltam (RN05, D-35).
           if (!ids.has(v.estudanteId) || !STATUS_PENDENTES.includes(v.statusValidacao)) continue;
-          lista.push({ versao: v, estudante: ctx.estudante(v.estudanteId), diasEmAberto: Math.floor((Date.now() - new Date(v.createdAt).getTime()) / MS_POR_DIA) });
+          lista.push({
+            versao: v,
+            estudante: ctx.estudante(v.estudanteId),
+            diasEmAberto: Math.floor((Date.now() - new Date(v.createdAt).getTime()) / MS_POR_DIA),
+          });
         }
         return lista.sort((a, b) => b.diasEmAberto - a.diasEmAberto);
       }),
@@ -176,10 +192,19 @@ export function ciclo(ctx: ContextoMock) {
         ctx.aplicarExpiracao();
         const ids = ctx.estado.vinculos.filter((v) => v.usuarioId === u.id && v.status === "ATIVO" && v.papel === "COORDENACAO").map((v) => v.estudanteId);
         if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "O painel da escola é da coordenação pedagógica.");
-        const resumo: ResumoEscola = { totalEstudantes: ids.length, comConsentimento: 0, semConsentimento: 0, semProfissional: 0, validacoesAtrasadas: 0, ciclosParados: 0, pendencias: [] };
+        const resumo: ResumoEscola = {
+          totalEstudantes: ids.length,
+          comConsentimento: 0,
+          semConsentimento: 0,
+          semProfissional: 0,
+          validacoesAtrasadas: 0,
+          ciclosParados: 0,
+          pendencias: [],
+        };
         for (const id of ids) {
           const e = ctx.estudante(id);
-          const add = (motivo: ResumoEscola["pendencias"][number]["motivo"], desde: string | null) => resumo.pendencias.push({ estudanteId: id, nome: e.nome, motivo, desde });
+          const add = (motivo: ResumoEscola["pendencias"][number]["motivo"], desde: string | null) =>
+            resumo.pendencias.push({ estudanteId: id, nome: e.nome, motivo, desde });
           if (ctx.temConsentimento(id)) resumo.comConsentimento++;
           else {
             resumo.semConsentimento++;
@@ -191,14 +216,21 @@ export function ciclo(ctx: ContextoMock) {
             add("SEM_PROFISSIONAL", null);
           }
           const atrasada = ctx.estado.versoes.find(
-            (v) => v.estudanteId === id && (v.statusValidacao === "EXPIRADA" || (v.statusValidacao === "PENDENTE" && Date.now() - new Date(v.createdAt).getTime() >= DIAS_VALIDACAO_ATRASADA * MS_POR_DIA))
+            (v) =>
+              v.estudanteId === id &&
+              (v.statusValidacao === "EXPIRADA" ||
+                (v.statusValidacao === "PENDENTE" && Date.now() - new Date(v.createdAt).getTime() >= DIAS_VALIDACAO_ATRASADA * MS_POR_DIA)),
           );
           if (atrasada) {
             resumo.validacoesAtrasadas++;
             add("VALIDACAO_ATRASADA", atrasada.createdAt);
           }
           const aberto = ctx.estado.ciclos.find((c) => c.estudanteId === id && c.status === "ABERTO");
-          if (aberto && Date.now() - new Date(aberto.dataInicio).getTime() > DIAS_CICLO_PARADO * MS_POR_DIA && !ctx.estado.observacoes.some((o) => o.cicloId === aberto.id)) {
+          if (
+            aberto &&
+            Date.now() - new Date(aberto.dataInicio).getTime() > DIAS_CICLO_PARADO * MS_POR_DIA &&
+            !ctx.estado.observacoes.some((o) => o.cicloId === aberto.id)
+          ) {
             resumo.ciclosParados++;
             add("CICLO_PARADO", aberto.dataInicio);
           }

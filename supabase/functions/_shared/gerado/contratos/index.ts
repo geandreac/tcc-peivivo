@@ -78,7 +78,10 @@ export interface RespostaGerarMaterial {
  */
 export const SaidaIASchema = z
   .object({
-    textoSimplificado: z.string().min(1).max(Math.floor(LIMITE_TEXTO * 1.5)),
+    textoSimplificado: z
+      .string()
+      .min(1)
+      .max(Math.floor(LIMITE_TEXTO * 1.5)),
     glossario: z
       .array(z.object({ termo: z.string().min(1).max(60), explicacao: z.string().min(1).max(300) }).strict())
       .max(50)

@@ -46,8 +46,8 @@ export function Acessibilidade() {
     <>
       <h1>Acessibilidade</h1>
       <p className="pagina-leitura">
-        Ajuste a interface do seu jeito. As preferências ficam salvas neste dispositivo e valem para todas as telas. O zoom do navegador
-        (até 400 %) também funciona — nada aqui o substitui.
+        Ajuste a interface do seu jeito. As preferências ficam salvas neste dispositivo e valem para todas as telas. O zoom do navegador (até 400 %) também
+        funciona — nada aqui o substitui.
       </p>
 
       <div className="preferencias">
@@ -140,8 +140,8 @@ export function Acessibilidade() {
           <li>respeito à preferência de redução de movimento.</li>
         </ul>
         <p>
-          Limitações conhecidas: a validação com leitor de tela (NVDA) e usuários reais ainda está planejada (ver plano de testes). Encontrou uma
-          barreira? Escreva para <a href="mailto:acessibilidade@peivivo.example">acessibilidade@peivivo.example</a> (endereço fictício).
+          Limitações conhecidas: a validação com leitor de tela (NVDA) e usuários reais ainda está planejada (ver plano de testes). Encontrou uma barreira?
+          Escreva para <a href="mailto:acessibilidade@peivivo.example">acessibilidade@peivivo.example</a> (endereço fictício).
         </p>
       </Card>
 

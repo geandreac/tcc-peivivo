@@ -31,8 +31,16 @@ let escolaId = "";
 let estudanteId = "";
 let semConsentimentoId = "";
 let cicloId = "";
-const PARAMS = { maxLinhasPorBloco: 4, nivelVocabulario: "BASICO", interesseAncora: "dinossauros", formatoEnunciado: "ETAPA_UNICA", contrasteMinimo: 7, blocosPorMaterial: 8 };
-const TEXTO = "O ciclo da água é o movimento contínuo da água na Terra. A água evapora com o calor do sol.\n\nLeia o texto e depois responda às perguntas com suas palavras.";
+const PARAMS = {
+  maxLinhasPorBloco: 4,
+  nivelVocabulario: "BASICO",
+  interesseAncora: "dinossauros",
+  formatoEnunciado: "ETAPA_UNICA",
+  contrasteMinimo: 7,
+  blocosPorMaterial: 8,
+};
+const TEXTO =
+  "O ciclo da água é o movimento contínuo da água na Terra. A água evapora com o calor do sol.\n\nLeia o texto e depois responda às perguntas com suas palavras.";
 
 function totp(segredo: string): string {
   const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -75,20 +83,62 @@ describe.skipIf(!disponivel)("supabaseApi × Supabase real (Auth + PostgREST + E
     for (const p of PESSOAS) {
       const { data, error } = await admin.auth.admin.createUser({ email: email(p), password: SENHA, email_confirm: true });
       if (error) throw error;
-      ids[p] = { auth: data.user.id, usuario: await inserir("usuarios", { auth_user_id: data.user.id, nome: `${p} (fictício)`, email: email(p), termos_versao: "v-teste", termos_aceitos_em: new Date().toISOString() }) };
+      ids[p] = {
+        auth: data.user.id,
+        usuario: await inserir("usuarios", {
+          auth_user_id: data.user.id,
+          nome: `${p} (fictício)`,
+          email: email(p),
+          termos_versao: "v-teste",
+          termos_aceitos_em: new Date().toISOString(),
+        }),
+      };
     }
     escolaId = await inserir("escolas", { nome: `Escola fictícia contrato ${SUFIXO}` });
     await inserir("membros_escola", { usuario_id: ids.coordenacao!.usuario, escola_id: escolaId, papel: "COORDENACAO" });
     await inserir("membros_escola", { usuario_id: ids.docente!.usuario, escola_id: escolaId, papel: "DOCENTE" });
-    estudanteId = await inserir("estudantes", { escola_id: escolaId, nome: "Estudante fictício contrato", data_nascimento: "2017-01-01", turma: "4º ano", laudo_apresentado_em: "2025-02-10" });
+    estudanteId = await inserir("estudantes", {
+      escola_id: escolaId,
+      nome: "Estudante fictício contrato",
+      data_nascimento: "2017-01-01",
+      turma: "4º ano",
+      laudo_apresentado_em: "2025-02-10",
+    });
     semConsentimentoId = await inserir("estudantes", { escola_id: escolaId, nome: "Estudante fictício sem autorização", data_nascimento: "2016-01-01" });
-    for (const [p, e] of [["docente", estudanteId], ["docente", semConsentimentoId], ["responsavel", estudanteId]] as const) {
+    for (const [p, e] of [
+      ["docente", estudanteId],
+      ["docente", semConsentimentoId],
+      ["responsavel", estudanteId],
+    ] as const) {
       await inserir("vinculos_usuario_estudante", { usuario_id: ids[p]!.usuario, estudante_id: e, papel: p === "docente" ? "DOCENTE" : "RESPONSAVEL" });
     }
-    await inserir("vinculos_usuario_estudante", { usuario_id: ids.saude!.usuario, estudante_id: estudanteId, papel: "PROFISSIONAL_SAUDE", registro_conselho: "CONSELHO-CONTRATO", verificacao_registro: "NAO_VERIFICADO" });
-    await inserir("consentimentos", { estudante_id: estudanteId, responsavel_id: ids.responsavel!.usuario, escopos: ["observacao_pedagogica", "observacao_domiciliar", "validacao_clinica", "geracao_material"], versao_termo: "v-contrato", status: "ATIVO" });
-    await inserir("versoes_perfil", { estudante_id: estudanteId, numero_ciclo: 1, parametros: PARAMS, status_validacao: "VIGENTE", data_vigencia: new Date().toISOString() });
-    cicloId = await inserir("ciclos_observacao", { estudante_id: estudanteId, numero: 2, data_inicio: new Date().toISOString().slice(0, 10), status: "ABERTO" });
+    await inserir("vinculos_usuario_estudante", {
+      usuario_id: ids.saude!.usuario,
+      estudante_id: estudanteId,
+      papel: "PROFISSIONAL_SAUDE",
+      registro_conselho: "CONSELHO-CONTRATO",
+      verificacao_registro: "NAO_VERIFICADO",
+    });
+    await inserir("consentimentos", {
+      estudante_id: estudanteId,
+      responsavel_id: ids.responsavel!.usuario,
+      escopos: ["observacao_pedagogica", "observacao_domiciliar", "validacao_clinica", "geracao_material"],
+      versao_termo: "v-contrato",
+      status: "ATIVO",
+    });
+    await inserir("versoes_perfil", {
+      estudante_id: estudanteId,
+      numero_ciclo: 1,
+      parametros: PARAMS,
+      status_validacao: "VIGENTE",
+      data_vigencia: new Date().toISOString(),
+    });
+    cicloId = await inserir("ciclos_observacao", {
+      estudante_id: estudanteId,
+      numero: 2,
+      data_inicio: new Date().toISOString().slice(0, 10),
+      status: "ABERTO",
+    });
     await inserir("notas_clinicas", { estudante_id: estudanteId, profissional_id: ids.saude!.usuario, conteudo: "Nota reservada fictícia (contrato)" });
   }, 90_000);
 
@@ -96,7 +146,11 @@ describe.skipIf(!disponivel)("supabaseApi × Supabase real (Auth + PostgREST + E
     if (!admin) return;
     for (const e of [estudanteId, semConsentimentoId]) if (e) await admin.from("estudantes").delete().eq("id", e);
     const { data: extras } = await admin.from("estudantes").select("id").eq("escola_id", escolaId);
-    for (const x of extras ?? []) await admin.from("estudantes").delete().eq("id", (x as { id: string }).id);
+    for (const x of extras ?? [])
+      await admin
+        .from("estudantes")
+        .delete()
+        .eq("id", (x as { id: string }).id);
     if (escolaId) await admin.from("escolas").delete().eq("id", escolaId);
     for (const p of PESSOAS) if (ids[p]) await admin.auth.admin.deleteUser(ids[p]!.auth);
   });
@@ -175,7 +229,13 @@ describe.skipIf(!disponivel)("supabaseApi × Supabase real (Auth + PostgREST + E
     expect(novo.nome).toBe("Fictício Novo");
 
     // convite pela Edge Function `convidar` — mesma chamada da tela de vínculos, com a sessão aal2
-    const convite = await coord.convidar({ email: email("prof-convidada"), nome: "Profissional convidada (fictícia)", papel: "PROFISSIONAL_SAUDE", estudanteId, registroConselho: "CONSELHO-CONVITE" });
+    const convite = await coord.convidar({
+      email: email("prof-convidada"),
+      nome: "Profissional convidada (fictícia)",
+      papel: "PROFISSIONAL_SAUDE",
+      estudanteId,
+      registroConselho: "CONSELHO-CONVITE",
+    });
     expect(convite.emailEnviado).toBe(true);
     const familia = await abrirApp("responsavel");
     const pendente = (await familia.listarVinculos(estudanteId)).find((v) => v.status === "PENDENTE_RESPONSAVEL");

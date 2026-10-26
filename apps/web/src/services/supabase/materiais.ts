@@ -13,7 +13,14 @@ export function materiais(c: Contexto) {
     listarMateriais: async (estudanteId, pagina) =>
       (
         await paginado<Linha>(
-          (de, ate) => sb.from("materiais_adaptados").select(COL_MATERIAL).eq("estudante_id", estudanteId).order("data_geracao", { ascending: false }).order("id").range(de, ate),
+          (de, ate) =>
+            sb
+              .from("materiais_adaptados")
+              .select(COL_MATERIAL)
+              .eq("estudante_id", estudanteId)
+              .order("data_geracao", { ascending: false })
+              .order("id")
+              .range(de, ate),
           pagina,
         )
       ).map((r) => paraMaterial(r)),

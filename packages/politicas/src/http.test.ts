@@ -163,7 +163,10 @@ describe.skipIf(!disponivel)("HTTP real: Supabase Auth + PostgREST (403 com toke
     await elevarParaAal2(coord);
     const com = await coord.rpc("fn_cadastrar_estudante", { p_escola: escolaId, p_nome: "Fictício HTTP 2", p_data_nascimento: "2018-01-01" });
     expect(com.error).toBeNull();
-    await admin.from("estudantes").delete().eq("id", com.data as string);
+    await admin
+      .from("estudantes")
+      .delete()
+      .eq("id", com.data as string);
   });
 
   it("RN08: responsável revoga pela API e o docente perde a leitura na hora", async () => {

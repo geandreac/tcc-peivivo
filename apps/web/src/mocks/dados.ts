@@ -29,7 +29,6 @@ const diasAtras = (n: number, hora = 20) => {
 };
 const dataAtras = (n: number) => diasAtras(n).slice(0, 10);
 
-
 export const USUARIOS: Usuario[] = [
   { id: ID.docente, nome: "Márcia (fictícia)", email: "docente.dev@example.test", papelInstitucional: null },
   { id: ID.responsavel, nome: "Rosa (fictícia)", email: "responsavel.dev@example.test", papelInstitucional: null },
@@ -60,13 +59,53 @@ export const ESTUDANTES: Estudante[] = [
 
 export const VINCULOS: Vinculo[] = [
   { id: "vin-1", usuarioId: ID.docente, estudanteId: ID.estudanteA, papel: "DOCENTE", dataVinculo: diasAtras(90), status: "ATIVO", registroConselho: null },
-  { id: "vin-2", usuarioId: ID.responsavel, estudanteId: ID.estudanteA, papel: "RESPONSAVEL", dataVinculo: diasAtras(89), status: "ATIVO", registroConselho: null },
-  { id: "vin-3", usuarioId: ID.profissional, estudanteId: ID.estudanteA, papel: "PROFISSIONAL_SAUDE", dataVinculo: diasAtras(85), status: "ATIVO", registroConselho: "CREFITO-DEV-000" },
-  { id: "vin-4", usuarioId: ID.coordenacao, estudanteId: ID.estudanteA, papel: "COORDENACAO", dataVinculo: diasAtras(90), status: "ATIVO", registroConselho: null },
+  {
+    id: "vin-2",
+    usuarioId: ID.responsavel,
+    estudanteId: ID.estudanteA,
+    papel: "RESPONSAVEL",
+    dataVinculo: diasAtras(89),
+    status: "ATIVO",
+    registroConselho: null,
+  },
+  {
+    id: "vin-3",
+    usuarioId: ID.profissional,
+    estudanteId: ID.estudanteA,
+    papel: "PROFISSIONAL_SAUDE",
+    dataVinculo: diasAtras(85),
+    status: "ATIVO",
+    registroConselho: "CREFITO-DEV-000",
+  },
+  {
+    id: "vin-4",
+    usuarioId: ID.coordenacao,
+    estudanteId: ID.estudanteA,
+    papel: "COORDENACAO",
+    dataVinculo: diasAtras(90),
+    status: "ATIVO",
+    registroConselho: null,
+  },
   // Estudante B: cadastrado há 3 dias; sem consentimento ainda (RN01) e sem profissional (RN06)
-  { id: "vin-5", usuarioId: ID.coordenacao, estudanteId: ID.estudanteB, papel: "COORDENACAO", dataVinculo: diasAtras(3), status: "ATIVO", registroConselho: null },
+  {
+    id: "vin-5",
+    usuarioId: ID.coordenacao,
+    estudanteId: ID.estudanteB,
+    papel: "COORDENACAO",
+    dataVinculo: diasAtras(3),
+    status: "ATIVO",
+    registroConselho: null,
+  },
   { id: "vin-6", usuarioId: ID.docente, estudanteId: ID.estudanteB, papel: "DOCENTE", dataVinculo: diasAtras(2), status: "ATIVO", registroConselho: null },
-  { id: "vin-7", usuarioId: ID.responsavel, estudanteId: ID.estudanteB, papel: "RESPONSAVEL", dataVinculo: diasAtras(2), status: "ATIVO", registroConselho: null },
+  {
+    id: "vin-7",
+    usuarioId: ID.responsavel,
+    estudanteId: ID.estudanteB,
+    papel: "RESPONSAVEL",
+    dataVinculo: diasAtras(2),
+    status: "ATIVO",
+    registroConselho: null,
+  },
 ];
 
 export const CONSENTIMENTOS: Consentimento[] = [
@@ -97,7 +136,7 @@ const obs = (
   dimensao: ObservacaoRegistro["dimensao"],
   valorEscala: ObservacaoRegistro["valorEscala"],
   evidencia: string | null,
-  dias: number
+  dias: number,
 ): ObservacaoRegistro => ({
   id: `obs-${++seq}`,
   cicloId,
@@ -129,14 +168,20 @@ export const OBSERVACOES: ObservacaoRegistro[] = [
   obs(ID.ciclo4, 4, ID.responsavel, "RESPONSAVEL", "FADIGA_TAREFA", "AMPLIADA", "Cansa depois de 10 min de tarefa em casa.", 5),
 ];
 
-
 export const VERSOES: VersaoPerfil[] = [
   {
     id: "v-0010",
     estudanteId: ID.estudanteA,
     cicloOrigemId: ID.ciclo1,
     numeroCiclo: 1,
-    parametros: { maxLinhasPorBloco: 5, nivelVocabulario: "INTERMEDIARIO", interesseAncora: null, formatoEnunciado: "ETAPA_UNICA", contrasteMinimo: 7, blocosPorMaterial: 8 },
+    parametros: {
+      maxLinhasPorBloco: 5,
+      nivelVocabulario: "INTERMEDIARIO",
+      interesseAncora: null,
+      formatoEnunciado: "ETAPA_UNICA",
+      contrasteMinimo: 7,
+      blocosPorMaterial: 8,
+    },
     statusValidacao: "SUBSTITUIDA",
     validadorId: ID.profissional,
     dataVigencia: diasAtras(41),
@@ -148,7 +193,14 @@ export const VERSOES: VersaoPerfil[] = [
     estudanteId: ID.estudanteA,
     cicloOrigemId: ID.ciclo2,
     numeroCiclo: 2,
-    parametros: { maxLinhasPorBloco: 4, nivelVocabulario: "BASICO", interesseAncora: "dinossauros", formatoEnunciado: "ETAPA_UNICA", contrasteMinimo: 7, blocosPorMaterial: 8 },
+    parametros: {
+      maxLinhasPorBloco: 4,
+      nivelVocabulario: "BASICO",
+      interesseAncora: "dinossauros",
+      formatoEnunciado: "ETAPA_UNICA",
+      contrasteMinimo: 7,
+      blocosPorMaterial: 8,
+    },
     statusValidacao: "SUBSTITUIDA",
     validadorId: ID.profissional,
     dataVigencia: diasAtras(27),
@@ -168,7 +220,6 @@ export const VERSOES: VersaoPerfil[] = [
     createdAt: diasAtras(14),
   },
 ];
-
 
 const TEXTO_FRACOES = `Uma fração representa uma parte de um todo. Quando dividimos uma pizza em quatro pedaços iguais e comemos um pedaço, comemos um quarto da pizza. O número de cima se chama numerador e mostra quantas partes pegamos. O número de baixo se chama denominador e mostra em quantas partes o todo foi dividido.
 
@@ -231,8 +282,40 @@ export const NOTAS_CLINICAS: NotaClinica[] = [
 export const AUDITORIA: Auditoria[] = [
   { id: "a-1", entidade: "estudantes", entidadeId: ID.estudanteA, evento: "CADASTRO", autorId: ID.coordenacao, data: diasAtras(90), detalhes: {} },
   { id: "a-2", entidade: "consentimentos", entidadeId: "con-1", evento: "CONCESSAO", autorId: ID.responsavel, data: diasAtras(88), detalhes: { escopo: 3 } },
-  { id: "a-3", entidade: "versoes_perfil", entidadeId: "v-0010", evento: "VALIDACAO", autorId: ID.profissional, data: diasAtras(41), detalhes: { numeroCiclo: 1 } },
-  { id: "a-4", entidade: "versoes_perfil", entidadeId: "v-0020", evento: "VALIDACAO", autorId: ID.profissional, data: diasAtras(27), detalhes: { numeroCiclo: 2 } },
-  { id: "a-5", entidade: "materiais_adaptados", entidadeId: ID.materialAprovado, evento: "APROVACAO_MATERIAL", autorId: ID.docente, data: diasAtras(20, 21), detalhes: {} },
-  { id: "a-6", entidade: "versoes_perfil", entidadeId: ID.versao3, evento: "VALIDACAO", autorId: ID.profissional, data: diasAtras(13), detalhes: { numeroCiclo: 3 } },
+  {
+    id: "a-3",
+    entidade: "versoes_perfil",
+    entidadeId: "v-0010",
+    evento: "VALIDACAO",
+    autorId: ID.profissional,
+    data: diasAtras(41),
+    detalhes: { numeroCiclo: 1 },
+  },
+  {
+    id: "a-4",
+    entidade: "versoes_perfil",
+    entidadeId: "v-0020",
+    evento: "VALIDACAO",
+    autorId: ID.profissional,
+    data: diasAtras(27),
+    detalhes: { numeroCiclo: 2 },
+  },
+  {
+    id: "a-5",
+    entidade: "materiais_adaptados",
+    entidadeId: ID.materialAprovado,
+    evento: "APROVACAO_MATERIAL",
+    autorId: ID.docente,
+    data: diasAtras(20, 21),
+    detalhes: {},
+  },
+  {
+    id: "a-6",
+    entidade: "versoes_perfil",
+    entidadeId: ID.versao3,
+    evento: "VALIDACAO",
+    autorId: ID.profissional,
+    data: diasAtras(13),
+    detalhes: { numeroCiclo: 3 },
+  },
 ];

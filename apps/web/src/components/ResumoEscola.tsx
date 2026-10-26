@@ -7,7 +7,12 @@ import { formatarData } from "../utils/datas";
 
 const MOTIVO: Record<MotivoPendenciaEscola, { texto: string; acao: string; rota: (id: string) => string; Icone: LucideIcon }> = {
   SEM_CONSENTIMENTO: { texto: "Aguardando autorização da família", acao: "Ver estudante", rota: (id) => `/estudantes/${id}`, Icone: ShieldQuestion },
-  SEM_PROFISSIONAL: { texto: "Sem profissional de saúde (ajustes só pela escola e família)", acao: "Ver vínculos", rota: (id) => `/estudantes/${id}/vinculos`, Icone: Stethoscope },
+  SEM_PROFISSIONAL: {
+    texto: "Sem profissional de saúde (ajustes só pela escola e família)",
+    acao: "Ver vínculos",
+    rota: (id) => `/estudantes/${id}/vinculos`,
+    Icone: Stethoscope,
+  },
   VALIDACAO_ATRASADA: { texto: "Validação do perfil atrasada", acao: "Ver pendências", rota: () => "/pendencias", Icone: Clock },
   CICLO_PARADO: { texto: "Quinzena sem nenhuma observação", acao: "Ver estudante", rota: (id) => `/estudantes/${id}`, Icone: CircleAlert },
 };

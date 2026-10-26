@@ -13,9 +13,13 @@ export function privacidade(c: Contexto) {
     listarNotasClinicas: async (estudanteId) => {
       // a RPC devolve uma tabela: o PostgREST também corta em max_rows, então vem em lotes
       const linhas = await paginado<Linha>((de, ate) => sb.rpc("fn_ler_notas_clinicas", { p_estudante: estudanteId }).range(de, ate));
-      return linhas.map(
-        (r): NotaClinica => ({ id: String(r.id), estudanteId, profissionalId: r.minha ? c.eu().id : String(r.profissional_nome), conteudo: String(r.conteudo), dataRegistro: String(r.data_registro) }),
-      );
+      return linhas.map((r): NotaClinica => ({
+        id: String(r.id),
+        estudanteId,
+        profissionalId: r.minha ? c.eu().id : String(r.profissional_nome),
+        conteudo: String(r.conteudo),
+        dataRegistro: String(r.data_registro),
+      }));
     },
     registrarNotaClinica: async (estudanteId, conteudo) => {
       const id = await exec<string>(sb.rpc("fn_registrar_nota_clinica", { p_estudante: estudanteId, p_conteudo: conteudo }));
@@ -24,27 +28,30 @@ export function privacidade(c: Contexto) {
 
     // ---- auditoria e LGPD
     listarAuditoria: async (estudanteId, pagina) => {
-      const linhas = await paginado<Linha>((de, ate) => sb.rpc("fn_listar_auditoria", { p_estudante: estudanteId, p_limite: ate - de + 1, p_deslocamento: de }), pagina);
+      const linhas = await paginado<Linha>(
+        (de, ate) => sb.rpc("fn_listar_auditoria", { p_estudante: estudanteId, p_limite: ate - de + 1, p_deslocamento: de }),
+        pagina,
+      );
       return linhas
         .filter((r) => EVENTO_DO_BANCO[String(r.evento)])
-        .map(
-          (r, i): Auditoria => ({
-            id: `${estudanteId}-${(pagina?.deslocamento ?? 0) + i}`,
-            entidade: "",
-            entidadeId: estudanteId,
-            evento: EVENTO_DO_BANCO[String(r.evento)]!,
-            autorId: null,
-            autorNome: String(r.autor_nome),
-            data: String(r.criado_em),
-            detalhes: (r.detalhes as Record<string, unknown>) ?? {},
-          }),
-        );
+        .map((r, i): Auditoria => ({
+          id: `${estudanteId}-${(pagina?.deslocamento ?? 0) + i}`,
+          entidade: "",
+          entidadeId: estudanteId,
+          evento: EVENTO_DO_BANCO[String(r.evento)]!,
+          autorId: null,
+          autorNome: String(r.autor_nome),
+          data: String(r.criado_em),
+          detalhes: (r.detalhes as Record<string, unknown>) ?? {},
+        }));
     },
     exportarDados: async (estudanteId) => {
       const [estudante, vinculos, consentimentos, ciclos, observacoes, versoesPerfil, materiais, auditoria] = await Promise.all([
         c.api.obterEstudante(estudanteId),
         c.api.listarVinculos(estudanteId),
-        paginado<Linha>((de, ate) => sb.from("consentimentos").select(COL_CONSENT).eq("estudante_id", estudanteId).order("data_concessao").order("id").range(de, ate)),
+        paginado<Linha>((de, ate) =>
+          sb.from("consentimentos").select(COL_CONSENT).eq("estudante_id", estudanteId).order("data_concessao").order("id").range(de, ate),
+        ),
         c.api.listarCiclos(estudanteId),
         c.api.listarObservacoes(estudanteId),
         c.api.listarVersoes(estudanteId),

@@ -28,8 +28,7 @@ export function RecuperarSenha() {
       <h1>Recuperar senha</h1>
       {enviado ? (
         <Alerta tom="sucesso" titulo="Pedido recebido" vivo>
-          Se houver uma conta com esse e-mail, enviamos um link para criar uma nova senha. O link vale por 1 hora. Confira também a caixa de
-          spam.
+          Se houver uma conta com esse e-mail, enviamos um link para criar uma nova senha. O link vale por 1 hora. Confira também a caixa de spam.
         </Alerta>
       ) : (
         <form
@@ -45,7 +44,17 @@ export function RecuperarSenha() {
               {mensagemAmigavel(pedir.erro)}
             </Alerta>
           )}
-          <Campo id="email" rotulo="E-mail" type="email" autoComplete="username" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} erro={erro} />
+          <Campo
+            id="email"
+            rotulo="E-mail"
+            type="email"
+            autoComplete="username"
+            inputMode="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            erro={erro}
+          />
           <div className="grupo-botoes grupo-botoes--empilhado">
             <Botao type="submit" carregando={pedir.ocupado} textoCarregando="Enviando…">
               Enviar link

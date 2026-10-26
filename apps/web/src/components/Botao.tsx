@@ -17,18 +17,33 @@ interface BotaoProps extends BaseProps, Omit<ButtonHTMLAttributes<HTMLButtonElem
 }
 
 function classes(variante: Variante, largo?: boolean, pequeno?: boolean, extra?: string) {
-  return ["botao", variante !== "primario" && `botao--${variante}`, largo && "botao--largo", pequeno && "botao--pequeno", extra]
-    .filter(Boolean)
-    .join(" ");
+  return ["botao", variante !== "primario" && `botao--${variante}`, largo && "botao--largo", pequeno && "botao--pequeno", extra].filter(Boolean).join(" ");
 }
 
 /**
  * `<button>` para ações. Nunca `<div>` ou `<span>` (regra 8.2).
  * Alvo mínimo 44×44 px via CSS. Loading usa `aria-busy` + texto vivo.
  */
-export function Botao({ variante = "primario", largo, pequeno, carregando, textoCarregando = "Aguarde…", children, className, disabled, type = "button", ...rest }: BotaoProps) {
+export function Botao({
+  variante = "primario",
+  largo,
+  pequeno,
+  carregando,
+  textoCarregando = "Aguarde…",
+  children,
+  className,
+  disabled,
+  type = "button",
+  ...rest
+}: BotaoProps) {
   return (
-    <button type={type} className={classes(variante, largo, pequeno, className)} disabled={disabled || carregando} aria-busy={carregando || undefined} {...rest}>
+    <button
+      type={type}
+      className={classes(variante, largo, pequeno, className)}
+      disabled={disabled || carregando}
+      aria-busy={carregando || undefined}
+      {...rest}
+    >
       {carregando && <span className="botao__spinner" aria-hidden="true" />}
       <span>{carregando ? textoCarregando : children}</span>
     </button>

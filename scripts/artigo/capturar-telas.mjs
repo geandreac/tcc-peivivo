@@ -40,7 +40,14 @@ async function foto(arquivo, ancora) {
 await entrar("docente", /Márcia/);
 await pagina.goto(`${BASE}/estudantes/${MIGUEL}/observar`);
 await pagina.getByRole("heading", { level: 1 }).waitFor();
-for (const [dimensao, valor] of [["Atenção sustentada", /^Reduzida/], ["Compreensão de enunciados", /^Estável/], ["Autonomia com palavras", /^Estável/], ["Interesse manifesto", /^Estável/], ["Sensibilidade visual", /^Estável/], ["Cansaço na tarefa", /^Estável/]]) {
+for (const [dimensao, valor] of [
+  ["Atenção sustentada", /^Reduzida/],
+  ["Compreensão de enunciados", /^Estável/],
+  ["Autonomia com palavras", /^Estável/],
+  ["Interesse manifesto", /^Estável/],
+  ["Sensibilidade visual", /^Estável/],
+  ["Cansaço na tarefa", /^Estável/],
+]) {
   await pagina.getByRole("group", { name: dimensao }).getByRole("radio", { name: valor }).check();
 }
 await foto("01-observar.png");

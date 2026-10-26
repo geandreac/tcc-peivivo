@@ -22,7 +22,7 @@ describe("deErroBanco · SQLSTATE → HTTP (mesma tabela do app)", () => {
   });
 
   it.each([
-    ["código desconhecido", erroBanco("XX000", "relation \"notas_clinicas\" — e-mail fulano@example.test")],
+    ["código desconhecido", erroBanco("XX000", 'relation "notas_clinicas" — e-mail fulano@example.test')],
     ["falha de rede (sem código)", Object.assign(new TypeError("fetch failed"), {})],
     ["valor não-erro", null],
   ])("%s → 500 genérico, sem repassar o detalhe interno", (_n, e) => {

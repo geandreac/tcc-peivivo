@@ -10,18 +10,22 @@ export function consentimento(ctx: ContextoMock) {
     obterConsentimento: (estudanteId) =>
       ctx.chamada(() => {
         if (!ctx.meuPapel(estudanteId)) throw new ErroApi("NEGADO", "Você não está vinculado a este estudante.");
-        return (
-          ctx.estado.consentimentos
-            .filter((c) => c.estudanteId === estudanteId)
-            .sort((a, b) => b.dataConcessao.localeCompare(a.dataConcessao))[0] ?? null
-        );
+        return ctx.estado.consentimentos.filter((c) => c.estudanteId === estudanteId).sort((a, b) => b.dataConcessao.localeCompare(a.dataConcessao))[0] ?? null;
       }),
     concederConsentimento: (estudanteId, escopo) =>
       ctx.chamada(() => {
         ctx.exigirPapel(estudanteId, "RESPONSAVEL");
         if (ctx.temConsentimento(estudanteId)) throw new ErroApi("CONFLITO", "Já existe um consentimento ativo.");
         if (escopo.length === 0) throw new ErroApi("VALIDACAO", "Escolha ao menos um escopo.");
-        const c: Consentimento = { id: uuid(), estudanteId, responsavelId: ctx.eu().id, dataConcessao: ctx.agora(), escopo: [...escopo], status: "ATIVO", dataRevogacao: null };
+        const c: Consentimento = {
+          id: uuid(),
+          estudanteId,
+          responsavelId: ctx.eu().id,
+          dataConcessao: ctx.agora(),
+          escopo: [...escopo],
+          status: "ATIVO",
+          dataRevogacao: null,
+        };
         ctx.estado.consentimentos.push(c);
         ctx.registrarAuditoria("consentimentos", c.id, "CONCESSAO", { escopo: escopo.length });
         ctx.notificar(estudanteId, "CONSENTIMENTO_CONCEDIDO", TODOS);

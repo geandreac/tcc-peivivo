@@ -1,15 +1,31 @@
 /** Colunas explícitas (nunca `select *`, D-33) e conversão das linhas do banco (snake_case) para os tipos do app. */
 import type { ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
 import type { Linha } from "./infra";
-import type { Consentimento, Ciclo, Desfecho, EscopoConsentimento, Estudante, EventoAuditoria, Material, Notificacao, ObservacaoRegistro, Papel, ResultadoDesfecho, VersaoPerfil, Vinculo } from "../tipos";
+import type {
+  Consentimento,
+  Ciclo,
+  Desfecho,
+  EscopoConsentimento,
+  Estudante,
+  EventoAuditoria,
+  Material,
+  Notificacao,
+  ObservacaoRegistro,
+  Papel,
+  ResultadoDesfecho,
+  VersaoPerfil,
+  Vinculo,
+} from "../tipos";
 
 export const COL_ESTUDANTE = "id, nome, data_nascimento, turma, escola_id, created_at";
 export const COL_VINCULO = "id, usuario_id, estudante_id, papel, data_vinculo, status, registro_conselho";
 export const COL_CONSENT = "id, estudante_id, responsavel_id, data_concessao, escopos, versao_termo, status, data_revogacao";
 export const COL_CICLO = "id, estudante_id, numero, data_inicio, data_fim, status";
 export const COL_OBS = "id, ciclo_id, autor_id, papel_autor, dimensao, valor_escala, evidencia, data_registro";
-export const COL_VERSAO = "id, estudante_id, ciclo_origem_id, numero_ciclo, parametros, status_validacao, validador_id, data_vigencia, justificativa, created_at";
-export const COL_MATERIAL = "id, estudante_id, versao_perfil_id, docente_id, titulo, texto_original, texto_adaptado, texto_revisado, data_geracao, status_aprovacao, ia_aplicada, hash_texto";
+export const COL_VERSAO =
+  "id, estudante_id, ciclo_origem_id, numero_ciclo, parametros, status_validacao, validador_id, data_vigencia, justificativa, created_at";
+export const COL_MATERIAL =
+  "id, estudante_id, versao_perfil_id, docente_id, titulo, texto_original, texto_adaptado, texto_revisado, data_geracao, status_aprovacao, ia_aplicada, hash_texto";
 export const COL_DESFECHO = "id, material_id, resultado, observacao_livre, data_registro";
 export const COL_NOTIF = "id, usuario_id, tipo, estudante_id, criada_em, lida_em";
 

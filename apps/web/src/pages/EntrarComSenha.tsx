@@ -53,7 +53,17 @@ export function EntrarComSenha() {
             {mensagemAmigavel(entrar.erro)}
           </Alerta>
         )}
-        <Campo id="email" rotulo="E-mail" type="email" autoComplete="username" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} erro={erros.find((x) => x.campo === "email")?.mensagem ?? null} />
+        <Campo
+          id="email"
+          rotulo="E-mail"
+          type="email"
+          autoComplete="username"
+          inputMode="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          erro={erros.find((x) => x.campo === "email")?.mensagem ?? null}
+        />
         <Campo
           id="senha"
           rotulo="Senha"
@@ -78,9 +88,7 @@ export function EntrarComSenha() {
       <p>
         <Link to="/recuperar-senha">Esqueci minha senha</Link>
       </p>
-      <p className="texto-apoio">
-        Não tem conta? O acesso é só por convite: a coordenação da escola convida a família, a docente e a equipe de saúde.
-      </p>
+      <p className="texto-apoio">Não tem conta? O acesso é só por convite: a coordenação da escola convida a família, a docente e a equipe de saúde.</p>
     </div>
   );
 }

@@ -16,7 +16,12 @@ export function consentimento(c: Contexto) {
     },
     concederConsentimento: async (estudanteId, escopo) => {
       const id = await exec<string>(
-        sb.rpc("fn_conceder_consentimento", { p_estudante: estudanteId, p_escopos: escopo, p_versao_termo: VERSAO_TERMO, p_user_agent: globalThis.navigator?.userAgent ?? null }),
+        sb.rpc("fn_conceder_consentimento", {
+          p_estudante: estudanteId,
+          p_escopos: escopo,
+          p_versao_termo: VERSAO_TERMO,
+          p_user_agent: globalThis.navigator?.userAgent ?? null,
+        }),
       );
       return paraConsentimento(await exec<Linha>(sb.from("consentimentos").select(COL_CONSENT).eq("id", id).single()));
     },

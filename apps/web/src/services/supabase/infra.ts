@@ -25,7 +25,11 @@ export function traduzirErro(e: unknown): ErroApi {
   return new ErroApi("REDE", "Algo deu errado do nosso lado. Tente de novo em instantes.");
 }
 
-const MENSAGEM_PADRAO = { NEGADO: "Seu perfil não tem permissão para esta ação.", CONFLITO: "A situação mudou; recarregue e tente de novo.", VALIDACAO: "Dados inválidos." } as const;
+const MENSAGEM_PADRAO = {
+  NEGADO: "Seu perfil não tem permissão para esta ação.",
+  CONFLITO: "A situação mudou; recarregue e tente de novo.",
+  VALIDACAO: "Dados inválidos.",
+} as const;
 
 export async function exec<T>(p: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
   let r: { data: T | null; error: unknown };

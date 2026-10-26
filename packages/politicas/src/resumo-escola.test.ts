@@ -107,8 +107,7 @@ describe("fn_listar_auditoria paginada · permitido", () => {
 });
 
 describe("prazos do banco = constantes de @pei-vivo/contratos (mock e app usam as mesmas)", () => {
-  const definicao = async (assinatura: string) =>
-    String((await db.sistema(`select pg_get_functiondef('${assinatura}'::regprocedure) as d`)).rows[0]?.d);
+  const definicao = async (assinatura: string) => String((await db.sistema(`select pg_get_functiondef('${assinatura}'::regprocedure) as d`)).rows[0]?.d);
   it("painel: validação atrasada e ciclo parado", async () => {
     const d = await definicao("public.fn_resumo_escola(uuid)");
     expect(d).toContain(`interval '${DIAS_VALIDACAO_ATRASADA} days'`);
