@@ -9,6 +9,7 @@ import { Botao } from "../components/Botao";
 import { PAPEL } from "../utils/rotulos";
 import { perfilPorSlug } from "../utils/perfisLogin";
 import { NaoEncontrada } from "./NaoEncontrada";
+import { destinoInterno } from "../utils/destino";
 
 /**
  * Tela de login de UM perfil (família, professores, equipe de saúde,
@@ -23,13 +24,13 @@ export function EntrarPapel() {
   const location = useLocation();
   const { entrar } = useSessao();
   const { anunciar } = useAnuncio();
-  const destino = (location.state as { de?: string } | null)?.de;
+  const destino = destinoInterno(location.state);
 
   const usuarios = useConsulta<Usuario[]>(() => api.listarPerfisDemo(), []);
   const mutacao = useMutacao(async (u: Usuario) => {
     await entrar(u.id);
     anunciar(`Você entrou como ${u.nome} (${espec ? espec.titulo : ""}).`, "sucesso");
-    navigate(destino && !destino.startsWith("/entrar") ? destino : "/painel");
+    navigate(destino);
   });
 
   if (!espec) return <NaoEncontrada />;

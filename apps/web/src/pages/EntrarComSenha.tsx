@@ -7,6 +7,7 @@ import { useTitulo } from "../hooks/useTitulo";
 import { Alerta, ResumoErros } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Campo } from "../components/Campo";
+import { destinoInterno } from "../utils/destino";
 
 /**
  * Entrar no sistema real (R2.2, D-32). WCAG 3.3.8 (autenticação acessível):
@@ -18,7 +19,7 @@ export function EntrarComSenha() {
   useTitulo("Entrar");
   const navigate = useNavigate();
   const location = useLocation();
-  const destino = (location.state as { de?: string } | null)?.de ?? "/painel";
+  const destino = destinoInterno(location.state);
   const { entrarComSenha } = useSessao();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");

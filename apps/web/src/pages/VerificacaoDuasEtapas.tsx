@@ -7,6 +7,7 @@ import { useTitulo } from "../hooks/useTitulo";
 import { Alerta, Carregando, ErroCarregamento } from "../components/Feedback";
 import { Botao } from "../components/Botao";
 import { Campo } from "../components/Campo";
+import { destinoInterno } from "../utils/destino";
 
 /**
  * Verificação em duas etapas (R2.2, D-32): obrigatória para profissional de
@@ -19,7 +20,7 @@ export function VerificacaoDuasEtapas() {
   useTitulo("Verificação em duas etapas");
   const navigate = useNavigate();
   const location = useLocation();
-  const destino = (location.state as { de?: string } | null)?.de ?? "/painel";
+  const destino = destinoInterno(location.state);
   const { usuario, atualizar } = useSessao();
   const [codigo, setCodigo] = useState("");
   const [cadastro, setCadastro] = useState<CadastroSegundoFator | null>(null);
