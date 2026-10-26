@@ -249,6 +249,8 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
     if (!error) return data as T;
     const resposta = (error as { context?: Response }).context;
     if (resposta && typeof resposta.json === "function") {
+      // 401 vem do gateway (JWT expirado), com corpo próprio, sem { erro }
+      if (resposta.status === 401) throw new ErroApi("NAO_AUTENTICADO", "Sua sessão expirou. Entre novamente.");
       try {
         const { erro } = (await resposta.json()) as CorpoErro;
         const mapa: Record<string, CodigoErro> = { NEGADO: "NEGADO", CONFLITO: "CONFLITO", VALIDACAO: "VALIDACAO", NAO_AUTENTICADO: "NAO_AUTENTICADO", INTERNO: "REDE" };
