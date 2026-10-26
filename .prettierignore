@@ -1,0 +1,12 @@
+node_modules
+**/dist
+**/coverage
+playwright-report
+test-results
+package-lock.json
+supabase/functions/_shared/gerado
+supabase/.temp
+docs
+*.md
+*.svg
+*.sql

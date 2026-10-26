@@ -35,6 +35,8 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (api.modo !== "real") return;
     let ativo = true;
+    // `atualizar` é assíncrona (o setState vem depois do await); a regra não distingue
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     atualizar().finally(() => ativo && setCarregando(false));
     return () => {
       ativo = false;

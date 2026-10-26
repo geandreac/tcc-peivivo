@@ -6,7 +6,8 @@
   "description": "Testes das políticas RLS e RPCs (caminho negado primeiro). PGlite local; Postgres do Supabase no CI via DATABASE_URL.",
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",

@@ -108,7 +108,7 @@ jobs:
           deno-version: v2.1.4
       - name: Tipos das Edge Functions
         working-directory: supabase/functions
-        run: deno check gerar-material/index.ts fechar-ciclo/index.ts
+        run: deno check gerar-material/index.ts fechar-ciclo/index.ts convidar/index.ts
 
   e2e:
     # R5.1: navegador real (Chromium) em 390 e 1280 px; axe com contraste renderizado;
@@ -145,6 +145,8 @@ jobs:
       - run: npm ci
       - run: npm run contraste
       - run: npm run typecheck -w apps/web
+      - name: ESLint (monorepo inteiro; typescript-eslint, react-hooks, jsx-a11y)
+        run: npm run lint
       - run: npm run test:coverage -w apps/web
       - run: npm run build -w apps/web
       - uses: actions/upload-artifact@v4

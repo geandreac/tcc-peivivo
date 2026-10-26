@@ -1,3 +1,4 @@
+/* global window */ // usado só dentro de page.evaluate (roda no navegador)
 // Captura as telas do protótipo usadas na seção 4.2 do artigo (dados 100 % fictícios do mock).
 // Requer o protótipo em modo demonstração: `VITE_API=mock npx vite --port 5179` em apps/web.
 //   node scripts/artigo/capturar-telas.mjs   → docs/tcc/artigo/telas/*.png

@@ -36,7 +36,6 @@ import type {
   ResumoEscola,
   TipoNotificacao,
   ResultadoDesfecho,
-  ResultadoFechamento,
   Usuario,
   VersaoPerfil,
   Vinculo,
