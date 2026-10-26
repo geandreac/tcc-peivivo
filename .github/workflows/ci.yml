@@ -147,6 +147,8 @@ jobs:
       - run: npm run typecheck -w apps/web
       - name: ESLint (monorepo inteiro; typescript-eslint, react-hooks, jsx-a11y)
         run: npm run lint
+      - name: Prettier (formatação)
+        run: npm run format:check
       - run: npm run test:coverage -w apps/web
       - run: npm run build -w apps/web
       - uses: actions/upload-artifact@v4
