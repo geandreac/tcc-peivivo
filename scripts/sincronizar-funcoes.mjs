@@ -1,7 +1,7 @@
 // Gera supabase/functions/_shared/gerado/ a partir do código TS puro do
 // monorepo (motor, contratos, casos de uso), reescrevendo os imports para Deno:
 //   "./x"                        → "./x.ts"
-//   "zod"                        → "npm:zod@3.23.8"
+//   "zod"                        → "npm:zod@4.6.7"
 //   "@pei-vivo/motor-adaptacao"  → "../motor/index.ts"   (idem contratos/funcoes)
 // Motivo: o bundler das Edge Functions só empacota o que está sob
 // supabase/functions/ (packages/motor-adaptacao/README.md, P3.1).
@@ -18,7 +18,7 @@ const pacotes = [
   { de: "packages/contratos/src", para: "contratos", nome: "@pei-vivo/contratos" },
   { de: "packages/funcoes/src", para: "funcoes", nome: "@pei-vivo/funcoes" },
 ];
-const ZOD = "npm:zod@3.23.8";
+const ZOD = "npm:zod@4.6.7";
 const CABECALHO = (origem) =>
   `// GERADO por scripts/sincronizar-funcoes.mjs a partir de ${origem} — NÃO EDITE.\n`;
 

@@ -7,7 +7,13 @@
  * Importável de Node/Vite (`@pei-vivo/contratos`) e de Deno (cópia gerada em
  * supabase/functions/_shared/gerado/ por scripts/sincronizar-funcoes.mjs).
  */
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@4.6.7";
+
+/**
+ * Identificador no formato que o tipo `uuid` do Postgres aceita (8-4-4-4-12 hex).
+ * O `uuid()` do zod 4 exige a versão RFC (1–8) e recusaria os ids do seed (versão 0).
+ */
+const id = (mensagem?: string) => z.guid(mensagem);
 
 export const LIMITE_TEXTO = 20_000;
 export const LIMITE_TITULO = 120;
@@ -45,7 +51,7 @@ export const ParametrosAdaptacaoSchema = z
 // ------------------------------------------------------------------ gerar-material (F8)
 export const EntradaGerarMaterialSchema = z
   .object({
-    estudanteId: z.string().uuid("Estudante inválido."),
+    estudanteId: id("Estudante inválido."),
     titulo: z.string().trim().max(LIMITE_TITULO, `O título pode ter até ${LIMITE_TITULO} caracteres.`).default(""),
     texto: z
       .string()
@@ -82,7 +88,7 @@ export const SaidaIASchema = z
 export type SaidaIA = z.infer<typeof SaidaIASchema>;
 
 // ------------------------------------------------------------------ fechar-ciclo (F6/F7)
-export const EntradaFecharCicloSchema = z.object({ cicloId: z.string().uuid("Ciclo inválido.") }).strict();
+export const EntradaFecharCicloSchema = z.object({ cicloId: id("Ciclo inválido.") }).strict();
 export type EntradaFecharCiclo = z.infer<typeof EntradaFecharCicloSchema>;
 
 export interface DiffParametro {
@@ -126,11 +132,11 @@ export interface CorpoErro {
 // ------------------------------------------------------------------ convidar (F1/F2/F4/F5, D-32)
 export const EntradaConviteSchema = z
   .object({
-    escolaId: z.string().uuid("Escola inválida."),
+    escolaId: id("Escola inválida."),
     email: z.string().trim().toLowerCase().email("Informe um e-mail válido."),
     nome: z.string().trim().max(120).default(""),
     papel: z.enum(["DOCENTE", "RESPONSAVEL", "PROFISSIONAL_SAUDE"]),
-    estudanteId: z.string().uuid().nullable().default(null),
+    estudanteId: id().nullable().default(null),
     registroConselho: z.string().trim().max(60).nullable().default(null),
     conferidoPresencialmente: z.boolean().default(false),
   })

@@ -53,6 +53,10 @@ describe("fecharCiclo · caso de uso", () => {
     return { p: { dados: vi.fn(async () => dados), registrar, ...extra } satisfies PortasFecharCiclo, registrar };
   };
 
+  it("aceita qualquer uuid que o Postgres aceita, inclusive os do seed (versão 0)", async () => {
+    const { p } = portas();
+    await expect(fecharCiclo({ cicloId: "00000000-0000-0000-0000-000000000020" }, p)).resolves.toMatchObject({ versaoId: "v2" });
+  });
   it("corpo inválido → 400", async () => {
     await expect(fecharCiclo({ cicloId: "nao-uuid" }, portas().p)).rejects.toMatchObject({ status: 400 });
   });
