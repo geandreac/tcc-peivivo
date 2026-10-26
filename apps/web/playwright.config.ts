@@ -27,6 +27,8 @@ export default defineConfig({
   ],
   webServer: {
     command: `npx vite --port ${PORTA} --strictPort`,
+    env: { VITE_API: "mock" }, // o .env.local da dupla pode apontar para o Supabase real
+
     url: `http://localhost:${PORTA}`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
