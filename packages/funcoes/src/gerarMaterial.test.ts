@@ -52,6 +52,35 @@ describe("gerar-material · caminho negado primeiro", () => {
     const { p } = portas({ preparar: vi.fn(async () => Promise.reject(erroBanco("XX000", "relation secreta não existe"))) });
     await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({ status: 500, message: expect.not.stringContaining("secreta") });
   });
+  it("falha de rede ao falar com o banco → 500 genérico, nada é gravado", async () => {
+    const { p, registrar } = portas({ preparar: vi.fn(async () => Promise.reject(new TypeError("fetch failed"))) });
+    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({ status: 500, codigo: "INTERNO" });
+    expect(registrar).not.toHaveBeenCalled();
+  });
+  it("perfil vigente fora do contrato (ex.: jsonb corrompido) → 500, nada é gravado", async () => {
+    const { p, registrar } = portas({}, { parametros: { ...PARAMS, maxLinhasPorBloco: 0 } });
+    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({ status: 500 });
+    expect(registrar).not.toHaveBeenCalled();
+  });
+  it("versão deixou de ser vigente entre preparar e gravar (PT409) → 409", async () => {
+    const { p } = portas({ registrar: vi.fn(async () => Promise.reject(erroBanco("PT409", "A versão de perfil não é mais a vigente; gere de novo."))) });
+    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({ status: 409, codigo: "CONFLITO" });
+  });
+});
+
+describe("gerar-material · dados duplicados (idempotência)", () => {
+  it("mesmo texto de novo → o banco devolve o rascunho existente (emCache) e o hash é o mesmo", async () => {
+    const registrar = vi.fn(async (_m: MaterialParaRegistrar) => ({ materialId: "m1", emCache: true }));
+    const { p } = portas({ registrar });
+    const r1 = await gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p);
+    const r2 = await gerarMaterial({ estudanteId: ESTUDANTE, texto: `  ${TEXTO} ` }, p);
+    expect([r1.materialId, r2.materialId, r2.emCache]).toEqual(["m1", "m1", true]);
+    expect(registrar.mock.calls[0]![0].hash).toBe(registrar.mock.calls[1]![0].hash);
+  });
+  it("corrida de duas gravações iguais (unique violado, 23505) → 409, não 500", async () => {
+    const { p } = portas({ registrar: vi.fn(async () => Promise.reject(erroBanco("23505"))) });
+    await expect(gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p)).rejects.toMatchObject({ status: 409 });
+  });
 });
 
 describe("gerar-material · caminho permitido", () => {

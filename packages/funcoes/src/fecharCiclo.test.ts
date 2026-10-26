@@ -65,6 +65,23 @@ describe("fecharCiclo · caso de uso", () => {
     const { p } = portas({ dados: vi.fn(async () => Promise.reject(Object.assign(new Error("sem obs"), { code: "PT409" }))) });
     await expect(fecharCiclo({ cicloId: CICLO }, p)).rejects.toMatchObject({ status: 409 });
   });
+  it("fechar duas vezes (o banco trava o ciclo e responde PT409 na segunda) → 409", async () => {
+    const { p } = portas({ registrar: vi.fn(async () => Promise.reject(Object.assign(new Error("Este ciclo já foi fechado."), { code: "PT409" }))) });
+    await expect(fecharCiclo({ cicloId: CICLO }, p)).rejects.toMatchObject({ status: 409, message: "Este ciclo já foi fechado." });
+  });
+  it("duas versões vigentes ao mesmo tempo (uq_versao_vigente, 23505) → 409", async () => {
+    const { p } = portas({ registrar: vi.fn(async () => Promise.reject(Object.assign(new Error("duplicate key"), { code: "23505" }))) });
+    await expect(fecharCiclo({ cicloId: CICLO }, p)).rejects.toMatchObject({ status: 409 });
+  });
+  it("falha de rede ao gravar → 500 genérico", async () => {
+    const { p } = portas({ registrar: vi.fn(async () => Promise.reject(new TypeError("fetch failed"))) });
+    await expect(fecharCiclo({ cicloId: CICLO }, p)).rejects.toMatchObject({ status: 500, codigo: "INTERNO" });
+  });
+  it("campo extra no corpo (ex.: docenteId forjado) → 400, sem consultar o banco", async () => {
+    const { p } = portas();
+    await expect(fecharCiclo({ cicloId: CICLO, docenteId: "outro" }, p)).rejects.toMatchObject({ status: 400 });
+    expect(p.dados).not.toHaveBeenCalled();
+  });
   it("PERMITIDO: registra com o docente do banco e os parâmetros do motor; devolve o diff", async () => {
     const { p, registrar } = portas();
     const r = await fecharCiclo({ cicloId: CICLO }, p);

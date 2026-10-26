@@ -35,6 +35,18 @@ describe("convidar · caminho negado primeiro", () => {
     await expect(convidar(base, p)).rejects.toMatchObject({ status: 502 });
     expect(p.registrar).not.toHaveBeenCalled();
   });
+  it.each([["e-mail inválido", { ...base, email: "sem-arroba" }], ["papel não convidável", { ...base, papel: "COORDENACAO" }], ["responsável sem estudante é recusado pelo banco", null]])(
+    "%s → 400",
+    async (_n, corpo) => {
+      const p = corpo ? portas() : portas({ preparar: vi.fn(async () => Promise.reject(erroBanco("22023"))) });
+      await expect(convidar(corpo ?? { ...base, papel: "RESPONSAVEL" }, p)).rejects.toMatchObject({ status: 400 });
+      expect(p.convidarNoAuth).not.toHaveBeenCalled();
+    },
+  );
+  it("convite duplicado (uq_convite_pendente, 23505) → 409", async () => {
+    const p = portas({ registrar: vi.fn(async () => Promise.reject(erroBanco("23505"))) });
+    await expect(convidar(base, p)).rejects.toMatchObject({ status: 409, codigo: "CONFLITO" });
+  });
 });
 
 describe("convidar · caminho permitido", () => {
