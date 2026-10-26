@@ -81,6 +81,9 @@ describe("Edge Functions · caminho negado primeiro", () => {
     expect(r.status).toBe(status);
     expect(await r.json()).toEqual({ erro: { codigo, mensagem: "Mensagem simples." } });
     expect(info.mock.calls[0]![0]).not.toContain("Mensagem simples."); // log só com status e código
+    const log = JSON.parse(String(info.mock.calls[0]![0]));
+    expect(log.requestId).toBe(r.headers.get("x-request-id"));
+    expect(log.requestId).toMatch(/^[0-9a-f-]{36}$/u);
   });
 
   it("erro inesperado → 500 genérico; nem a resposta nem o log repassam o detalhe", async () => {
@@ -94,6 +97,43 @@ describe("Edge Functions · caminho negado primeiro", () => {
     expect(texto).toContain("INTERNO");
     expect(texto).not.toMatch(/notas_clinicas|example\.test/u);
     expect(String(erro.mock.calls[0]![0])).not.toMatch(/notas_clinicas|example\.test/u);
+  });
+
+  it("500: o log traz requestId, tipo e código do erro (ex.: timeout do banco), nunca a mensagem", async () => {
+    const erro = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { tratar } = montar(async () => {
+      throw Object.assign(new Error("canceling statement due to statement timeout para fulano@example.test"), { name: "PostgrestError", code: "57014" });
+    });
+    const r = await tratar(post("{}"));
+    const log = JSON.parse(String(erro.mock.calls[0]![0]));
+    expect(log).toMatchObject({ funcao: "teste", status: 500, tipo: "PostgrestError", code: "57014", requestId: r.headers.get("x-request-id") });
+    expect(JSON.stringify(log)).not.toContain("example.test");
+  });
+
+  it("chamadas ao banco têm tempo limite de 10 s: o sinal do fetch aborta quando o tempo expira", async () => {
+    const relogio = new AbortController(); // faz o papel do AbortSignal.timeout (timer interno, fora dos fake timers)
+    const timeout = vi.spyOn(AbortSignal, "timeout").mockReturnValue(relogio.signal);
+    const fetchOriginal = globalThis.fetch;
+    let sinal: AbortSignal | undefined;
+    globalThis.fetch = vi.fn((_u: unknown, init?: RequestInit) => {
+      sinal = init?.signal ?? undefined;
+      return new Promise<Response>(() => undefined); // banco que nunca responde
+    }) as typeof fetch;
+    try {
+      const { tratar } = montar(async (_c, { usuario }) => {
+        // o PostgREST só dispara a requisição quando a promise é consumida
+        (usuario as unknown as { rpc: (n: string) => PromiseLike<unknown> }).rpc("fn_lenta").then(undefined, () => undefined);
+        return { ok: true };
+      });
+      await tratar(post("{}"));
+      await vi.waitFor(() => expect(sinal).toBeDefined());
+      expect(timeout).toHaveBeenCalledWith(10_000);
+      expect(sinal!.aborted).toBe(false);
+      relogio.abort(new DOMException("tempo esgotado", "TimeoutError"));
+      expect(sinal!.aborted).toBe(true);
+    } finally {
+      globalThis.fetch = fetchOriginal;
+    }
   });
 
   it("variável de ambiente ausente (service role) → 500, sem expor o nome da chave", async () => {
