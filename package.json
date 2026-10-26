@@ -31,7 +31,8 @@
     "artigo": "python scripts/artigo/gerar_docx.py",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:backup": "node scripts/backup-dados.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
