@@ -26,9 +26,10 @@ let ErroFuncaoDeno: new (status: number, codigo: string, mensagem: string) => Er
 beforeAll(async () => {
   vi.stubGlobal("Deno", { env: { get: (k: string) => ENV[k] }, serve: (t: Tratador) => void (tratar = t) });
   // caminho em variável: o tsc deste pacote não deve seguir o código Deno (npm:, Deno.*)
-  const raiz = "../../../supabase/functions/_shared/";
-  ({ servir, rpc } = await import(/* @vite-ignore */ `${raiz}http.ts`));
-  ({ ErroFuncao: ErroFuncaoDeno } = await import(/* @vite-ignore */ `${raiz}gerado/funcoes/erros.ts`));
+  // URL absoluta a partir deste arquivo (o vitest 4 resolve caminho relativo variável a partir da raiz)
+  const caminho = (rel: string) => new URL(`../../../supabase/functions/_shared/${rel}`, import.meta.url).href;
+  ({ servir, rpc } = await import(/* @vite-ignore */ caminho("http.ts")));
+  ({ ErroFuncao: ErroFuncaoDeno } = await import(/* @vite-ignore */ caminho("gerado/funcoes/erros.ts")));
 });
 afterEach(() => vi.restoreAllMocks());
 

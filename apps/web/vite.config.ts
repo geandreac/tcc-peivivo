@@ -1,5 +1,5 @@
-/// <reference types="vitest" />
-import { defineConfig } from "vite";
+// defineConfig do vitest: o mesmo arquivo configura o Vite e os testes (chave `test`)
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
 // apps/web — React + Vite (pré-projeto §9.1). PWA (RNF06) entra em P5.6.
