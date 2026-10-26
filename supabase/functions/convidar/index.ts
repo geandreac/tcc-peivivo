@@ -37,5 +37,9 @@ servir("convidar", (corpo, { usuario, servico }) =>
         p_registro_conselho: r.registroConselho,
         p_conferido_presencialmente: r.conferidoPresencialmente,
       }),
+    desfazerNoAuth: async (id) => {
+      const { error } = await servico.auth.admin.deleteUser(id);
+      if (error) throw error;
+    },
   }),
 );

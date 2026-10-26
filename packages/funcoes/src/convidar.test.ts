@@ -43,6 +43,23 @@ describe("convidar · caminho negado primeiro", () => {
       expect(p.convidarNoAuth).not.toHaveBeenCalled();
     },
   );
+  it("registro falha depois do e-mail → a conta recém-criada é apagada e o erro do banco sobe", async () => {
+    const desfazerNoAuth = vi.fn(async (_id: string) => undefined);
+    const p = portas({ registrar: vi.fn(async () => Promise.reject(erroBanco("42501"))), desfazerNoAuth });
+    await expect(convidar(base, p)).rejects.toMatchObject({ status: 403 });
+    expect(desfazerNoAuth).toHaveBeenCalledWith("auth-novo");
+  });
+  it("compensação que também falha não esconde o erro original", async () => {
+    const p = portas({ registrar: vi.fn(async () => Promise.reject(erroBanco("23505"))), desfazerNoAuth: vi.fn(async () => Promise.reject(new Error("auth fora"))) });
+    await expect(convidar(base, p)).rejects.toMatchObject({ status: 409 });
+  });
+  it("sem conta criada nesta chamada (já tinha conta ou convite pendente), nada é apagado", async () => {
+    const desfazerNoAuth = vi.fn(async (_id: string) => undefined);
+    const falha = vi.fn(async () => Promise.reject(erroBanco("42501")));
+    await expect(convidar(base, portas({ registrar: falha, desfazerNoAuth }, true))).rejects.toMatchObject({ status: 403 });
+    await expect(convidar(base, portas({ registrar: falha, desfazerNoAuth, convidarNoAuth: vi.fn(async () => null) }))).rejects.toMatchObject({ status: 403 });
+    expect(desfazerNoAuth).not.toHaveBeenCalled();
+  });
   it("convite duplicado (uq_convite_pendente, 23505) → 409", async () => {
     const p = portas({ registrar: vi.fn(async () => Promise.reject(erroBanco("23505"))) });
     await expect(convidar(base, p)).rejects.toMatchObject({ status: 409, codigo: "CONFLITO" });
