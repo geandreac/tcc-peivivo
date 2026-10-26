@@ -119,12 +119,22 @@ function clienteSimulado(opcoes: {
     });
     return construtor;
   }
-  const rpc = vi.fn(async (nome: string, args?: Record<string, unknown>) => {
+  // como no supabase-js: rpc() devolve um construtor encadeável (.range etc.) que só resolve no await
+  const rpc = vi.fn((nome: string, args?: Record<string, unknown>) => {
     rpcsChamadas.push([nome, args]);
-    const erro = opcoes.rpcErros?.[nome];
-    if (erro) return { data: null, error: erro };
-    const v = opcoes.rpcs?.[nome];
-    return { data: typeof v === "function" ? (v as (a: Record<string, unknown>) => unknown)(args ?? {}) : (v ?? null), error: null };
+    const resolver = () => {
+      const erro = opcoes.rpcErros?.[nome];
+      if (erro) return { data: null, error: erro };
+      const v = opcoes.rpcs?.[nome];
+      return { data: typeof v === "function" ? (v as (a: Record<string, unknown>) => unknown)(args ?? {}) : (v ?? null), error: null };
+    };
+    const construtor: Record<string, unknown> = new Proxy({} as Record<string, unknown>, {
+      get(_alvo, metodo: string) {
+        if (metodo === "then") return (ok: (v: unknown) => unknown, falha: (e: unknown) => unknown) => Promise.resolve(resolver()).then(ok, falha);
+        return () => construtor;
+      },
+    });
+    return construtor;
   });
   const mfa = {
     getAuthenticatorAssuranceLevel: async () => ({ data: { currentLevel: "aal1" } }),
@@ -480,6 +490,20 @@ describe("supabaseApi · paginação (D-48)", () => {
       ["range", 1000, 1999],
       ["range", 2000, 2999],
     ]);
+  });
+
+  it("listagens sem página (estudantes, vínculos, ciclos, versões, notificações) também buscam em lotes: 1.500 estudantes, nenhum cortado", async () => {
+    const ESTUDANTES = Array.from({ length: 1_500 }, (_, i) => ({ id: `e${i}`, nome: `Estudante fictício ${i}`, data_nascimento: "2017-01-01", created_at: "d" }));
+    const faixa = (lista: Linhas) => (c: Consulta) => {
+      const r = c.ops.find(([n]) => n === "range") as [string, number, number] | undefined;
+      return r ? lista.slice(r[1], Math.min(r[2] + 1, r[1] + 1000)) : lista.slice(0, 1000);
+    };
+    const { api, consultas } = await apiLogada(PERFIL_COORD, { tabelas: { estudantes: faixa(ESTUDANTES) } });
+    const todos = await api.listarEstudantes();
+    expect(new Set(todos.map((e) => e.id)).size).toBe(1_500);
+    const lotes = consultas.filter((c) => c.tabela === "estudantes");
+    expect(lotes.map((c) => c.ops.find(([n]) => n === "range"))).toEqual([["range", 0, 999], ["range", 1000, 1999]]);
+    expect(lotes[0]!.ops).toContainEqual(["order", "id"]); // desempate estável entre lotes
   });
 
   it("observações também paginam; auditoria pagina pela RPC (p_limite/p_deslocamento) com ids únicos entre páginas", async () => {

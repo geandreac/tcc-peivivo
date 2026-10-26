@@ -1,7 +1,7 @@
 /** Estudantes, vínculos, convites e notificações. */
 import type { NovoConvite, NovoEstudante, NovoVinculo, PeiVivoApi, RespostaConvite } from "../api";
 import { ErroApi } from "../erros";
-import { exec, type Linha } from "./infra";
+import { exec, paginado, type Linha } from "./infra";
 import { COL_ESTUDANTE, COL_VINCULO, COL_NOTIF, paraEstudante, paraVinculo, paraNotificacao } from "./mapeadores";
 import type { Contexto } from "./contexto";
 
@@ -10,7 +10,7 @@ export function escola(c: Contexto) {
   return {
     // ---- estudantes e vínculos
     listarEstudantes: async () => {
-      const linhas = await exec<Linha[]>(sb.from("estudantes").select(COL_ESTUDANTE).order("nome"));
+      const linhas = await paginado<Linha>((de, ate) => sb.from("estudantes").select(COL_ESTUDANTE).order("nome").order("id").range(de, ate));
       return linhas.map((r) => paraEstudante(r));
     },
     obterEstudante: async (id) => {
@@ -26,14 +26,20 @@ export function escola(c: Contexto) {
     },
     meuPapel: (estudanteId) => c.meuPapel(estudanteId),
     listarVinculos: async (estudanteId) => {
-      const linhas = await exec<Linha[]>(
-        sb.from("vinculos_usuario_estudante").select(`${COL_VINCULO}, usuarios!vinculos_usuario_estudante_usuario_id_fkey(nome)`).eq("estudante_id", estudanteId).order("data_vinculo"),
+      const linhas = await paginado<Linha>((de, ate) =>
+        sb
+          .from("vinculos_usuario_estudante")
+          .select(`${COL_VINCULO}, usuarios!vinculos_usuario_estudante_usuario_id_fkey(nome)`)
+          .eq("estudante_id", estudanteId)
+          .order("data_vinculo")
+          .order("id")
+          .range(de, ate),
       );
       return linhas.map(paraVinculo);
     },
     listarUsuarios: async () => {
       if (!c.eu().escolaCoordenada) throw new ErroApi("NEGADO", "Só a coordenação lista usuários.");
-      const linhas = await exec<Linha[]>(sb.from("usuarios").select("id, nome").order("nome"));
+      const linhas = await paginado<Linha>((de, ate) => sb.from("usuarios").select("id, nome").order("nome").order("id").range(de, ate));
       return linhas.filter((u) => u.id !== c.eu().id).map((u) => ({ id: String(u.id), nome: String(u.nome), email: "", papelInstitucional: null }));
     },
     cadastrarEstudante: async (dados: NovoEstudante) => {
@@ -85,7 +91,8 @@ export function escola(c: Contexto) {
     },
 
     // ---- notificações
-    listarNotificacoes: async () => (await exec<Linha[]>(sb.from("notificacoes").select(COL_NOTIF).order("criada_em", { ascending: false }))).map(paraNotificacao),
+    listarNotificacoes: async () =>
+      (await paginado<Linha>((de, ate) => sb.from("notificacoes").select(COL_NOTIF).order("criada_em", { ascending: false }).order("id").range(de, ate))).map(paraNotificacao),
     marcarNotificacoesLidas: async (ids) => {
       let q = sb.from("notificacoes").update({ lida_em: new Date().toISOString() }).is("lida_em", null);
       if (ids) q = q.in("id", ids);

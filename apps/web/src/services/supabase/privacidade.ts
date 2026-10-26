@@ -11,7 +11,8 @@ export function privacidade(c: Contexto) {
   return {
     // ---- nota clínica (RN02: só por RPC auditada)
     listarNotasClinicas: async (estudanteId) => {
-      const linhas = await exec<Linha[]>(sb.rpc("fn_ler_notas_clinicas", { p_estudante: estudanteId }));
+      // a RPC devolve uma tabela: o PostgREST também corta em max_rows, então vem em lotes
+      const linhas = await paginado<Linha>((de, ate) => sb.rpc("fn_ler_notas_clinicas", { p_estudante: estudanteId }).range(de, ate));
       return linhas.map(
         (r): NotaClinica => ({ id: String(r.id), estudanteId, profissionalId: r.minha ? c.eu().id : String(r.profissional_nome), conteudo: String(r.conteudo), dataRegistro: String(r.data_registro) }),
       );
@@ -43,7 +44,7 @@ export function privacidade(c: Contexto) {
       const [estudante, vinculos, consentimentos, ciclos, observacoes, versoesPerfil, materiais, auditoria] = await Promise.all([
         c.api.obterEstudante(estudanteId),
         c.api.listarVinculos(estudanteId),
-        exec<Linha[]>(sb.from("consentimentos").select(COL_CONSENT).eq("estudante_id", estudanteId)),
+        paginado<Linha>((de, ate) => sb.from("consentimentos").select(COL_CONSENT).eq("estudante_id", estudanteId).order("data_concessao").order("id").range(de, ate)),
         c.api.listarCiclos(estudanteId),
         c.api.listarObservacoes(estudanteId),
         c.api.listarVersoes(estudanteId),

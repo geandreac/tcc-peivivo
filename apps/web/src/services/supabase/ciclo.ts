@@ -14,7 +14,8 @@ export function ciclo(c: Contexto) {
   const { sb } = c;
   return {
     // ---- ciclos e observações
-    listarCiclos: async (estudanteId) => (await exec<Linha[]>(sb.from("ciclos_observacao").select(COL_CICLO).eq("estudante_id", estudanteId).order("numero"))).map(paraCiclo),
+    listarCiclos: async (estudanteId) =>
+      (await paginado<Linha>((de, ate) => sb.from("ciclos_observacao").select(COL_CICLO).eq("estudante_id", estudanteId).order("numero").order("id").range(de, ate))).map(paraCiclo),
     obterCicloAberto: async (estudanteId) => {
       const r = await exec<Linha | null>(sb.from("ciclos_observacao").select(COL_CICLO).eq("estudante_id", estudanteId).eq("status", "ABERTO").maybeSingle());
       return r ? paraCiclo(r) : null;
@@ -51,7 +52,11 @@ export function ciclo(c: Contexto) {
 
     // ---- versões de perfil
     listarVersoes: async (estudanteId) =>
-      (await exec<Linha[]>(sb.from("versoes_perfil").select(COL_VERSAO).eq("estudante_id", estudanteId).order("numero_ciclo", { ascending: false }).order("created_at", { ascending: false }))).map(paraVersao),
+      (
+        await paginado<Linha>((de, ate) =>
+          sb.from("versoes_perfil").select(COL_VERSAO).eq("estudante_id", estudanteId).order("numero_ciclo", { ascending: false }).order("created_at", { ascending: false }).order("id").range(de, ate),
+        )
+      ).map(paraVersao),
     obterVersaoVigente: async (estudanteId) => {
       const r = await exec<Linha | null>(sb.from("versoes_perfil").select(COL_VERSAO).eq("estudante_id", estudanteId).eq("status_validacao", "VIGENTE").maybeSingle());
       return r ? paraVersao(r) : null;
@@ -87,8 +92,8 @@ export function ciclo(c: Contexto) {
       return c.obterVersao(id);
     },
     listarPendencias: async () => {
-      const linhas = await exec<Linha[]>(
-        sb.from("versoes_perfil").select(`${COL_VERSAO}, estudantes(${COL_ESTUDANTE})`).in("status_validacao", [...STATUS_PENDENTES]).order("created_at"),
+      const linhas = await paginado<Linha>((de, ate) =>
+        sb.from("versoes_perfil").select(`${COL_VERSAO}, estudantes(${COL_ESTUDANTE})`).in("status_validacao", [...STATUS_PENDENTES]).order("created_at").order("id").range(de, ate),
       );
       const agora = Date.now();
       return linhas
