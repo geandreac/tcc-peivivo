@@ -4,6 +4,7 @@
  * linhas provam que a contagem e a paginação não dependem do corte do
  * PostgREST (`max_rows = 1000`). Dados 100 % fictícios, desfeitos no savepoint.
  */
+import { DIAS_CICLO_PARADO, DIAS_EXPIRACAO_VALIDACAO, DIAS_VALIDACAO_ATRASADA } from "@pei-vivo/contratos";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ID, NEGADO, abrirBanco, type Banco, type Resultado } from "./banco";
 
@@ -102,5 +103,18 @@ describe("fn_listar_auditoria paginada · permitido", () => {
   });
   it("a chamada antiga, só com o estudante, continua funcionando (padrão: tudo)", async () => {
     ok(await db.como("coordenacao", `select * from fn_listar_auditoria('${ID.e1}')`));
+  });
+});
+
+describe("prazos do banco = constantes de @pei-vivo/contratos (mock e app usam as mesmas)", () => {
+  const definicao = async (assinatura: string) =>
+    String((await db.sistema(`select pg_get_functiondef('${assinatura}'::regprocedure) as d`)).rows[0]?.d);
+  it("painel: validação atrasada e ciclo parado", async () => {
+    const d = await definicao("public.fn_resumo_escola(uuid)");
+    expect(d).toContain(`interval '${DIAS_VALIDACAO_ATRASADA} days'`);
+    expect(d).toContain(`current_date - ${DIAS_CICLO_PARADO}`);
+  });
+  it("RN05: expiração da validação", async () => {
+    expect(await definicao("public.fn_expirar_validacoes(timestamptz)")).toContain(`interval '${DIAS_EXPIRACAO_VALIDACAO} days'`);
   });
 });

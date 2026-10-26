@@ -8,9 +8,10 @@
 //   com `requestId` (também no header x-request-id) para correlacionar.
 // - Toda chamada ao banco/Auth tem tempo limite (TIMEOUT_REDE_MS).
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.4";
+import { ORIGEM_PADRAO_DEV } from "./gerado/contratos/index.ts";
 import { ErroFuncao } from "./gerado/funcoes/index.ts";
 
-const ORIGEM = Deno.env.get("ORIGEM_APP") ?? "http://localhost:5173";
+const ORIGEM = Deno.env.get("ORIGEM_APP") ?? ORIGEM_PADRAO_DEV;
 const CORS = {
   "Access-Control-Allow-Origin": ORIGEM,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",

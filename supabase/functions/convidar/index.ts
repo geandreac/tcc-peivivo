@@ -2,10 +2,11 @@
 // docente, responsável ou profissional de saúde. O banco decide se ela pode
 // (fn_preparar_convite com o JWT dela, aal2); o Auth envia o e-mail com o
 // link de definir senha (uso único); o banco grava com service role.
+import { ORIGEM_PADRAO_DEV } from "../_shared/gerado/contratos/index.ts";
 import { convidar, type DadosConvite } from "../_shared/gerado/funcoes/index.ts";
 import { rpc, servir } from "../_shared/http.ts";
 
-const ORIGEM = Deno.env.get("ORIGEM_APP") ?? "http://localhost:5173";
+const ORIGEM = Deno.env.get("ORIGEM_APP") ?? ORIGEM_PADRAO_DEV;
 
 servir("convidar", (corpo, { usuario, servico }) =>
   convidar(corpo, {

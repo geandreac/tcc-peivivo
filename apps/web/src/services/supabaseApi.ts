@@ -12,7 +12,7 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { calcularFechamento } from "@pei-vivo/funcoes";
-import type { CorpoErro, RespostaFecharCiclo, RespostaGerarMaterial } from "@pei-vivo/contratos";
+import { CODIGO_DO_SQLSTATE, MS_POR_DIA, type CorpoErro, type RespostaFecharCiclo, type RespostaGerarMaterial } from "@pei-vivo/contratos";
 import type { ObservacaoHistorica, ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
 import { VERSAO_TERMO, type NovaObservacao, type NovoConvite, type NovoEstudante, type NovoVinculo, type Pagina, type PeiVivoApi, type RespostaConvite } from "./api";
 import { ErroApi, type CodigoErro } from "./erros";
@@ -65,13 +65,14 @@ export function traduzirErro(e: unknown): ErroApi {
   const { code, message = "", status, name } = (e ?? {}) as ErroPostgrest;
   const msg = message.split("\n")[0] ?? "";
   if (name === "TypeError" || /fetch|network/iu.test(msg)) return new ErroApi("REDE", "Falha de rede.");
-  if (code === "42501") return new ErroApi("NEGADO", msg || "Seu perfil não tem permissão para esta ação.");
-  if (code === "PT409" || code === "23505") return new ErroApi("CONFLITO", msg || "A situação mudou; recarregue e tente de novo.");
-  if (code === "22023" || code === "23514" || code === "22P02") return new ErroApi("VALIDACAO", msg || "Dados inválidos.");
+  const codigo = code ? CODIGO_DO_SQLSTATE[code] : undefined;
+  if (codigo) return new ErroApi(codigo, msg || MENSAGEM_PADRAO[codigo]);
   if (code === "PGRST116") return new ErroApi("NAO_ENCONTRADO", "Não encontrado.");
   if (code === "PGRST301" || code === "PGRST302" || status === 401) return new ErroApi("NAO_AUTENTICADO", "Entre para continuar.");
   return new ErroApi("REDE", "Algo deu errado do nosso lado. Tente de novo em instantes.");
 }
+
+const MENSAGEM_PADRAO = { NEGADO: "Seu perfil não tem permissão para esta ação.", CONFLITO: "A situação mudou; recarregue e tente de novo.", VALIDACAO: "Dados inválidos." } as const;
 
 async function exec<T>(p: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
   let r: { data: T | null; error: unknown };
@@ -544,7 +545,7 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
           (r): Pendencia => ({
             versao: paraVersao(r),
             estudante: paraEstudante(r.estudantes as Linha),
-            diasEmAberto: Math.floor((agora - new Date(String(r.created_at)).getTime()) / 86_400_000),
+            diasEmAberto: Math.floor((agora - new Date(String(r.created_at)).getTime()) / MS_POR_DIA),
           }),
         )
         .sort((a, b) => b.diasEmAberto - a.diasEmAberto);

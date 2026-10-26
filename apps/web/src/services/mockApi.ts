@@ -14,7 +14,15 @@
  */
 import { adaptar, type ObservacaoHistorica, type ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 import { calcularFechamento } from "@pei-vivo/funcoes";
-import { LIMITE_EVIDENCIA, LIMITE_NOTA_CLINICA, LIMITE_OBSERVACAO_DESFECHO } from "@pei-vivo/contratos";
+import {
+  DIAS_CICLO_PARADO,
+  DIAS_EXPIRACAO_VALIDACAO,
+  DIAS_VALIDACAO_ATRASADA,
+  LIMITE_EVIDENCIA,
+  LIMITE_NOTA_CLINICA,
+  LIMITE_OBSERVACAO_DESFECHO,
+  MS_POR_DIA,
+} from "@pei-vivo/contratos";
 import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, Pagina, PeiVivoApi } from "./api";
 import { ErroApi } from "./erros";
 import type {
@@ -60,7 +68,6 @@ interface Estado {
 
 const CHAVE_ESTADO = "pei-vivo:demo:v3"; // v3: âncora do ciclo 3 só com o tema (navegadores com a demo antiga recebem os dados novos)
 const CHAVE_SESSAO = "pei-vivo:sessao";
-const DIAS_EXPIRACAO = 7; // RN05
 
 const clonar = <T>(v: T): T => (v === undefined ? v : (JSON.parse(JSON.stringify(v)) as T));
 
@@ -224,7 +231,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
 
   /** RN05 — simula o job diário: PENDENTE há mais de 7 dias vira EXPIRADA. */
   function aplicarExpiracao() {
-    const limite = Date.now() - DIAS_EXPIRACAO * 86_400_000;
+    const limite = Date.now() - DIAS_EXPIRACAO_VALIDACAO * MS_POR_DIA;
     let mudou = false;
     for (const v of estado.versoes) {
       if (v.statusValidacao === "PENDENTE" && new Date(v.createdAt).getTime() < limite) {
@@ -666,7 +673,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         for (const v of estado.versoes) {
           // Só o que ainda pode ser decidido: substituída e expirada não voltam (RN05, D-35).
           if (!ids.has(v.estudanteId) || !STATUS_PENDENTES.includes(v.statusValidacao)) continue;
-          lista.push({ versao: v, estudante: estudante(v.estudanteId), diasEmAberto: Math.floor((Date.now() - new Date(v.createdAt).getTime()) / 86_400_000) });
+          lista.push({ versao: v, estudante: estudante(v.estudanteId), diasEmAberto: Math.floor((Date.now() - new Date(v.createdAt).getTime()) / MS_POR_DIA) });
         }
         return lista.sort((a, b) => b.diasEmAberto - a.diasEmAberto);
       }),
@@ -678,7 +685,6 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const ids = estado.vinculos.filter((v) => v.usuarioId === u.id && v.status === "ATIVO" && v.papel === "COORDENACAO").map((v) => v.estudanteId);
         if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "O painel da escola é da coordenação pedagógica.");
         const resumo: ResumoEscola = { totalEstudantes: ids.length, comConsentimento: 0, semConsentimento: 0, semProfissional: 0, validacoesAtrasadas: 0, ciclosParados: 0, pendencias: [] };
-        const dia = 86_400_000;
         for (const id of ids) {
           const e = estudante(id);
           const add = (motivo: ResumoEscola["pendencias"][number]["motivo"], desde: string | null) => resumo.pendencias.push({ estudanteId: id, nome: e.nome, motivo, desde });
@@ -693,14 +699,14 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
             add("SEM_PROFISSIONAL", null);
           }
           const atrasada = estado.versoes.find(
-            (v) => v.estudanteId === id && (v.statusValidacao === "EXPIRADA" || (v.statusValidacao === "PENDENTE" && Date.now() - new Date(v.createdAt).getTime() >= 5 * dia))
+            (v) => v.estudanteId === id && (v.statusValidacao === "EXPIRADA" || (v.statusValidacao === "PENDENTE" && Date.now() - new Date(v.createdAt).getTime() >= DIAS_VALIDACAO_ATRASADA * MS_POR_DIA))
           );
           if (atrasada) {
             resumo.validacoesAtrasadas++;
             add("VALIDACAO_ATRASADA", atrasada.createdAt);
           }
           const aberto = estado.ciclos.find((c) => c.estudanteId === id && c.status === "ABERTO");
-          if (aberto && Date.now() - new Date(aberto.dataInicio).getTime() > 15 * dia && !estado.observacoes.some((o) => o.cicloId === aberto.id)) {
+          if (aberto && Date.now() - new Date(aberto.dataInicio).getTime() > DIAS_CICLO_PARADO * MS_POR_DIA && !estado.observacoes.some((o) => o.cicloId === aberto.id)) {
             resumo.ciclosParados++;
             add("CICLO_PARADO", aberto.dataInicio);
           }

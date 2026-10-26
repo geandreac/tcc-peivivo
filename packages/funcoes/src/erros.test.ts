@@ -10,6 +10,7 @@ describe("deErroBanco · SQLSTATE → HTTP (mesma tabela do app)", () => {
     ["23505", 409, "CONFLITO"], // duplicado (unique) vira conflito, não erro interno
     ["22023", 400, "VALIDACAO"],
     ["23514", 400, "VALIDACAO"],
+    ["22P02", 400, "VALIDACAO"], // texto que não é uuid: agora igual ao app (antes caía em 500)
   ])("%s → %i %s, com a mensagem do banco", (code, status, codigo) => {
     const e = deErroBanco(erroBanco(code));
     expect(e).toBeInstanceOf(ErroFuncao);

@@ -17,6 +17,17 @@ export const LIMITE_NOTA_CLINICA = 5_000;
 /** RNF08: a IA nunca segura a geração; passado o limite, vale só a camada de regras. */
 export const TIMEOUT_IA_MS = 30_000;
 
+// ------------------------------------------------------------------ prazos e padrões compartilhados
+export const MS_POR_DIA = 86_400_000;
+/** RN05: proposta sem validação vira EXPIRADA depois de N dias (fn_expirar_validacoes). */
+export const DIAS_EXPIRACAO_VALIDACAO = 7;
+/** Painel da escola (D-48, `fn_resumo_escola` em 0011): PENDENTE há ≥ N dias conta como validação atrasada. */
+export const DIAS_VALIDACAO_ATRASADA = 5;
+/** Painel da escola: ciclo ABERTO há mais de N dias sem observação conta como parado. */
+export const DIAS_CICLO_PARADO = 15;
+/** Origem do app em desenvolvimento (CORS e link do convite) quando ORIGEM_APP não está definida. */
+export const ORIGEM_PADRAO_DEV = "http://localhost:5173";
+
 // ------------------------------------------------------------------ parâmetros
 /** Espelha `ParametrosAdaptacao` do motor (6 campos, D-13) e `privado.parametros_validos` no banco. */
 export const ParametrosAdaptacaoSchema = z
@@ -93,6 +104,20 @@ export interface RespostaFecharCiclo {
 // ------------------------------------------------------------------ erros
 /** Códigos estáveis (os mesmos de `ErroApi` no app). */
 export type CodigoErro = "NEGADO" | "CONFLITO" | "VALIDACAO" | "NAO_AUTENTICADO" | "INTERNO";
+
+/**
+ * SQLSTATE do banco → código estável. Uma tabela só, usada pelas Edge Functions
+ * (`deErroBanco`) e pelo app (`traduzirErro`). Convenção de `0004`: negado 42501,
+ * conflito PT409, inválido 22023; 23505/23514/22P02 vêm de restrições do Postgres.
+ */
+export const CODIGO_DO_SQLSTATE: Readonly<Record<string, "NEGADO" | "CONFLITO" | "VALIDACAO">> = {
+  "42501": "NEGADO",
+  PT409: "CONFLITO",
+  "23505": "CONFLITO",
+  "22023": "VALIDACAO",
+  "23514": "VALIDACAO",
+  "22P02": "VALIDACAO",
+};
 export interface CorpoErro {
   erro: { codigo: CodigoErro; mensagem: string };
 }
