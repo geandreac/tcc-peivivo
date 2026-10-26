@@ -14,7 +14,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { calcularFechamento } from "@pei-vivo/funcoes";
 import type { CorpoErro, RespostaFecharCiclo, RespostaGerarMaterial } from "@pei-vivo/contratos";
 import type { ObservacaoHistorica, ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
-import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, PeiVivoApi, RespostaConvite } from "./api";
+import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, Pagina, PeiVivoApi, RespostaConvite } from "./api";
 import { ErroApi, type CodigoErro } from "./erros";
 import { STATUS_PENDENTES } from "./tipos";
 import type {
@@ -83,6 +83,27 @@ async function exec<T>(p: PromiseLike<{ data: T | null; error: unknown }>): Prom
   }
   if (r.error) throw traduzirErro(r.error);
   return r.data as T;
+}
+
+/** `max_rows` do PostgREST (supabase/config.toml): acima disso a resposta é cortada sem erro. */
+const LOTE = 1000;
+
+/**
+ * D-48: com página, um `range`; sem página, busca em lotes de `LOTE` até vir
+ * menos que um lote — a lista inteira nunca é cortada em silêncio.
+ * `montar` cria uma consulta nova a cada lote (o construtor do PostgREST é de uso único).
+ */
+async function paginado<T>(montar: (de: number, ate: number) => PromiseLike<{ data: T[] | null; error: unknown }>, pagina?: Pagina): Promise<T[]> {
+  if (pagina) {
+    const de = pagina.deslocamento ?? 0;
+    return exec(montar(de, de + pagina.limite - 1));
+  }
+  const tudo: T[] = [];
+  for (let de = 0; ; de += LOTE) {
+    const lote = await exec(montar(de, de + LOTE - 1));
+    tudo.push(...lote);
+    if (lote.length < LOTE) return tudo;
+  }
 }
 
 // ------------------------------------------------------------------ mapeamentos (snake → camel)
@@ -451,9 +472,17 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
       if (aberto) return aberto;
       return paraCiclo(await exec<Linha>(sb.from("ciclos_observacao").insert({ estudante_id: estudanteId }).select(COL_CICLO).single()));
     },
-    listarObservacoes: async (estudanteId) => {
-      const linhas = await exec<Linha[]>(
-        sb.from("observacoes").select(`${COL_OBS}, ciclos_observacao!inner(numero, estudante_id)`).eq("ciclos_observacao.estudante_id", estudanteId).order("data_registro", { ascending: false }),
+    listarObservacoes: async (estudanteId, pagina) => {
+      const linhas = await paginado<Linha>(
+        (de, ate) =>
+          sb
+            .from("observacoes")
+            .select(`${COL_OBS}, ciclos_observacao!inner(numero, estudante_id)`)
+            .eq("ciclos_observacao.estudante_id", estudanteId)
+            .order("data_registro", { ascending: false })
+            .order("id")
+            .range(de, ate),
+        pagina,
       );
       return linhas.map(paraObservacao);
     },
@@ -524,47 +553,18 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
     resumoEscola: async () => {
       const escola = eu().escolaCoordenada;
       if (!escola) throw new ErroApi("NEGADO", "O painel da escola é da coordenação pedagógica.");
-      const [estudantes, consents, vinculos, versoes, ciclos] = await Promise.all([
-        exec<Linha[]>(sb.from("estudantes").select("id, nome, created_at").eq("escola_id", escola)),
-        exec<Linha[]>(sb.from("consentimentos").select("estudante_id, status")),
-        exec<Linha[]>(sb.from("vinculos_usuario_estudante").select("estudante_id, papel, status")),
-        exec<Linha[]>(sb.from("versoes_perfil").select("estudante_id, status_validacao, created_at")),
-        exec<Linha[]>(sb.from("ciclos_observacao").select("id, estudante_id, status, data_inicio, observacoes(id)").eq("status", "ABERTO")),
-      ]);
-      const dia = 86_400_000;
-      const r: ResumoEscola = { totalEstudantes: estudantes.length, comConsentimento: 0, semConsentimento: 0, semProfissional: 0, validacoesAtrasadas: 0, ciclosParados: 0, pendencias: [] };
-      for (const e of estudantes) {
-        const id = String(e.id);
-        const add = (motivo: ResumoEscola["pendencias"][number]["motivo"], desde: string | null) => r.pendencias.push({ estudanteId: id, nome: String(e.nome), motivo, desde });
-        if (!consents.some((c) => c.estudante_id === id && c.status === "ATIVO")) {
-          r.semConsentimento++;
-          add("SEM_CONSENTIMENTO", String(e.created_at));
-          continue;
-        }
-        r.comConsentimento++;
-        if (!vinculos.some((v) => v.estudante_id === id && v.papel === "PROFISSIONAL_SAUDE" && v.status === "ATIVO")) {
-          r.semProfissional++;
-          add("SEM_PROFISSIONAL", null);
-        }
-        const atrasada = versoes.find(
-          (v) => v.estudante_id === id && (v.status_validacao === "EXPIRADA" || (v.status_validacao === "PENDENTE" && Date.now() - new Date(String(v.created_at)).getTime() >= 5 * dia)),
-        );
-        if (atrasada) {
-          r.validacoesAtrasadas++;
-          add("VALIDACAO_ATRASADA", String(atrasada.created_at));
-        }
-        const aberto = ciclos.find((c) => c.estudante_id === id);
-        if (aberto && Date.now() - new Date(String(aberto.data_inicio)).getTime() > 15 * dia && ((aberto.observacoes as unknown[]) ?? []).length === 0) {
-          r.ciclosParados++;
-          add("CICLO_PARADO", String(aberto.data_inicio));
-        }
-      }
-      return r;
+      // D-48: o banco agrega (fn_resumo_escola, 0011); antes eram 5 tabelas inteiras contadas aqui.
+      return exec<ResumoEscola>(sb.rpc("fn_resumo_escola", { p_escola: escola }));
     },
 
     // ---- materiais
-    listarMateriais: async (estudanteId) =>
-      (await exec<Linha[]>(sb.from("materiais_adaptados").select(COL_MATERIAL).eq("estudante_id", estudanteId).order("data_geracao", { ascending: false }))).map((r) => paraMaterial(r)),
+    listarMateriais: async (estudanteId, pagina) =>
+      (
+        await paginado<Linha>(
+          (de, ate) => sb.from("materiais_adaptados").select(COL_MATERIAL).eq("estudante_id", estudanteId).order("data_geracao", { ascending: false }).order("id").range(de, ate),
+          pagina,
+        )
+      ).map((r) => paraMaterial(r)),
     obterMaterial: async (id) => {
       const r = await exec<Linha | null>(sb.from("materiais_adaptados").select(COL_MATERIAL).eq("id", id).maybeSingle());
       if (!r) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado.");
@@ -607,13 +607,13 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
     },
 
     // ---- auditoria e LGPD
-    listarAuditoria: async (estudanteId) => {
-      const linhas = await exec<Linha[]>(sb.rpc("fn_listar_auditoria", { p_estudante: estudanteId }));
+    listarAuditoria: async (estudanteId, pagina) => {
+      const linhas = await paginado<Linha>((de, ate) => sb.rpc("fn_listar_auditoria", { p_estudante: estudanteId, p_limite: ate - de + 1, p_deslocamento: de }), pagina);
       return linhas
         .filter((r) => EVENTO_DO_BANCO[String(r.evento)])
         .map(
           (r, i): Auditoria => ({
-            id: `${estudanteId}-${i}`,
+            id: `${estudanteId}-${(pagina?.deslocamento ?? 0) + i}`,
             entidade: "",
             entidadeId: estudanteId,
             evento: EVENTO_DO_BANCO[String(r.evento)]!,

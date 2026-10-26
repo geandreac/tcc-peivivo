@@ -443,28 +443,55 @@ describe("supabaseApi · escritas e guardas de papel", () => {
 });
 
 describe("supabaseApi · painel da escola (só contagens)", () => {
-  it("conta consentimento, profissional, validação atrasada (≥ 5 dias) e ciclo parado (> 15 dias sem observação)", async () => {
-    const { api, consultas } = await apiLogada(PERFIL_COORD, {
-      tabelas: {
-        estudantes: [
-          { id: "a", nome: "A (fictício)", created_at: atras(30) },
-          { id: "b", nome: "B (fictício)", created_at: atras(30) },
-          { id: "c", nome: "C (fictício)", created_at: atras(2) },
-        ],
-        consentimentos: [{ estudante_id: "a", status: "ATIVO" }, { estudante_id: "b", status: "ATIVO" }, { estudante_id: "c", status: "REVOGADO" }],
-        vinculos_usuario_estudante: [{ estudante_id: "a", papel: "PROFISSIONAL_SAUDE", status: "ATIVO" }],
-        versoes_perfil: [{ estudante_id: "a", status_validacao: "PENDENTE", created_at: atras(6) }, { estudante_id: "b", status_validacao: "PENDENTE", created_at: atras(1) }],
-        ciclos_observacao: [{ id: "x", estudante_id: "b", status: "ABERTO", data_inicio: atras(20), observacoes: [] }],
-      },
-    });
-    const r = await api.resumoEscola();
-    expect(r).toMatchObject({ totalEstudantes: 3, comConsentimento: 2, semConsentimento: 1, semProfissional: 1, validacoesAtrasadas: 1, ciclosParados: 1 });
-    expect(r.pendencias.map((p) => [p.estudanteId, p.motivo])).toEqual([
-      ["a", "VALIDACAO_ATRASADA"],
-      ["b", "SEM_PROFISSIONAL"],
-      ["b", "CICLO_PARADO"],
-      ["c", "SEM_CONSENTIMENTO"],
+  it("chama fn_resumo_escola com a escola do perfil e não baixa tabela nenhuma (D-48)", async () => {
+    const resumo = { totalEstudantes: 3, comConsentimento: 2, semConsentimento: 1, semProfissional: 1, validacoesAtrasadas: 1, ciclosParados: 1, pendencias: [] };
+    const { api, consultas, rpcsChamadas } = await apiLogada(PERFIL_COORD, { rpcs: { fn_resumo_escola: resumo } });
+    expect(await api.resumoEscola()).toEqual(resumo);
+    expect(rpcsChamadas).toContainEqual(["fn_resumo_escola", { p_escola: "esc-1" }]);
+    expect(consultas).toHaveLength(0);
+  });
+});
+
+describe("supabaseApi · paginação (D-48)", () => {
+  const MATERIAIS = Array.from({ length: 2_350 }, (_, i) => ({ id: `m${i}`, estudante_id: "e1", status_aprovacao: "APROVADO" }));
+  /** Responde como o PostgREST: só a faixa pedida em `range`, nunca mais que 1000. */
+  const porFaixa = (c: Consulta) => {
+    const r = c.ops.find(([n]) => n === "range");
+    if (!r) return MATERIAIS.slice(0, 1000); // sem range, o corte silencioso do max_rows
+    const [, de, ate] = r as [string, number, number];
+    return MATERIAIS.slice(de, Math.min(ate + 1, de + 1000));
+  };
+
+  it("com página: um único range [deslocamento, deslocamento + limite - 1]", async () => {
+    const { api, consultas } = await apiLogada(PERFIL_DOCENTE, { tabelas: { materiais_adaptados: porFaixa } });
+    const pagina = await api.listarMateriais("e1", { limite: 10, deslocamento: 20 });
+    expect(pagina.map((m) => m.id)).toEqual(MATERIAIS.slice(20, 30).map((m) => m.id));
+    expect(consultas.filter((c) => c.tabela === "materiais_adaptados")).toHaveLength(1);
+    expect(consultas.at(-1)!.ops).toContainEqual(["range", 20, 29]);
+  });
+
+  it("sem página: busca em lotes de 1000 até o fim — 2.350 linhas, nenhuma cortada", async () => {
+    const { api, consultas } = await apiLogada(PERFIL_DOCENTE, { tabelas: { materiais_adaptados: porFaixa } });
+    const tudo = await api.listarMateriais("e1");
+    expect(tudo).toHaveLength(2_350);
+    expect(new Set(tudo.map((m) => m.id)).size).toBe(2_350);
+    expect(consultas.filter((c) => c.tabela === "materiais_adaptados").map((c) => c.ops.find(([n]) => n === "range"))).toEqual([
+      ["range", 0, 999],
+      ["range", 1000, 1999],
+      ["range", 2000, 2999],
     ]);
-    expect(consultas.find((c) => c.tabela === "estudantes")!.ops).toContainEqual(["eq", "escola_id", "esc-1"]);
+  });
+
+  it("observações também paginam; auditoria pagina pela RPC (p_limite/p_deslocamento) com ids únicos entre páginas", async () => {
+    const { api, consultas, rpcsChamadas } = await apiLogada(PERFIL_COORD, {
+      rpcs: { fn_listar_auditoria: () => [{ evento: "VERSAO_PROPOSTA", autor_nome: "Sistema", criado_em: "d" }] },
+    });
+    await api.listarObservacoes("e1", { limite: 5 });
+    expect(consultas.at(-1)!.ops).toContainEqual(["range", 0, 4]);
+    const [a] = await api.listarAuditoria("e1", { limite: 20, deslocamento: 40 });
+    expect(rpcsChamadas.at(-1)).toEqual(["fn_listar_auditoria", { p_estudante: "e1", p_limite: 20, p_deslocamento: 40 }]);
+    expect(a!.id).toBe("e1-40");
+    await api.listarAuditoria("e1"); // sem página: primeiro lote de 1000; veio menos, para
+    expect(rpcsChamadas.at(-1)).toEqual(["fn_listar_auditoria", { p_estudante: "e1", p_limite: 1000, p_deslocamento: 0 }]);
   });
 });

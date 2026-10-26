@@ -32,6 +32,12 @@ import type {
   Vinculo,
 } from "./tipos";
 
+/** D-48: página de uma listagem. Sem página, a lista vem inteira (no modo real, buscada em lotes). */
+export interface Pagina {
+  limite: number;
+  deslocamento?: number;
+}
+
 export interface NovaObservacao {
   dimensao: DimensaoObservada;
   valorEscala: EscalaObservacao;
@@ -123,7 +129,7 @@ export interface PeiVivoApi {
   listarCiclos(estudanteId: string): Promise<Ciclo[]>;
   obterCicloAberto(estudanteId: string): Promise<Ciclo | null>;
   abrirCiclo(estudanteId: string): Promise<Ciclo>;
-  listarObservacoes(estudanteId: string): Promise<ObservacaoRegistro[]>;
+  listarObservacoes(estudanteId: string, pagina?: Pagina): Promise<ObservacaoRegistro[]>;
   registrarObservacao(cicloId: string, dados: NovaObservacao): Promise<ObservacaoRegistro>;
 
   // versões de perfil (RF05–RF07)
@@ -137,7 +143,7 @@ export interface PeiVivoApi {
   resumoEscola(): Promise<ResumoEscola>;
 
   // materiais (RF08–RF13)
-  listarMateriais(estudanteId: string): Promise<Material[]>;
+  listarMateriais(estudanteId: string, pagina?: Pagina): Promise<Material[]>;
   obterMaterial(id: string): Promise<Material>;
   gerarMaterial(estudanteId: string, titulo: string, texto: string): Promise<Material>;
   aprovarMaterial(id: string, textoRevisado?: string): Promise<Material>;
@@ -150,7 +156,7 @@ export interface PeiVivoApi {
   registrarNotaClinica(estudanteId: string, conteudo: string): Promise<NotaClinica>;
 
   // auditoria e LGPD (D-05, D-06)
-  listarAuditoria(estudanteId: string): Promise<Auditoria[]>;
+  listarAuditoria(estudanteId: string, pagina?: Pagina): Promise<Auditoria[]>;
   exportarDados(estudanteId: string): Promise<ExportacaoEstudante>;
   excluirEstudante(estudanteId: string, confirmacaoNome: string): Promise<void>;
 

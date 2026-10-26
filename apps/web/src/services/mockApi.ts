@@ -15,7 +15,7 @@
 import { adaptar, type ObservacaoHistorica, type ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 import { calcularFechamento } from "@pei-vivo/funcoes";
 import { LIMITE_EVIDENCIA, LIMITE_NOTA_CLINICA, LIMITE_OBSERVACAO_DESFECHO } from "@pei-vivo/contratos";
-import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, PeiVivoApi } from "./api";
+import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, Pagina, PeiVivoApi } from "./api";
 import { ErroApi } from "./erros";
 import type {
   Auditoria,
@@ -163,6 +163,13 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
     if (!temConsentimento(estudanteId)) {
       throw new ErroApi("NEGADO", "Sem consentimento ativo do responsável, nenhuma escrita nem geração é permitida.");
     }
+  }
+
+  /** D-48: mesma semântica do `range` do modo real. */
+  function paginar<T>(lista: T[], pagina?: Pagina): T[] {
+    if (!pagina) return lista;
+    const inicio = pagina.deslocamento ?? 0;
+    return lista.slice(inicio, inicio + pagina.limite);
   }
 
   /** D-47: mesmo limite do `check` da migration 0010. */
@@ -526,11 +533,11 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         salvar();
         return novo;
       }),
-    listarObservacoes: (estudanteId) =>
+    listarObservacoes: (estudanteId, pagina) =>
       chamada(() => {
         exigirLeitura(estudanteId);
         const ids = new Set(estado.ciclos.filter((c) => c.estudanteId === estudanteId).map((c) => c.id));
-        return estado.observacoes.filter((o) => ids.has(o.cicloId)).sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro));
+        return paginar(estado.observacoes.filter((o) => ids.has(o.cicloId)).sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro)), pagina);
       }),
     registrarObservacao: (cicloId, dados) =>
       chamada(() => {
@@ -703,12 +710,13 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       }),
 
     // ---- materiais
-    listarMateriais: (estudanteId) =>
+    listarMateriais: (estudanteId, pagina) =>
       chamada(() => {
         const p = exigirLeitura(estudanteId);
-        return estado.materiais
+        const lista = estado.materiais
           .filter((m) => m.estudanteId === estudanteId && (m.statusAprovacao === "APROVADO" || (p === "DOCENTE" && m.docenteId === eu().id))) // D-34: rascunho só do autor
           .sort((a, b) => b.dataGeracao.localeCompare(a.dataGeracao));
+        return paginar(lista, pagina);
       }),
     obterMaterial: (id) =>
       chamada(() => {
@@ -824,7 +832,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       }),
 
     // ---- auditoria e LGPD
-    listarAuditoria: (estudanteId) =>
+    listarAuditoria: (estudanteId, pagina) =>
       chamada(() => {
         exigirPapel(estudanteId, "RESPONSAVEL", "COORDENACAO");
         const idsFilhos = new Set<string>([
@@ -837,10 +845,11 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         ]);
         const papel = meuPapel(estudanteId);
         const CLINICOS: EventoAuditoria[] = ["LEITURA_NOTA_CLINICA", "NOTA_CLINICA_REGISTRADA"];
-        return estado.auditoria
+        const lista = estado.auditoria
           .filter((a) => idsFilhos.has(a.entidadeId) && (papel === "RESPONSAVEL" || !CLINICOS.includes(a.evento)))
           .map((a) => ({ ...a, autorNome: estado.usuarios.find((x) => x.id === a.autorId)?.nome ?? "Sistema" }))
           .sort((a, b) => b.data.localeCompare(a.data));
+        return paginar(lista, pagina);
       }),
     exportarDados: (estudanteId) =>
       chamada(() => {

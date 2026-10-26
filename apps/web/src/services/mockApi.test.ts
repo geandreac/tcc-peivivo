@@ -223,6 +223,21 @@ describe("D-47 — texto livre com o mesmo limite do banco (0010)", () => {
   });
 });
 
+describe("D-48 — paginação com a mesma semântica do modo real", () => {
+  it("página devolve a faixa pedida; sem página, tudo; páginas não se repetem", async () => {
+    await api.entrar(ID.coordenacao);
+    const tudo = await api.listarAuditoria(ID.estudanteA);
+    expect(tudo.length).toBeGreaterThan(2);
+    const p1 = await api.listarAuditoria(ID.estudanteA, { limite: 2 });
+    const p2 = await api.listarAuditoria(ID.estudanteA, { limite: 2, deslocamento: 2 });
+    expect(p1).toEqual(tudo.slice(0, 2));
+    expect(p2).toEqual(tudo.slice(2, 4));
+    await api.entrar(ID.docente);
+    expect(await api.listarObservacoes(ID.estudanteA, { limite: 1 })).toHaveLength(1);
+    expect((await api.listarMateriais(ID.estudanteA, { limite: 1 })).length).toBeLessThanOrEqual(1);
+  });
+});
+
 describe("RF13 — desfecho", () => {
   it("segundo desfecho no mesmo material → CONFLITO; responsável → NEGADO", async () => {
     await api.entrar(ID.responsavel);
