@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LIMITE_NOTA_CLINICA } from "@pei-vivo/contratos";
 import { api, ehErroApi, mensagemAmigavel, type NotaClinica } from "../services";
 import { useEstudante } from "../hooks/useEstudante";
 import { useConsulta, useMutacao } from "../hooks/useConsulta";
@@ -90,6 +91,7 @@ export function NotasClinicas() {
               rotulo="Conteúdo da nota"
               dica="Reservado. Outros profissionais de saúde vinculados ao mesmo estudante também leem (equipe multiprofissional)."
               required
+              maxLength={LIMITE_NOTA_CLINICA}
               value={conteudo}
               onChange={(e) => setConteudo(e.target.value)}
               erro={erros.find((x) => x.campo === "conteudo")?.mensagem ?? null}

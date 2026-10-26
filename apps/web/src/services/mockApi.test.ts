@@ -212,6 +212,17 @@ describe("RF03/RF04 — observações (D-04)", () => {
   });
 });
 
+describe("D-47 — texto livre com o mesmo limite do banco (0010)", () => {
+  it("evidência e nota clínica acima do limite → VALIDACAO; no limite, aceitas", async () => {
+    await api.entrar(ID.responsavel);
+    await esperaNegado(api.registrarObservacao(ID.ciclo4, { dimensao: "FADIGA_TAREFA", valorEscala: "ESTAVEL", evidencia: "x".repeat(1_001) }), "VALIDACAO");
+    expect((await api.registrarObservacao(ID.ciclo4, { dimensao: "FADIGA_TAREFA", valorEscala: "ESTAVEL", evidencia: "x".repeat(1_000) })).evidencia).toHaveLength(1_000);
+    await api.entrar(ID.profissional);
+    await esperaNegado(api.registrarNotaClinica(ID.estudanteA, "x".repeat(5_001)), "VALIDACAO");
+    await api.registrarNotaClinica(ID.estudanteA, "x".repeat(5_000));
+  });
+});
+
 describe("RF13 — desfecho", () => {
   it("segundo desfecho no mesmo material → CONFLITO; responsável → NEGADO", async () => {
     await api.entrar(ID.responsavel);

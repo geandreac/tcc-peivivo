@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LIMITE_OBSERVACAO_DESFECHO } from "@pei-vivo/contratos";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, mensagemAmigavel, type Material, type ResultadoDesfecho } from "../services";
 import { useConsulta, useMutacao } from "../hooks/useConsulta";
@@ -86,7 +87,7 @@ export function Desfecho() {
             </div>
           )}
         </fieldset>
-        <Campo tipo="area" id="observacao" rotulo="Observação livre" opcional rows={3} dica="Ex.: “Terminou sozinho. A âncora de interesse funcionou.”" value={observacao} onChange={(e) => setObservacao(e.target.value)} />
+        <Campo tipo="area" id="observacao" rotulo="Observação livre" opcional rows={3} maxLength={LIMITE_OBSERVACAO_DESFECHO} dica="Ex.: “Terminou sozinho. A âncora de interesse funcionou.”" value={observacao} onChange={(e) => setObservacao(e.target.value)} />
         <div className="grupo-botoes grupo-botoes--empilhado">
           <Botao type="submit" carregando={salvar.ocupado} textoCarregando="Registrando…">
             Registrar desfecho

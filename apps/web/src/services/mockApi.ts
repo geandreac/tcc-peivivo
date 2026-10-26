@@ -14,6 +14,7 @@
  */
 import { adaptar, type ObservacaoHistorica, type ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 import { calcularFechamento } from "@pei-vivo/funcoes";
+import { LIMITE_EVIDENCIA, LIMITE_NOTA_CLINICA, LIMITE_OBSERVACAO_DESFECHO } from "@pei-vivo/contratos";
 import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, PeiVivoApi } from "./api";
 import { ErroApi } from "./erros";
 import type {
@@ -162,6 +163,11 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
     if (!temConsentimento(estudanteId)) {
       throw new ErroApi("NEGADO", "Sem consentimento ativo do responsável, nenhuma escrita nem geração é permitida.");
     }
+  }
+
+  /** D-47: mesmo limite do `check` da migration 0010. */
+  function exigirTamanho(texto: string | null | undefined, limite: number, nome: string) {
+    if ((texto?.trim().length ?? 0) > limite) throw new ErroApi("VALIDACAO", `${nome} pode ter até ${limite.toLocaleString("pt-BR")} caracteres.`);
   }
 
   /** D-11: leitura de dados filhos — R e C sempre; D e P só com consentimento. */
@@ -533,6 +539,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         const papel = exigirPapel(ciclo.estudanteId, "DOCENTE", "RESPONSAVEL", "PROFISSIONAL_SAUDE");
         exigirConsentimento(ciclo.estudanteId);
         if (ciclo.status !== "ABERTO") throw new ErroApi("CONFLITO", "Este ciclo já foi fechado.");
+        exigirTamanho(dados.evidencia, LIMITE_EVIDENCIA, "A evidência");
         const o: ObservacaoRegistro = {
           id: uuid(),
           cicloId,
@@ -786,6 +793,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
         exigirConsentimento(m.estudanteId);
         if (m.statusAprovacao !== "APROVADO") throw new ErroApi("CONFLITO", "Só materiais aprovados recebem desfecho.");
         if (estado.desfechos.some((d) => d.materialId === materialId)) throw new ErroApi("CONFLITO", "Este material já tem desfecho registrado.");
+        exigirTamanho(observacaoLivre, LIMITE_OBSERVACAO_DESFECHO, "A observação");
         const d: Desfecho = { id: uuid(), materialId, resultado, observacaoLivre: observacaoLivre?.trim() || null, dataRegistro: agora() };
         estado.desfechos.push(d);
         salvar();
@@ -807,6 +815,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
       chamada(() => {
         exigirPapel(estudanteId, "PROFISSIONAL_SAUDE");
         if (!conteudo.trim()) throw new ErroApi("VALIDACAO", "Escreva o conteúdo da nota.");
+        exigirTamanho(conteudo, LIMITE_NOTA_CLINICA, "A nota");
         const n: NotaClinica = { id: uuid(), estudanteId, profissionalId: eu().id, conteudo: conteudo.trim(), dataRegistro: agora() };
         estado.notas.push(n);
         registrarAuditoria("notas_clinicas", estudanteId, "NOTA_CLINICA_REGISTRADA");

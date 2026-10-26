@@ -11,6 +11,10 @@ import { z } from "npm:zod@3.23.8";
 
 export const LIMITE_TEXTO = 20_000;
 export const LIMITE_TITULO = 120;
+/** Textos livres curtos (D-47): o mesmo número vale no formulário, no mock e no `check` do banco (0010). */
+export const LIMITE_EVIDENCIA = 1_000;
+export const LIMITE_OBSERVACAO_DESFECHO = 1_000;
+export const LIMITE_NOTA_CLINICA = 5_000;
 /** RNF08: a IA nunca segura a geração; passado o limite, vale só a camada de regras. */
 export const TIMEOUT_IA_MS = 30_000;
 

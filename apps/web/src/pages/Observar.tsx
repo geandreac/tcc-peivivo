@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DIMENSOES, type DimensaoObservada, type EscalaObservacao } from "@pei-vivo/motor-adaptacao";
+import { LIMITE_EVIDENCIA } from "@pei-vivo/contratos";
 import { api, mensagemAmigavel, type Ciclo, type ObservacaoRegistro } from "../services";
 import { useEstudante } from "../hooks/useEstudante";
 import { useConsulta, useMutacao } from "../hooks/useConsulta";
@@ -166,6 +167,7 @@ export function Observar() {
                   rotulo="Evidência"
                   opcional
                   rows={2}
+                  maxLength={LIMITE_EVIDENCIA}
                   dica={d === "INTERESSE_MANIFESTO" ? "Escreva o tema (ex.: dinossauros). Ele vira a âncora de interesse do perfil." : "Um exemplo concreto do que você viu. Texto livre, nunca diagnóstico."}
                   value={respostas[d]?.evidencia ?? ""}
                   onChange={(e) => setRespostas((r) => ({ ...r, [d]: { escala: r[d]?.escala ?? null, evidencia: e.target.value } }))}
