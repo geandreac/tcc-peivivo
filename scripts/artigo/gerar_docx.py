@@ -11,6 +11,7 @@ diagramas com .svg ao lado do .png entram como vetor. Figuras com {paisagem} vã
 Marcadores [PREENCHER: …] e [CONFERIR: …] saem destacados em amarelo.
 """
 import re
+import sys
 from pathlib import Path
 
 from docx import Document
@@ -26,8 +27,9 @@ from docx.shared import Cm, Pt, RGBColor
 from PIL import Image
 
 RAIZ = Path(__file__).resolve().parents[2]
-ORIGEM = RAIZ / "docs/tcc/artigo/artigo.md"
-DESTINO = RAIZ / "docs/tcc/artigo/Artigo_PEI_Vivo_v3.docx"  # a v2 fica como estava
+# argumentos opcionais: origem e destino (ex.: a versão _revisado); sem eles, a v3
+ORIGEM = (Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else RAIZ / "docs/tcc/artigo/artigo.md")
+DESTINO = (Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else RAIZ / "docs/tcc/artigo/Artigo_PEI_Vivo_v3.docx")  # a v2 fica como estava
 
 INSTITUICAO = ["CENTRO UNIVERSITÁRIO CEUNI – FAMETRO", "FACULDADE METROPOLITANA DE MANAUS – FAMETRO", "CURSO DE BACHARELADO EM SISTEMAS DE INFORMAÇÃO"]
 AUTORES = ["GEANDRE ALFAIA COLARES", "JEAN VICTOR TORRES DOS SANTOS"]
@@ -45,7 +47,7 @@ AUTORIA = [  # nota de autoria (NBR 6022): função, curso, instituição, cidad
 
 FONTE = "Arial"
 LARGURA_RETRATO = Cm(16)
-MARCADOR = re.compile(r"(\[(?:PREENCHER|CONFERIR|CONFIRMAR COM O AVALIADOR)[^\]]*\])")
+MARCADOR = re.compile(r"(\[(?:PREENCHER|CONFERIR|CONFIRMAR COM O AVALIADOR|COMPLETAR)[^\]]*\])")
 NEGRITO = re.compile(r"(\*\*[^*]+\*\*)")
 
 
