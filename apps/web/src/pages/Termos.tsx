@@ -1,5 +1,5 @@
 import { useTitulo } from "../hooks/useTitulo";
-import { VERSAO_TERMO } from "../services/supabaseApi";
+import { VERSAO_TERMO } from "../services";
 
 /**
  * Termos de uso e política de privacidade em linguagem simples (prompt §4.1),

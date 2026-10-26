@@ -5,7 +5,7 @@
  * Os perfis de demonstração são os usuários fictícios de mocks/dados.ts.
  */
 import type { Papel } from "../services/tipos";
-import { ID } from "../mocks/dados";
+import { ID } from "../mocks/exemplos";
 
 export interface EspecificacaoLogin {
   slug: string;

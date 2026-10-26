@@ -22,7 +22,7 @@ function EntrarDemonstracao() {
   return (
     <>
       <div className="entrar-capa">
-        <img src="/logo-pei-vivo.png" alt="" width="160" height="209" className="entrar-capa__logo" />
+        <img src="/logo-pei-vivo.webp" alt="" width="160" height="209" className="entrar-capa__logo" />
         <div>
           <h1>Entrar</h1>
           <p>

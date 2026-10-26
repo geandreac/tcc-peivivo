@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api, mensagemAmigavel } from "../services";
-import { VERSAO_TERMO } from "../services/supabaseApi";
+import { VERSAO_TERMO } from "../services";
 import { useSessao } from "../hooks/useSessao";
 import { useMutacao } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";

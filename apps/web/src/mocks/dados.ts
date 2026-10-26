@@ -17,6 +17,9 @@ import type {
   Vinculo,
 } from "../services/tipos";
 import { adaptar } from "@pei-vivo/motor-adaptacao";
+import { ID, PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA } from "./exemplos";
+
+export { ID, PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA };
 
 const diasAtras = (n: number, hora = 20) => {
   const d = new Date();
@@ -26,24 +29,6 @@ const diasAtras = (n: number, hora = 20) => {
 };
 const dataAtras = (n: number) => diasAtras(n).slice(0, 10);
 
-export const ID = {
-  docente: "u-0001",
-  responsavel: "u-0002",
-  profissional: "u-0003",
-  coordenacao: "u-0004",
-  docente2: "u-0005",
-  fono: "u-0006",
-  estudanteA: "e-0010",
-  estudanteB: "e-0011",
-  ciclo1: "c-0021",
-  ciclo2: "c-0022",
-  ciclo3: "c-0023",
-  ciclo4: "c-0024",
-  cicloB1: "c-0031",
-  versao3: "v-0030",
-  materialAprovado: "m-0040",
-  materialRascunho: "m-0041",
-} as const;
 
 export const USUARIOS: Usuario[] = [
   { id: ID.docente, nome: "Márcia (fictícia)", email: "docente.dev@example.test", papelInstitucional: null },
@@ -144,14 +129,6 @@ export const OBSERVACOES: ObservacaoRegistro[] = [
   obs(ID.ciclo4, 4, ID.responsavel, "RESPONSAVEL", "FADIGA_TAREFA", "AMPLIADA", "Cansa depois de 10 min de tarefa em casa.", 5),
 ];
 
-export const PARAMETROS_CENARIO_A = {
-  maxLinhasPorBloco: 4,
-  nivelVocabulario: "BASICO" as const,
-  interesseAncora: "dinossauros",
-  formatoEnunciado: "ETAPA_UNICA" as const,
-  contrasteMinimo: 7 as const,
-  blocosPorMaterial: 8,
-};
 
 export const VERSOES: VersaoPerfil[] = [
   {
@@ -192,11 +169,6 @@ export const VERSOES: VersaoPerfil[] = [
   },
 ];
 
-export const TEXTO_CICLO_DA_AGUA = `O ciclo da água é o movimento contínuo da água na Terra. A água dos rios, lagos e oceanos evapora com o calor do sol e sobe para o céu em forma de vapor. Lá em cima, o vapor esfria e vira pequenas gotinhas, formando as nuvens. Quando as gotinhas ficam pesadas, caem como chuva, neve ou granizo. Essa água volta para os rios, para o solo e para os oceanos, e o ciclo recomeça.
-
-Leia o texto acima e depois responda às perguntas com suas palavras.
-
-Circule as palavras que você não conhece, em seguida escreva uma frase com cada uma delas.`;
 
 const TEXTO_FRACOES = `Uma fração representa uma parte de um todo. Quando dividimos uma pizza em quatro pedaços iguais e comemos um pedaço, comemos um quarto da pizza. O número de cima se chama numerador e mostra quantas partes pegamos. O número de baixo se chama denominador e mostra em quantas partes o todo foi dividido.
 

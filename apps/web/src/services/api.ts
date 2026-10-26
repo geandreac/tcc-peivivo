@@ -32,6 +32,9 @@ import type {
   Vinculo,
 } from "./tipos";
 
+/** Versão do termo de consentimento e de uso apresentada nesta versão do app. */
+export const VERSAO_TERMO = "v1-2026-10";
+
 /** D-48: página de uma listagem. Sem página, a lista vem inteira (no modo real, buscada em lotes). */
 export interface Pagina {
   limite: number;

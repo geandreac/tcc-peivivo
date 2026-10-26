@@ -14,7 +14,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { calcularFechamento } from "@pei-vivo/funcoes";
 import type { CorpoErro, RespostaFecharCiclo, RespostaGerarMaterial } from "@pei-vivo/contratos";
 import type { ObservacaoHistorica, ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
-import type { NovaObservacao, NovoConvite, NovoEstudante, NovoVinculo, Pagina, PeiVivoApi, RespostaConvite } from "./api";
+import { VERSAO_TERMO, type NovaObservacao, type NovoConvite, type NovoEstudante, type NovoVinculo, type Pagina, type PeiVivoApi, type RespostaConvite } from "./api";
 import { ErroApi, type CodigoErro } from "./erros";
 import { STATUS_PENDENTES } from "./tipos";
 import type {
@@ -38,8 +38,7 @@ import type {
   Vinculo,
 } from "./tipos";
 
-/** Versão do termo de consentimento e de uso apresentada nesta versão do app. */
-export const VERSAO_TERMO = "v1-2026-10";
+export { VERSAO_TERMO } from "./api";
 
 // ------------------------------------------------------------------ colunas (nunca *)
 const COL_ESTUDANTE = "id, nome, data_nascimento, turma, escola_id, created_at";

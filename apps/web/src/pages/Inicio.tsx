@@ -5,7 +5,7 @@ import { adaptar } from "@pei-vivo/motor-adaptacao";
 import { LinkBotao } from "../components/Botao";
 import { useTitulo } from "../hooks/useTitulo";
 import { useSessao } from "../hooks/useSessao";
-import { PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA } from "../mocks/dados";
+import { PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA } from "../mocks/exemplos";
 
 /** Os quatro passos do ciclo — sequência real (a ordem é a informação). */
 const CICLO = [

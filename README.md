@@ -83,7 +83,7 @@ Personas em `docs/validacao-da-ideia.md` §2.
 pei-vivo/
 ├── apps/web/                      # React + Vite — protótipo funcional
 │   ├── index.html · vite.config.ts · tsconfig.json
-│   ├── public/                    # favicon.svg, manifest.webmanifest, logo-pei-vivo.png
+│   ├── public/                    # favicon.svg, manifest.webmanifest, logo-pei-vivo.webp (arte-fonte em design/)
 │   └── src/
 │       ├── main.tsx               # providers (sessão, anúncios) + router
 │       ├── routes/                # mapa de rotas (= arquitetura da informação) e RotaProtegida

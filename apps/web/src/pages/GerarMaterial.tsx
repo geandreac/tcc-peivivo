@@ -10,7 +10,7 @@ import { Alerta, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPa
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { PARAMETRO } from "../utils/rotulos";
-import { TEXTO_CICLO_DA_AGUA } from "../mocks/dados";
+import { TEXTO_CICLO_DA_AGUA } from "../mocks/exemplos";
 
 const MAX = 20_000;
 

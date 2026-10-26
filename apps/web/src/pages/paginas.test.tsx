@@ -12,6 +12,7 @@ import { api } from "../services";
 describe("Layout e navegação", () => {
   it("tem skip link, landmarks e um único h1 na tela inicial", async () => {
     const { container } = await renderizarApp("/");
+    await screen.findByRole("heading", { level: 1 }); // telas carregam sob demanda (React.lazy, D-48)
     const skip = screen.getByRole("link", { name: "Pular para o conteúdo principal" });
     expect(skip).toHaveAttribute("href", "#conteudo");
     expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -37,11 +38,11 @@ describe("Layout e navegação", () => {
 
   it("Ajuda e Acessibilidade existem e passam no axe", async () => {
     const a = await renderizarApp("/ajuda");
-    expect(screen.getByRole("heading", { level: 1, name: "Ajuda" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Ajuda" })).toBeInTheDocument();
     await semViolacoesAxe(a.container);
     a.unmount();
     const b = await renderizarApp("/acessibilidade");
-    expect(screen.getByRole("heading", { level: 1, name: "Acessibilidade" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Acessibilidade" })).toBeInTheDocument();
     await userEvent.click(screen.getByLabelText(/Alto contraste/));
     expect(document.documentElement).toHaveAttribute("data-contraste", "alto");
     await semViolacoesAxe(b.container);
@@ -291,7 +292,7 @@ describe("Reformulação R4 — navegação, linguagem e privacidade", () => {
 
   it("R4.6: tema escuro e leitura facilitada são preferências aplicadas no <html> e restauráveis", async () => {
     const { container } = await renderizarApp("/acessibilidade");
-    await userEvent.click(screen.getByRole("radio", { name: "Escuro" }));
+    await userEvent.click(await screen.findByRole("radio", { name: "Escuro" }));
     await userEvent.click(screen.getByRole("radio", { name: /Leitura facilitada/ }));
     expect(document.documentElement).toHaveAttribute("data-tema", "escuro");
     expect(document.documentElement).toHaveAttribute("data-leitura", "facilitada");
