@@ -8,6 +8,9 @@
  */
 import { z } from "zod";
 
+// Sem compilação JIT: o zod 4 testa `Function("")` e a CSP do app (sem unsafe-eval) registra violação a cada carga.
+z.config({ jitless: true });
+
 /**
  * Identificador no formato que o tipo `uuid` do Postgres aceita (8-4-4-4-12 hex).
  * O `uuid()` do zod 4 exige a versão RFC (1–8) e recusaria os ids do seed (versão 0).
