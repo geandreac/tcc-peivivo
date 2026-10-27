@@ -60,9 +60,10 @@ export function Layout() {
   });
 
   async function aoSair() {
+    // sai da rota protegida antes de zerar a sessão: senão a RotaProtegida redireciona para /entrar primeiro
+    navigate("/");
     await sair();
     anunciar("Você saiu da sua conta.", "neutro");
-    navigate("/");
   }
 
   return (
