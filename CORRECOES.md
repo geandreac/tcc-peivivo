@@ -150,3 +150,40 @@ Todas detalhadas em `CHECKLIST.md` §5:
 - decidir a reformatação com Prettier e a geração de OpenAPI;
 - `paginado()` nas listagens menores;
 - React 19, TypeScript 7 e vitest 5.
+
+---
+
+# Segunda rodada: plano de ação do CHECKLIST §4 (27/10/2026)
+
+**Branches**, empilhados sobre `chore/deps-breaking`, nesta ordem: `fix/paginacao-listas` → `chore/backup-script` → `style/prettier` → `chore/deps-major`.
+
+**PR:** #112 (`chore/deps-major` → `development`), com os 5 jobs do CI verdes no run `40433427658`, inclusive os 13 testes do Supabase real. O #111 (`audit/integracoes`) foi fechado em favor do #112: sozinho, ele falhava no CI por dois motivos corrigidos mais acima na pilha (o supabase-js 2.118 exige WebSocket nativo, do Node 22; e o `http.test.ts` precisa do import via `import.meta.url`).
+
+Nada foi executado contra o Supabase da nuvem.
+
+| Ação | Arquivos e motivo | Commit | Verificação | Situação |
+|---|---|---|---|---|
+| 5. Paginação restante | `services/supabase/{ciclo,escola,privacidade}.ts`: estudantes, vínculos, usuários, ciclos, versões, pendências, notificações, notas e consentimentos em `paginado()`, com desempate por `id`; `rpc()` simulado encadeável; teste com 1.500 estudantes | `42ceb9e` | 182 testes web, 20 E2E, cobertura | Feito |
+| 6. Backup | `scripts/backup-dados.mjs`, `npm run db:backup`, `backups/` no `.gitignore`, `IMPLANTACAO.md` §7.2 | `9293d11` | Sintaxe, lint e suíte | Parcial: não executado (leria a nuvem); homologação depende de vocês |
+| 7. Prettier | 109 arquivos + cópia Deno regenerada; `format:check` no CI | `b4410e9`, `4e4ffb0` | Suíte, 20 E2E, contraste 78/78, `db:validar`, lint | Feito |
+| CSP (regressão do zod 4) | `packages/contratos`: `z.config({ jitless: true })`. O zod 4 testava `Function("")` e a CSP registrava violação a cada carga (1 no modo real, 34 na demonstração). Passou despercebido na etapa 10c, porque o teste no navegador não foi refeito depois dela | `8205ead` | Build limpo servido com a CSP: 0 violações nos dois modos, 20 E2E | Feito |
+| 8a. React 19 | react/react-dom 19.3.1, tipos 19, lucide-react 1.61, Testing Library 16.3.3. O lockfile prendia uma cópia 18 na raiz e duas cópias quebravam 70 testes; foi corrigido. O "Sair" agora navega para `/` antes de zerar a sessão (no React 19, a RotaProtegida redirecionava para `/entrar` primeiro) | `44d7078` | 182 testes web, 20 E2E, produção no navegador sem erros e com 0 violações; chunk 254,57 → 335,11 kB | Feito (na primeira tentativa foi revertido; refeito e verificado) |
+| 8b. TypeScript 7 | — | — | O `typescript-eslint` 8.72.1 aceita só TypeScript abaixo da 6.1 | **Não feito:** bloqueado na origem |
+| 8c. vitest 5 | vitest e coverage-v8 5.0.5 (raiz e workspaces); CI em Node 22 nos 5 jobs | `6790122` | 434 testes, cobertura, `db:validar`; CI verde | Feito |
+| Extra: dependências dentro das faixas | axe-core e @axe-core/playwright 4.14, pglite 0.5.12, user-event 14.6.8 | `0025bf6` | 434 testes, 20 E2E, build | Feito |
+| 1. PRs e CI | PR #112 | — | 5/5 jobs verdes | Feito |
+| 2. CSP na preview | Link temporário da preview (conector Vercel, expira em 23 h) | — | 4 cabeçalhos presentes; tela de entrada sem mensagem de CSP | Parcial: a preview roda em modo demonstração (as variáveis do Supabase só existem em Production) |
+| 3. Nuvem / 4. Monitor | — | — | — | Dependem de vocês (`CHECKLIST.md` §5) |
+
+## Resultado depois da segunda rodada (`chore/deps-major`)
+
+| Comando | Depois da 1ª rodada | Depois da 2ª |
+|---|---|---|
+| `npm test` | 433 passaram + 13 pulados | **434 passaram** + 13 pulados (verdes no CI) |
+| `npm run test:coverage` | exit 0 | exit 0 (web 84,38 % das linhas, 81,29 % das funções) |
+| `npm run test:e2e` | 20 | 20 |
+| `npm run build` | chunk 254,57 kB | chunk 335,11 kB (React 19), sem aviso |
+| Prettier | só configurado | aplicado e conferido no CI |
+| `npm audit` | 0 | 0 |
+| Violações de CSP no build de produção | 34 (regressão do zod 4, não detectada) | **0** |
+| CHECKLIST (OK/PARCIAL/FALHA/NA/NV) | 44 / 15 / 0 / 1 / 1 | **45 / 14 / 0 / 1 / 1** |
