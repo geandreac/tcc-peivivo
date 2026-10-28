@@ -72,7 +72,7 @@ describe("Convites — preparar (como a coordenação)", () => {
   });
   it("PERMITIDO: coordenação com aal2 prepara convite e sabe se a pessoa já tem conta", async () => {
     const r = ok(await db.como("coordenacao", preparar("  NOVO@Example.TEST ", "DOCENTE")))[0]?.r as Record<string, unknown>;
-    expect(r).toEqual({ autorId: usuarioId("coordenacao"), email: "novo@example.test", jaTemConta: false });
+    expect(r).toEqual({ autorId: usuarioId("coordenacao"), email: "novo@example.test", jaTemConta: false, exigeAprovacao: false });
   });
 });
 

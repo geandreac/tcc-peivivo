@@ -375,6 +375,7 @@ policies `0002`). Aprovadas pela dupla em 07/10/2026.
 | D-47 | — | Limites de texto livre (`0010`): evidência ≤ 1.000, observação do desfecho ≤ 1.000 e nota clínica ≤ 5.000 caracteres, com o mesmo número no formulário (`maxLength`), no mock e no `check` do banco (`@pei-vivo/contratos`). Sem limite, um usuário autenticado gravava 1 MB pelo PostgREST (auditoria de 26/10/2026). `fn_registrar_material` serializa a chave do cache com `pg_advisory_xact_lock`, para que um clique duplo não gere dois rascunhos | completa D-20/D-37 |
 | D-48 | — | Listagens sem corte silencioso (`0011`): o painel da escola é agregado no banco (`fn_resumo_escola`, coordenação aal2), e `fn_listar_auditoria` aceita `p_limite`/`p_deslocamento`. No app, `listarObservacoes`, `listarMateriais` e `listarAuditoria` recebem `pagina?` (mesma semântica no mock e no real); sem página, o modo real busca em lotes de 1000 (`max_rows`) até o fim. Materiais do estudante (10) e trilha do histórico (20) têm "Carregar mais" | completa D-17/D-30 |
 | D-49 | — | Login real em cartão central (imagem, formulário em coluna, "Lembrar de mim" / "Esqueci a senha", botão largo, "Criar conta" no rodapé). "Lembrar de mim" escolhe onde o supabase-js guarda a sessão: marcado, `localStorage` (sobrevive ao fechar o navegador); desmarcado (padrão, mais seguro em aparelho compartilhado), `sessionStorage`. Só o token de login fica no navegador (RNF05). "Criar conta" não abre cadastro: `/criar-conta` explica que a conta nasce do convite da escola (D-32). O site da Vercel passa a usar a nuvem (`VITE_API=supabase` em Production); a demonstração com perfis fictícios fica para uso local, testes e E2E | completa D-32 |
+| D-50 | — | Painel administrativo (`0012`). **Administrador Geral** é papel de plataforma (`administradores`, 1º por script, aal2) que gerencia contas e acessos e **nunca lê dado de estudante** (não tem vínculo nem escola; nenhuma política o deixa passar). **Coordenação** é o perfil administrativo limitado: o mesmo painel, só na própria escola, sem editar perfis, ferramentas e configurações. **Perfis de acesso** com teto fixo (`catalogo_permissoes`, só o que o banco impõe: observação, gerar e aprovar material, validar, ler e registrar nota clínica, painel da escola); derivados ficam abaixo do teto (`tg_perfil_teto`, 22023). **Ferramentas** ligam e desligam esses módulos no sistema todo (`privado.pode`, sempre com AND às regras antigas). **Ponto único de bloqueio**: `privado.usuario_atual()` é nulo para suspenso, removido, expirado ou aguardando aprovação. Convite pelo painel com perfil, permissões removidas, organização, validade e aprovação (externos exigem aprovação por padrão). Toda mudança vai para a `auditoria` com responsável, ação e data, sem motivo nem evento de estudante. Exportação (RF15) fica fora das ferramentas: é montada no cliente e o banco não teria como impô-la | substitui a D-23 em "sem painel de super-admin"; completa D-32/D-34 |
 
 **Restrição de ambiente (07/10/2026):** a máquina de desenvolvimento não roda
 Docker. Banco validado localmente em PGlite; Supabase real só no CI.
@@ -689,6 +690,18 @@ celular. Lê muito, escreve pouco.
 | Sem auditoria | — | D-06 |
 
 ---
+
+### 5.5 Administração (D-50)
+
+O **Administrador Geral** é um papel de plataforma, acima das escolas, criado só pelo script de implantação e sempre com verificação em duas etapas. A **coordenação** usa o mesmo painel como perfil administrativo limitado, restrita à própria escola.
+
+| | Administrador Geral | Coordenação (no painel) |
+|---|---|---|
+| **Vê** | Pessoas de todas as escolas (nome, e-mail, organização, perfil, situação, último login), perfis, ferramentas, configurações e a trilha de atividades administrativas | Quem atua na escola dela, perfis, ferramentas e configurações (só leitura) e a trilha da escola |
+| **Escreve** | Cria acessos (docente e coordenação), suspende, reativa, remove, aprova, recusa, define perfil, permissões e validade; cria, altera e arquiva perfis derivados; liga e desliga ferramentas; altera as configurações | Cria acessos da escola (docente, responsável, profissional de saúde), suspende, reativa, remove (só na escola), aprova, recusa, define perfil e validade |
+| **Nunca vê** | Estudantes, observações, perfis de aprendizagem, materiais, notas clínicas e o motivo de uma suspensão na trilha | Outra escola, outra coordenação, Administradores Gerais e o próprio acesso como editável |
+
+Regras: ninguém altera o próprio acesso; Administradores Gerais são geridos só por script; todo perfil derivado fica abaixo do teto do papel; suspenso, removido, expirado ou aguardando aprovação não entra e não age (o bloqueio está em `privado.usuario_atual()`); toda ação vai para a trilha com responsável, ação e data. Testes: `packages/politicas/src/administracao.test.ts` (33), `apps/web/src/services/mockApi.test.ts` (13 cenários D-50), `apps/web/src/pages/admin.test.tsx` (16) e `apps/web/e2e/admin.spec.ts` (6 × 2 larguras).
 
 ## 6. Matriz de permissões v2 (substitui o Quadro 7)
 

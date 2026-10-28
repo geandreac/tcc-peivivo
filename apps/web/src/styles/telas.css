@@ -192,3 +192,190 @@ main > .container > .lista-simples li {
     transition: none;
   }
 }
+
+/* ----------------------------------------------------------- Painel administrativo (D-50) */
+.cabecalho-admin {
+  margin-bottom: var(--esp-5);
+}
+.cabecalho-admin__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--esp-3) var(--esp-5);
+}
+.cabecalho-admin h1 {
+  margin: 0;
+}
+.cabecalho-admin__escopo {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-meta);
+  font-weight: var(--peso-medio);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cabecalho-admin__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  margin-top: var(--esp-3);
+}
+.cabecalho-admin__acoes:empty {
+  display: none;
+}
+.busca-admin {
+  display: flex;
+  gap: var(--esp-2);
+  flex: 1 1 18rem;
+  max-width: 28rem;
+}
+.busca-admin .campo__controle {
+  min-width: 0;
+}
+
+.filtros-admin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0 var(--esp-4);
+  margin-bottom: var(--esp-4);
+}
+.filtros-admin .campo {
+  flex: 1 1 14rem;
+  margin-bottom: var(--esp-3);
+}
+.filtros-admin > .botao {
+  margin-bottom: var(--esp-3);
+}
+
+.acoes-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-1) var(--esp-3);
+}
+.tabela-cartoes th .meta {
+  font-weight: var(--peso-normal);
+}
+.acoes-linha .botao--discreto {
+  padding-inline: var(--esp-2);
+}
+
+.card--destaque {
+  border-left: 4px solid var(--cor-primaria);
+}
+.lista-cartoes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--esp-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+}
+.lista-compacta {
+  padding-left: 1.25em;
+}
+.lista-compacta li + li {
+  margin-top: var(--esp-1);
+}
+
+/* etapas do "Criar acesso": o número e o texto dizem a etapa; a cor só reforça */
+.etapas {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--esp-4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-4);
+  color: var(--cor-texto-secundario);
+}
+.etapas li {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+.etapas__numero {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--raio-pill);
+  border: 2px solid var(--cor-borda);
+  font-weight: var(--peso-negrito);
+}
+.etapas li[aria-current="step"] {
+  color: var(--cor-texto);
+  font-weight: var(--peso-negrito);
+}
+.etapas li[aria-current="step"] .etapas__numero {
+  background: var(--cor-primaria);
+  border-color: var(--cor-primaria);
+  color: var(--cor-sobre-primaria);
+}
+.etapas__feita .etapas__numero {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.matriz-permissoes td,
+.matriz-permissoes th[scope="col"] {
+  text-align: center;
+}
+
+/* tabelas viram cartões no celular: cada célula traz o próprio rótulo */
+@media (max-width: 40em) {
+  .tabela-cartoes thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .tabela-cartoes,
+  .tabela-cartoes tbody,
+  .tabela-cartoes tr,
+  .tabela-cartoes th,
+  .tabela-cartoes td {
+    display: block;
+    width: 100%;
+  }
+  .tabela-cartoes caption {
+    display: block;
+    text-align: left;
+  }
+  .tabela-cartoes tr {
+    border: 1px solid var(--cor-borda-suave);
+    border-radius: var(--raio-md);
+    padding: var(--esp-2) var(--esp-3);
+    margin-bottom: var(--esp-3);
+    background: var(--cor-superficie);
+  }
+  .tabela-cartoes th,
+  .tabela-cartoes td {
+    border: 0;
+    padding: var(--esp-1) 0;
+  }
+  .tabela-cartoes [data-rotulo]::before {
+    content: attr(data-rotulo);
+    display: block;
+    color: var(--cor-texto-secundario);
+    font-size: var(--texto-meta);
+    font-weight: var(--peso-medio);
+  }
+  .busca-admin {
+    max-width: none;
+  }
+}
+
+/* seis itens na barra inferior do celular: duas linhas de três */
+@media (max-width: 47.99em) {
+  .nav-app--admin ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .app--com-nav:has(.nav-app--admin) main > .container {
+    padding-bottom: calc(var(--esp-8) + 7rem);
+  }
+}

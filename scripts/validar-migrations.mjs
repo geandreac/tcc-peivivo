@@ -11,7 +11,7 @@ const dirMigrations = join(raiz, "supabase", "migrations");
 // Stub mínimo do que o Supabase provê e as migrations referenciam.
 const stubSupabase = `
   create schema if not exists auth;
-  create table if not exists auth.users (id uuid primary key);
+  create table if not exists auth.users (id uuid primary key, last_sign_in_at timestamptz);
   -- Mesma leitura que o Supabase faz: claim.sub legado ou request.jwt.claims (JSON).
   create or replace function auth.jwt() returns jsonb language sql stable as $$
     select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb

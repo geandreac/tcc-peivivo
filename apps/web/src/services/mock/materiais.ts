@@ -30,6 +30,7 @@ export function materiais(ctx: ContextoMock) {
       ctx.chamada(() => {
         ctx.exigirPapel(estudanteId, "DOCENTE");
         ctx.exigirConsentimento(estudanteId);
+        ctx.exigirFerramenta("GERACAO_MATERIAL", "EDITAR", "A geração de material não está liberada para este acesso.");
         const t = texto.trim();
         if (t.length < 1 || t.length > 20_000) throw new ErroApi("VALIDACAO", "O texto precisa ter entre 1 e 20.000 caracteres.");
         const vigente = ctx.versaoVigente(estudanteId);
@@ -67,6 +68,7 @@ export function materiais(ctx: ContextoMock) {
         ctx.exigirPapel(m.estudanteId, "DOCENTE");
         ctx.exigirAutor(m);
         ctx.exigirConsentimento(m.estudanteId);
+        ctx.exigirFerramenta("GERACAO_MATERIAL", "APROVAR", "A aprovação de material não está liberada para este acesso.");
         if (m.statusAprovacao !== "RASCUNHO") throw new ErroApi("CONFLITO", "Só rascunhos podem ser aprovados.");
         m.statusAprovacao = "APROVADO";
         m.textoRevisado = textoRevisado?.trim() || null;
@@ -80,6 +82,7 @@ export function materiais(ctx: ContextoMock) {
         if (!m) throw new ErroApi("NAO_ENCONTRADO", "Material não encontrado.");
         ctx.exigirPapel(m.estudanteId, "DOCENTE");
         ctx.exigirAutor(m);
+        ctx.exigirFerramenta("GERACAO_MATERIAL", "APROVAR", "A aprovação de material não está liberada para este acesso.");
         if (m.statusAprovacao !== "RASCUNHO") throw new ErroApi("CONFLITO", "Só rascunhos podem ser descartados.");
         m.statusAprovacao = "DESCARTADO";
         ctx.registrarAuditoria("materiais_adaptados", m.id, "DESCARTE_MATERIAL");

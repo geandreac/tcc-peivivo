@@ -17,7 +17,8 @@ function pagina<M>(carregar: () => Promise<M>, nome: keyof M) {
 
 /**
  * Mapa de rotas = arquitetura da informação (docs/ux-ui.md §1).
- * Um layout só; o que muda por papel é o conteúdo, nunca um "modo admin".
+ * Um layout só; o que muda por papel é o conteúdo. O painel administrativo (D-50) usa o mesmo
+ * layout e a mesma navegação, só com outros itens.
  */
 export const rotas = [
   {
@@ -56,6 +57,16 @@ export const rotas = [
           { path: "/materiais/:id", element: pagina(() => import("../pages/MaterialFinal"), "MaterialFinal") },
           { path: "/materiais/:id/revisar", element: pagina(() => import("../pages/RevisarMaterial"), "RevisarMaterial") },
           { path: "/materiais/:id/desfecho", element: pagina(() => import("../pages/Desfecho"), "Desfecho") },
+          // D-50: painel administrativo (Administrador Geral e coordenação; quem decide é o banco)
+          { path: "/admin", element: pagina(() => import("../pages/AdminVisaoGeral"), "AdminVisaoGeral") },
+          { path: "/admin/usuarios", element: pagina(() => import("../pages/AdminUsuarios"), "AdminUsuarios") },
+          { path: "/admin/usuarios/novo", element: pagina(() => import("../pages/AdminCriarAcesso"), "AdminCriarAcesso") },
+          { path: "/admin/usuarios/:id", element: pagina(() => import("../pages/AdminUsuario"), "AdminUsuario") },
+          { path: "/admin/perfis", element: pagina(() => import("../pages/AdminPerfis"), "AdminPerfis") },
+          { path: "/admin/ferramentas", element: pagina(() => import("../pages/AdminFerramentas"), "AdminFerramentas") },
+          { path: "/admin/auditoria", element: pagina(() => import("../pages/AdminAuditoria"), "AdminAuditoria") },
+          { path: "/admin/configuracoes", element: pagina(() => import("../pages/AdminConfiguracoes"), "AdminConfiguracoes") },
+          { path: "/admin/busca", element: pagina(() => import("../pages/AdminBusca"), "AdminBusca") },
         ],
       },
       { path: "*", element: <NaoEncontrada /> },

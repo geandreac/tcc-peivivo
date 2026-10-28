@@ -15,15 +15,29 @@ export interface DadosConvite {
   estudanteId: string | null;
   registroConselho: string | null;
   conferidoPresencialmente: boolean;
+  /** D-50: campos do painel administrativo (o banco valida perfil, teto e validade). */
+  perfilId: string | null;
+  permissoesRemovidas: string[];
+  organizacao: string | null;
+  acessoExpiraEm: string | null;
+  exigeAprovacao: boolean | null;
+}
+
+export interface PreparoConvite {
+  autorId: string;
+  email: string;
+  jaTemConta: boolean;
+  /** Resolvido pelo banco (configuração do sistema quando o corpo não diz). */
+  exigeAprovacao?: boolean;
 }
 
 export interface PortasConvidar {
   /** `fn_preparar_convite` com o JWT de quem convida. */
-  preparar(e: DadosConvite): Promise<{ autorId: string; email: string; jaTemConta: boolean }>;
+  preparar(e: DadosConvite): Promise<PreparoConvite>;
   /** Auth admin: cria a conta e envia o e-mail. Devolve o id da conta, ou null se já havia convite pendente no Auth. */
   convidarNoAuth(email: string): Promise<string | null>;
   /** `fn_registrar_convite` com service role. */
-  registrar(r: DadosConvite & { autorId: string; authUserId: string | null; nome: string }): Promise<unknown>;
+  registrar(r: Omit<DadosConvite, "exigeAprovacao"> & { autorId: string; authUserId: string | null; nome: string; exigeAprovacao: boolean }): Promise<unknown>;
   /** Auth admin: apaga a conta criada por `convidarNoAuth` quando o registro falha (o link do e-mail deixa de valer). */
   desfazerNoAuth?(authUserId: string): Promise<void>;
 }
@@ -42,9 +56,14 @@ export async function convidar(corpo: unknown, portas: PortasConvidar): Promise<
     estudanteId: e.estudanteId,
     registroConselho: e.registroConselho,
     conferidoPresencialmente: e.conferidoPresencialmente,
+    perfilId: e.perfilId,
+    permissoesRemovidas: e.permissoesRemovidas,
+    organizacao: e.organizacao,
+    acessoExpiraEm: e.acessoExpiraEm,
+    exigeAprovacao: e.exigeAprovacao,
   };
 
-  let preparo: { autorId: string; email: string; jaTemConta: boolean };
+  let preparo: PreparoConvite;
   try {
     preparo = await portas.preparar(dados);
   } catch (erro) {
@@ -66,11 +85,13 @@ export async function convidar(corpo: unknown, portas: PortasConvidar): Promise<
 
   try {
     // o autor vem do banco (auth.uid()), nunca do corpo
-    await portas.registrar({ ...dados, email: preparo.email, autorId: preparo.autorId, authUserId, nome: e.nome });
+    // o autor e a exigência de aprovação vêm do banco, nunca do corpo
+    const exigeAprovacao = preparo.exigeAprovacao ?? false;
+    await portas.registrar({ ...dados, email: preparo.email, autorId: preparo.autorId, authUserId, nome: e.nome, exigeAprovacao });
   } catch (erro) {
     // Compensação: conta criada agora, sem acesso registrado → apaga, senão o e-mail leva a uma conta vazia.
     if (authUserId) await portas.desfazerNoAuth?.(authUserId).catch(() => undefined);
     throw deErroBanco(erro);
   }
-  return { emailEnviado, avisos };
+  return { emailEnviado, exigeAprovacao: preparo.exigeAprovacao ?? false, avisos };
 }

@@ -36,6 +36,12 @@ export const USUARIOS: Usuario[] = [
   { id: ID.coordenacao, nome: "Coordenação (fictícia)", email: "coordenacao.dev@example.test", papelInstitucional: "COORDENACAO" },
   { id: ID.docente2, nome: "Paulo (fictício)", email: "docente2.dev@example.test", papelInstitucional: null },
   { id: ID.fono, nome: "Beatriz (fictícia)", email: "fono.dev@example.test", papelInstitucional: null },
+  // D-50: Administrador Geral e acessos em cada situação do painel (sem vínculo com estudante)
+  { id: ID.admin, nome: "Administração Geral (fictícia)", email: "admin.dev@example.test", papelInstitucional: null, papelPlataforma: "ADMIN_GERAL" },
+  { id: ID.docenteSuspensa, nome: "Lúcia (fictícia)", email: "docente3.dev@example.test", papelInstitucional: null },
+  { id: ID.profissionalExpirado, nome: "Ricardo (fictício)", email: "terapeuta.dev@example.test", papelInstitucional: null },
+  { id: ID.externoAguardando, nome: "Henrique (fictício)", email: "externo.dev@example.test", papelInstitucional: null },
+  { id: ID.docenteConvidada, nome: "Joana (fictícia)", email: "convidada.dev@example.test", papelInstitucional: null },
 ];
 
 export const ESTUDANTES: Estudante[] = [
@@ -319,3 +325,30 @@ export const AUDITORIA: Auditoria[] = [
     detalhes: { numeroCiclo: 3 },
   },
 ];
+
+// ------------------------------------------------------------------ D-50: administração (fictícia)
+import type { AcessoMock } from "../services/mock/contexto";
+
+export const ESCOLA = { id: ID.escola, nome: "Escola Municipal Aurora (fictícia)" };
+
+/** Situação de acesso de quem aparece no painel. Quem não está aqui está ATIVO, sem perfil derivado. */
+export const ACESSOS: Record<string, AcessoMock> = {
+  [ID.docenteSuspensa]: {
+    papel: "DOCENTE",
+    suspensoEm: diasAtras(3),
+    motivoSuspensao: "Afastamento temporário (fictício)",
+    ultimoLogin: diasAtras(12),
+  },
+  [ID.profissionalExpirado]: {
+    papel: "PROFISSIONAL_SAUDE",
+    organizacao: "Clínica Girassol (fictícia)",
+    acessoExpiraEm: diasAtras(2),
+    ultimoLogin: diasAtras(40),
+  },
+  [ID.externoAguardando]: {
+    papel: "PROFISSIONAL_SAUDE",
+    organizacao: "Centro Terapêutico Horizonte (fictício)",
+    aguardandoAprovacao: true,
+  },
+  [ID.docenteConvidada]: { papel: "DOCENTE", convitePendente: true },
+};

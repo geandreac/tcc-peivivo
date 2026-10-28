@@ -46,6 +46,7 @@ export function ciclo(ctx: ContextoMock) {
         if (!ciclo) throw new ErroApi("NAO_ENCONTRADO", "Ciclo não encontrado.");
         const papel = ctx.exigirPapel(ciclo.estudanteId, "DOCENTE", "RESPONSAVEL", "PROFISSIONAL_SAUDE");
         ctx.exigirConsentimento(ciclo.estudanteId);
+        ctx.exigirFerramenta("OBSERVACAO", "EDITAR", "O registro de observações não está liberado para este acesso.");
         if (ciclo.status !== "ABERTO") throw new ErroApi("CONFLITO", "Este ciclo já foi fechado.");
         ctx.exigirTamanho(dados.evidencia, LIMITE_EVIDENCIA, "A evidência");
         const o: ObservacaoRegistro = {
@@ -146,6 +147,7 @@ export function ciclo(ctx: ContextoMock) {
         if (!v) throw new ErroApi("NAO_ENCONTRADO", "Versão não encontrada.");
         ctx.exigirPapel(v.estudanteId, "PROFISSIONAL_SAUDE");
         ctx.exigirConsentimento(v.estudanteId);
+        ctx.exigirFerramenta("VALIDACAO", "APROVAR", "A validação de parâmetros não está liberada para este acesso.");
         // D-35: só PENDENTE é decidida; expirada não volta (RN05); nunca por cima de vigente mais nova.
         if (v.statusValidacao !== "PENDENTE") throw new ErroApi("CONFLITO", "Só propostas pendentes podem ser decididas.");
         const vigente = ctx.versaoVigente(v.estudanteId);
@@ -192,6 +194,7 @@ export function ciclo(ctx: ContextoMock) {
         ctx.aplicarExpiracao();
         const ids = ctx.estado.vinculos.filter((v) => v.usuarioId === u.id && v.status === "ATIVO" && v.papel === "COORDENACAO").map((v) => v.estudanteId);
         if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "O painel da escola é da coordenação pedagógica.");
+        ctx.exigirFerramenta("PAINEL_ESCOLA", "VER", "O painel da escola não está liberado para este acesso.");
         const resumo: ResumoEscola = {
           totalEstudantes: ids.length,
           comConsentimento: 0,

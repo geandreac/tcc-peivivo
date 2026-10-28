@@ -14,6 +14,7 @@ export function privacidade(ctx: ContextoMock) {
         if (p !== "PROFISSIONAL_SAUDE") {
           throw new ErroApi("NEGADO", "Nota clínica reservada: acesso exclusivo do profissional de saúde vinculado.");
         }
+        ctx.exigirFerramenta("NOTAS_CLINICAS", "VER", "A leitura de notas clínicas não está liberada para este acesso.");
         ctx.registrarAuditoria("notas_clinicas", estudanteId, "LEITURA_NOTA_CLINICA"); // D-30: toda leitura vira evento
         ctx.salvar();
         return ctx.estado.notas.filter((n) => n.estudanteId === estudanteId).sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro));
@@ -21,6 +22,7 @@ export function privacidade(ctx: ContextoMock) {
     registrarNotaClinica: (estudanteId, conteudo) =>
       ctx.chamada(() => {
         ctx.exigirPapel(estudanteId, "PROFISSIONAL_SAUDE");
+        ctx.exigirFerramenta("NOTAS_CLINICAS", "EDITAR", "O registro de notas clínicas não está liberado para este acesso.");
         if (!conteudo.trim()) throw new ErroApi("VALIDACAO", "Escreva o conteúdo da nota.");
         ctx.exigirTamanho(conteudo, LIMITE_NOTA_CLINICA, "A nota");
         const n: NotaClinica = { id: uuid(), estudanteId, profissionalId: ctx.eu().id, conteudo: conteudo.trim(), dataRegistro: ctx.agora() };

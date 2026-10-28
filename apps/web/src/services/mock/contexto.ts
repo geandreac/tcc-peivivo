@@ -6,7 +6,7 @@
  */
 import type { ObservacaoHistorica, ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 import { calcularFechamento } from "@pei-vivo/funcoes";
-import { DIAS_EXPIRACAO_VALIDACAO, MS_POR_DIA } from "@pei-vivo/contratos";
+import { DIAS_EXPIRACAO_VALIDACAO, FERRAMENTAS, MS_POR_DIA, TETO, type Ferramenta, type PapelBase } from "@pei-vivo/contratos";
 import type { NovoEstudante, Pagina, PeiVivoApi } from "../api";
 import { ErroApi } from "../erros";
 import type {
@@ -26,8 +26,57 @@ import type {
   Usuario,
   VersaoPerfil,
   Vinculo,
+  PerfilAcesso,
+  SituacaoAcesso,
 } from "../tipos";
 import * as semente from "../../mocks/dados";
+
+/** D-50: o que o banco guarda em `usuarios` sobre o acesso (0012). */
+export interface AcessoMock {
+  /** Papel do convite, para quem ainda não tem vínculo (exibição e validação do perfil). */
+  papel?: PapelBase;
+  perfilId?: string | null;
+  permissoesRemovidas?: string[];
+  organizacao?: string | null;
+  acessoExpiraEm?: string | null;
+  aguardandoAprovacao?: boolean;
+  convitePendente?: boolean;
+  suspensoEm?: string | null;
+  motivoSuspensao?: string | null;
+  removidoEm?: string | null;
+  ultimoLogin?: string | null;
+}
+
+export interface EventoAdminMock {
+  id: string;
+  criadoEm: string;
+  evento: string;
+  autorId: string | null;
+  papelAutor: "ADMIN_GERAL" | "COORDENACAO";
+  entidade: string;
+  entidadeId: string | null;
+  detalhes: Record<string, unknown>;
+}
+
+/** Perfis base (sistema): mesmos nomes e teto da semente da 0012. */
+export const PERFIS_BASE: Omit<PerfilAcesso, "usuarios">[] = (
+  [
+    ["perfil-admin", "Administração geral", "ADMIN_GERAL", "Controle completo de contas, perfis, ferramentas e configurações. Nunca abre dados de estudante."],
+    ["perfil-coord", "Coordenação pedagógica", "COORDENACAO", "Administra os acessos da própria escola e abre o painel da escola."],
+    ["perfil-docente", "Docente regente", "DOCENTE", "Observa, gera e aprova material dos estudantes vinculados."],
+    ["perfil-resp", "Responsável legal", "RESPONSAVEL", "Concede o consentimento e registra observações de casa."],
+    ["perfil-saude", "Profissional de saúde", "PROFISSIONAL_SAUDE", "Valida os parâmetros do ciclo e mantém notas clínicas reservadas."],
+  ] as const
+).map(([id, nome, papelBase, descricao]) => ({
+  id,
+  nome,
+  descricao,
+  papelBase,
+  permissoes: [...TETO[papelBase]],
+  teto: [...TETO[papelBase]],
+  sistema: true,
+  arquivadoEm: null,
+}));
 
 export interface Estado {
   usuarios: Usuario[];
@@ -42,9 +91,15 @@ export interface Estado {
   notas: NotaClinica[];
   auditoria: Auditoria[];
   notificacoes: Notificacao[];
+  // D-50
+  acessos: Record<string, AcessoMock>;
+  perfis: Omit<PerfilAcesso, "usuarios">[];
+  ferramentas: Record<Ferramenta, { disponivel: boolean; alteradoEm: string | null }>;
+  configuracoes: { exigirAprovacaoExternos: boolean; validadePadraoDias: number; alteradoEm: string | null };
+  eventosAdmin: EventoAdminMock[];
 }
 
-export const CHAVE_ESTADO = "pei-vivo:demo:v3"; // v3: âncora do ciclo 3 só com o tema (navegadores com a demo antiga recebem os dados novos)
+export const CHAVE_ESTADO = "pei-vivo:demo:v4"; // v4: painel administrativo (D-50); navegadores com a demo antiga recebem os dados novos
 export const CHAVE_SESSAO = "pei-vivo:sessao";
 
 export const clonar = <T>(v: T): T => (v === undefined ? v : (JSON.parse(JSON.stringify(v)) as T));
@@ -63,8 +118,32 @@ export function estadoInicial(): Estado {
     notas: semente.NOTAS_CLINICAS,
     auditoria: semente.AUDITORIA,
     notificacoes: [],
+    acessos: semente.ACESSOS,
+    perfis: PERFIS_BASE,
+    ferramentas: Object.fromEntries(FERRAMENTAS.map((f) => [f, { disponivel: true, alteradoEm: null }])) as Estado["ferramentas"],
+    configuracoes: { exigirAprovacaoExternos: true, validadePadraoDias: 180, alteradoEm: null },
+    eventosAdmin: [],
   });
 }
+
+/** D-50: espelha privado.situacao_usuario (0012). */
+export function situacaoDe(a: AcessoMock | undefined, agora = Date.now()): SituacaoAcesso {
+  if (a?.removidoEm) return "REMOVIDO";
+  if (a?.suspensoEm) return "SUSPENSO";
+  if (a?.acessoExpiraEm && new Date(a.acessoExpiraEm).getTime() <= agora) return "EXPIRADO";
+  if (a?.aguardandoAprovacao) return "AGUARDANDO_APROVACAO";
+  if (a?.convitePendente) return "CONVITE_PENDENTE";
+  return "ATIVO";
+}
+
+/** Mensagem que o banco dá quando `privado.usuario_atual()` é nulo. */
+export const MOTIVO_BLOQUEIO: Partial<Record<SituacaoAcesso, string>> = {
+  SUSPENSO: "Seu acesso está suspenso. Fale com a coordenação da escola.",
+  REMOVIDO: "Seu acesso foi encerrado. Fale com a coordenação da escola.",
+  EXPIRADO: "O prazo do seu acesso terminou. Peça à coordenação da escola para renovar.",
+  AGUARDANDO_APROVACAO: "Seu acesso ainda aguarda a aprovação da escola.",
+  CONVITE_PENDENTE: "Aceite o convite enviado por e-mail para entrar.",
+};
 
 export function uuid(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
@@ -106,6 +185,7 @@ export function criarContextoMock(opcoes: OpcoesMock = {}) {
 
   let estado: Estado = (persistir && lerStorage<Estado>(CHAVE_ESTADO)) || estadoInicial();
   estado.notificacoes ??= [];
+  estado.eventosAdmin ??= [];
   let sessaoId: string | null = persistir ? lerStorage<string>(CHAVE_SESSAO) : null;
   let falhaAtiva = false;
 
@@ -121,7 +201,24 @@ export function criarContextoMock(opcoes: OpcoesMock = {}) {
   function eu(): Usuario {
     const u = sessaoId ? estado.usuarios.find((x) => x.id === sessaoId) : undefined;
     if (!u) throw new ErroApi("NAO_AUTENTICADO", "Entre para continuar.");
+    // D-50: ponto único de bloqueio, como privado.usuario_atual() na 0012
+    const motivo = MOTIVO_BLOQUEIO[situacaoDe(estado.acessos[u.id])];
+    if (motivo) throw new ErroApi("NEGADO", motivo);
     return u;
+  }
+
+  /** D-50: espelha privado.usuario_pode — ferramenta ligada + no perfil (sem perfil = teto) − removidas. */
+  function usuarioPode(usuarioId: string, ferramenta: Ferramenta, acao: "VER" | "EDITAR" | "APROVAR"): boolean {
+    if (!estado.ferramentas[ferramenta]?.disponivel) return false;
+    const a = estado.acessos[usuarioId];
+    if (situacaoDe(a) !== "ATIVO") return false;
+    const chave = `${ferramenta}:${acao}`;
+    const perfil = a?.perfilId ? estado.perfis.find((p) => p.id === a.perfilId) : undefined;
+    if (perfil && !perfil.permissoes.includes(chave)) return false;
+    return !(a?.permissoesRemovidas ?? []).includes(chave);
+  }
+  function exigirFerramenta(ferramenta: Ferramenta, acao: "VER" | "EDITAR" | "APROVAR", mensagem: string) {
+    if (!usuarioPode(eu().id, ferramenta, acao)) throw new ErroApi("NEGADO", mensagem);
   }
 
   /** `fn_meu_papel` — vínculo ATIVO do usuário atual com o estudante (D-14: um só). */
@@ -283,6 +380,8 @@ export function criarContextoMock(opcoes: OpcoesMock = {}) {
     latencia,
     chamada,
     eu,
+    usuarioPode,
+    exigirFerramenta,
     meuPapel,
     temConsentimento,
     exigirPapel,

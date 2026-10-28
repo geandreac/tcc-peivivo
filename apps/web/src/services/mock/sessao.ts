@@ -1,7 +1,7 @@
 /** Sessão da demonstração: entrar escolhendo um perfil fictício; o que exige Supabase responde que só existe no modo real. */
 import type { PeiVivoApi } from "../api";
 import { ErroApi } from "../erros";
-import { gravarStorage, CHAVE_SESSAO, type ContextoMock } from "./contexto";
+import { gravarStorage, CHAVE_SESSAO, MOTIVO_BLOQUEIO, situacaoDe, type ContextoMock } from "./contexto";
 
 export function sessao(ctx: ContextoMock) {
   return {
@@ -21,6 +21,11 @@ export function sessao(ctx: ContextoMock) {
       ctx.chamada(() => {
         const u = ctx.estado.usuarios.find((x) => x.id === usuarioId);
         if (!u) throw new ErroApi("NAO_ENCONTRADO", "Perfil não encontrado.");
+        // D-50: suspenso, expirado, aguardando aprovação ou com convite pendente não entra
+        const motivo = MOTIVO_BLOQUEIO[situacaoDe(ctx.estado.acessos[u.id])];
+        if (motivo) throw new ErroApi("NEGADO", motivo);
+        (ctx.estado.acessos[u.id] ??= {}).ultimoLogin = ctx.agora();
+        ctx.salvar();
         ctx.sessaoId = u.id;
         if (ctx.persistir) gravarStorage(CHAVE_SESSAO, ctx.sessaoId);
         return u;
