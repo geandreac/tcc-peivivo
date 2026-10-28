@@ -180,7 +180,7 @@ Nenhum problema de **segurança** foi encontrado: todo acesso proibido foi barra
 
 ## 9. O que o site publicado ainda não mostra
 
-- **Login real:** o site da Vercel roda em modo demonstração. O banco real na nuvem já tem as migrations 0001–0009, as 3 Edge Functions e a primeira escola ("Escola Piloto PEI Vivo"), mas o site publicado ainda não está ligado a ele. Para mostrar o modo real, rode localmente com `VITE_API=supabase` (ver `docs/reformulacao/IMPLANTACAO.md` §7) ou mostre os testes do CI contra o Supabase real.
+- **Demonstração com perfis fictícios:** desde a D-49 o site da Vercel usa o banco real da nuvem e entra com e-mail e senha (conta só por convite). A porta com os perfis fictícios continua disponível localmente: `cd apps/web && VITE_API=mock npx vite --port 5179`.
 - **IA:** desligada por decisão de projeto; só a camada determinística roda (trechos, etapas, contraste).
 
 ---

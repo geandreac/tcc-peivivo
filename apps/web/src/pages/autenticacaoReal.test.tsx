@@ -56,6 +56,30 @@ describe("Entrar com e-mail e senha (modo real)", () => {
     expect(senha).toHaveAttribute("type", "text");
   });
 
+  it("cartão: lembrar de mim desmarcado por padrão e repassado ao entrar; esqueci a senha e criar conta", async () => {
+    modoReal(null);
+    const entrar = vi.spyOn(api, "entrarComSenha").mockResolvedValue({ usuario: DOCENTE, exigeSegundoFator: false, temFatorCadastrado: false });
+    await renderizarApp("/entrar");
+    const lembrar = await screen.findByRole("checkbox", { name: "Lembrar de mim" });
+    expect(lembrar).not.toBeChecked();
+    expect(screen.getByRole("link", { name: "Esqueci a senha" })).toHaveAttribute("href", "/recuperar-senha");
+    expect(screen.getByRole("link", { name: "Criar conta" })).toHaveAttribute("href", "/criar-conta");
+    await userEvent.type(screen.getByLabelText(/E-mail/), DOCENTE.email);
+    await userEvent.type(screen.getByLabelText(/^Senha/), "senha-ficticia-123");
+    await userEvent.click(lembrar);
+    await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
+    await waitFor(() => expect(entrar).toHaveBeenCalledWith(DOCENTE.email, "senha-ficticia-123", true));
+  });
+
+  it("criar conta explica que a conta nasce do convite (não há cadastro aberto) e passa no axe", async () => {
+    modoReal(null);
+    const { container } = await renderizarApp("/criar-conta");
+    expect(await screen.findByRole("heading", { level: 1, name: "Criar conta" })).toBeInTheDocument();
+    expect(screen.getByText(/A conta nasce de um convite da escola/)).toBeInTheDocument();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    await semViolacoesAxe(container);
+  });
+
   it("perfil que exige segundo fator vai para a verificação antes de qualquer tela", async () => {
     modoReal(null);
     vi.spyOn(api, "entrarComSenha").mockResolvedValue({ usuario: SAUDE, exigeSegundoFator: true, temFatorCadastrado: true });
