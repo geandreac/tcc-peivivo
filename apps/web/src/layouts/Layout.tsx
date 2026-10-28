@@ -159,7 +159,14 @@ export function Layout() {
       <footer className="rodape">
         <div className="container">
           <p>
-            PEI Vivo — TCC de Sistemas de Informação, CEUNI FAMETRO, 2026. Protótipo com dados <strong>fictícios</strong>; a camada de IA está desligada.
+            PEI Vivo — TCC de Sistemas de Informação, CEUNI FAMETRO, 2026.{" "}
+            {api.modo === "real" ? (
+              "A camada de IA está desligada."
+            ) : (
+              <>
+                Protótipo com dados <strong>fictícios</strong>; a camada de IA está desligada.
+              </>
+            )}
           </p>
           <ul>
             <li>

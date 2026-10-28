@@ -17,11 +17,16 @@ const REAL = import.meta.env.MODE !== "test" && import.meta.env.VITE_API === "su
  */
 async function criarApi(): Promise<PeiVivoApi> {
   if (REAL) {
-    const [{ createClient }, { criarSupabaseApi }] = await Promise.all([import("@supabase/supabase-js"), import("./supabaseApi")]);
+    const [{ createClient }, { criarSupabaseApi }, { armazenamentoSessao }] = await Promise.all([
+      import("@supabase/supabase-js"),
+      import("./supabaseApi"),
+      import("./supabase/armazenamento"),
+    ]);
     return criarSupabaseApi(
       createClient(URL_SB!, CHAVE_ANON!, {
         // detectSessionInUrl: links de convite e de recuperação de senha trazem a sessão na URL
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+        // storage: "Lembrar de mim" escolhe entre localStorage e sessionStorage (D-49)
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: armazenamentoSessao },
       }),
     );
   }

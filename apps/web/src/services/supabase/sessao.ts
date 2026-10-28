@@ -3,6 +3,7 @@ import type { PeiVivoApi } from "../api";
 import { ErroApi } from "../erros";
 import { exec } from "./infra";
 import { paraUsuario, type Contexto } from "./contexto";
+import { lembrarSessao } from "./armazenamento";
 
 export function sessao(c: Contexto) {
   const { sb } = c;
@@ -25,7 +26,8 @@ export function sessao(c: Contexto) {
       const p = await c.carregarPerfil();
       return p ? paraUsuario(p) : null;
     },
-    entrarComSenha: async (email, senha) => {
+    entrarComSenha: async (email, senha, lembrar = false) => {
+      lembrarSessao(lembrar); // antes do login: o token já é gravado no lugar escolhido
       const { error } = await sb.auth.signInWithPassword({ email: email.trim(), password: senha });
       // mensagem genérica: não revela se o e-mail existe (prompt §4.1)
       if (error) throw new ErroApi("NAO_AUTENTICADO", "E-mail ou senha incorretos.");

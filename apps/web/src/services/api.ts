@@ -91,7 +91,8 @@ export interface PeiVivoApi {
   // sessão — modo real (D-32): convite, senha, segundo fator, recuperação
   /** Restaura a sessão salva pelo Auth (ao abrir o app ou voltar de um link de e-mail). */
   carregarSessao(): Promise<Usuario | null>;
-  entrarComSenha(email: string, senha: string): Promise<ResultadoEntrada>;
+  /** `lembrar` (D-49): a sessão sobrevive ao fechar o navegador; sem ele, acaba junto. */
+  entrarComSenha(email: string, senha: string, lembrar?: boolean): Promise<ResultadoEntrada>;
   nivelSessao(): Promise<{ atual: NivelSessao; temFatorCadastrado: boolean }>;
   iniciarCadastroSegundoFator(): Promise<CadastroSegundoFator>;
   /** Verifica o código de 6 dígitos: conclui o cadastro (fatorId) ou o desafio do fator existente. */

@@ -27,6 +27,7 @@ export const rotas = [
       { path: "/entrar", element: pagina(() => import("../pages/Entrar"), "Entrar") },
       { path: "/entrar/verificacao", element: pagina(() => import("../pages/VerificacaoDuasEtapas"), "VerificacaoDuasEtapas") },
       { path: "/entrar/:slug", element: pagina(() => import("../pages/EntrarPapel"), "EntrarPapel") },
+      { path: "/criar-conta", element: pagina(() => import("../pages/CriarConta"), "CriarConta") },
       { path: "/recuperar-senha", element: pagina(() => import("../pages/RecuperarSenha"), "RecuperarSenha") },
       { path: "/redefinir-senha", element: pagina(() => import("../pages/DefinirSenha"), "DefinirSenha") },
       { path: "/definir-senha", element: pagina(() => import("../pages/DefinirSenha"), "DefinirSenha") },
