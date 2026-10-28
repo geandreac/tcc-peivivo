@@ -23,13 +23,13 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (44) + funções (31) + políticas RLS (114, PGlite) + web (119, axe) — 100%
+npm test                                    # motor (44) + funções (77) + políticas RLS (166, PGlite) + web (216, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
 npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
 node scripts/sondar-rls.mjs                 # evidência histórica: 25/31 ataques passavam em 0002
 node scripts/sincronizar-funcoes.mjs        # copia motor/contratos/funcoes p/ supabase/functions/_shared/gerado (Deno)
-npm run test:e2e                            # Playwright (Chrome local, porta 5179): 20 E2E em 390/1280 px + axe com contraste real
+npm run test:e2e                            # Playwright (Chrome local, porta 5179): 32 E2E em 390/1280 px + axe com contraste real
 npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
 ```
 
@@ -131,6 +131,11 @@ escola "Escola Piloto PEI Vivo" com "Coordenação Piloto" (convite pendente de 
 gratuito: sem limite de sessão e sem modelo de e-mail em português (exige SMTP próprio). **Nunca** rode
 `config push` com o `supabase/config.toml` do repositório (Site URL localhost). Estado e passos em
 `IMPLANTACAO.md` §0.
+**Painel administrativo (28/10, D-50):** migration `0012` (Administrador Geral que nunca lê dado de estudante; perfis com teto
+fixo em `catalogo_permissoes`; ferramentas que ligam/desligam módulos via `privado.pode`; suspensão/validade/aprovação
+bloqueiam tudo em `privado.usuario_atual()`), telas `/admin/*` (Administrador Geral sempre; coordenação = admin limitado da
+própria escola) e `e2e/admin.spec.ts`. Teto do contrato (`TETO` em `@pei-vivo/contratos`) = semente do banco (teste).
+**A 0012 e a EF `convidar` nova ainda não foram aplicadas na nuvem.**
 **R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v3 (N1: até a
 Metodologia) em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera `Artigo_PEI_Vivo_v3.docx`; a v2 fica
 preservada). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`

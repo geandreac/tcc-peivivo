@@ -691,6 +691,18 @@ celular. Lê muito, escreve pouco.
 
 ---
 
+### 5.5 Administração (D-50)
+
+O **Administrador Geral** é um papel de plataforma, acima das escolas, criado só pelo script de implantação e sempre com verificação em duas etapas. A **coordenação** usa o mesmo painel como perfil administrativo limitado, restrita à própria escola.
+
+| | Administrador Geral | Coordenação (no painel) |
+|---|---|---|
+| **Vê** | Pessoas de todas as escolas (nome, e-mail, organização, perfil, situação, último login), perfis, ferramentas, configurações e a trilha de atividades administrativas | Quem atua na escola dela, perfis, ferramentas e configurações (só leitura) e a trilha da escola |
+| **Escreve** | Cria acessos (docente e coordenação), suspende, reativa, remove, aprova, recusa, define perfil, permissões e validade; cria, altera e arquiva perfis derivados; liga e desliga ferramentas; altera as configurações | Cria acessos da escola (docente, responsável, profissional de saúde), suspende, reativa, remove (só na escola), aprova, recusa, define perfil e validade |
+| **Nunca vê** | Estudantes, observações, perfis de aprendizagem, materiais, notas clínicas e o motivo de uma suspensão na trilha | Outra escola, outra coordenação, Administradores Gerais e o próprio acesso como editável |
+
+Regras: ninguém altera o próprio acesso; Administradores Gerais são geridos só por script; todo perfil derivado fica abaixo do teto do papel; suspenso, removido, expirado ou aguardando aprovação não entra e não age (o bloqueio está em `privado.usuario_atual()`); toda ação vai para a trilha com responsável, ação e data. Testes: `packages/politicas/src/administracao.test.ts` (33), `apps/web/src/services/mockApi.test.ts` (13 cenários D-50), `apps/web/src/pages/admin.test.tsx` (16) e `apps/web/e2e/admin.spec.ts` (6 × 2 larguras).
+
 ## 6. Matriz de permissões v2 (substitui o Quadro 7)
 
 | Informação | Responsável | Docente | Prof. saúde | Coordenação |

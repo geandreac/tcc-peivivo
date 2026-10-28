@@ -189,7 +189,7 @@ export interface PeiVivoApi {
   // administração (D-50) — Administrador Geral (tudo) e coordenação (só a própria escola).
   // Nunca devolve dado de estudante; quem decide é o banco (fn_admin_*).
   adminResumo(): Promise<ResumoAdmin>;
-  adminListarUsuarios(filtro?: { busca?: string; situacao?: SituacaoAcesso }, pagina?: Pagina): Promise<ListaPaginada<UsuarioAdmin>>;
+  adminListarUsuarios(filtro?: { busca?: string | undefined; situacao?: SituacaoAcesso | undefined }, pagina?: Pagina): Promise<ListaPaginada<UsuarioAdmin>>;
   adminObterUsuario(id: string): Promise<DetalheUsuarioAdmin>;
   adminSuspender(id: string, motivo: string): Promise<void>;
   adminReativar(id: string): Promise<void>;
@@ -207,7 +207,7 @@ export interface PeiVivoApi {
   adminDefinirFerramenta(ferramenta: Ferramenta, disponivel: boolean): Promise<void>;
   adminConfiguracoes(): Promise<ConfiguracoesSistema>;
   adminSalvarConfiguracoes(c: Pick<ConfiguracoesSistema, "exigirAprovacaoExternos" | "validadePadraoDias">): Promise<void>;
-  adminListarAuditoria(busca?: string, pagina?: Pagina): Promise<ListaPaginada<EventoAdmin>>;
+  adminListarAuditoria(busca?: string | undefined, pagina?: Pagina): Promise<ListaPaginada<EventoAdmin>>;
   adminListarEscolas(): Promise<{ id: string; nome: string }[]>;
 
   // utilidades de demonstração

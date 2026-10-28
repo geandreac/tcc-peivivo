@@ -6,7 +6,7 @@ import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { Alerta, Card, Carregando, ErroCarregamento } from "../components/Feedback";
 import { Botao } from "../components/Botao";
-import { PAPEL } from "../utils/rotulos";
+import { PAPEL_BASE } from "../utils/rotulos";
 import { perfilPorSlug } from "../utils/perfisLogin";
 import { NaoEncontrada } from "./NaoEncontrada";
 import { destinoInterno } from "../utils/destino";
@@ -86,7 +86,7 @@ export function EntrarPapel() {
 
       <section aria-labelledby="titulo-demo">
         <h2 id="titulo-demo">Escolha um perfil de demonstração</h2>
-        <p className="texto-apoio">Papel no sistema: {PAPEL[espec.papel]}. Sem senha nesta demonstração; os dados são fictícios.</p>
+        <p className="texto-apoio">Papel no sistema: {PAPEL_BASE[espec.papel]}. Sem senha nesta demonstração; os dados são fictícios.</p>
         {mutacao.erro && (
           <Alerta tom="erro" vivo>
             Não foi possível entrar. Tente novamente.

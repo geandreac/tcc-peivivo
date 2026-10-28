@@ -50,10 +50,10 @@ describe("Layout e navegação", () => {
 });
 
 describe("Entrar (D-16) e painel", () => {
-  it("porta de entrada lista os 4 perfis e cada um tem a sua tela com especificação", async () => {
+  it("porta de entrada lista os 5 perfis (D-50: + administração geral) e cada um tem a sua tela com especificação", async () => {
     const { container } = await renderizarApp("/entrar");
     const lista = screen.getByRole("list", { name: "Perfis de acesso" });
-    expect(within(lista).getAllByRole("link")).toHaveLength(4);
+    expect(within(lista).getAllByRole("link")).toHaveLength(5);
     await semViolacoesAxe(container);
     await userEvent.click(within(lista).getByRole("link", { name: /Equipe de saúde/ }));
     expect(await screen.findByRole("heading", { level: 1, name: /Entrar como equipe de saúde/ })).toBeInTheDocument();

@@ -70,7 +70,13 @@ export function sessao(c: Contexto) {
           error.message.includes("characters") ? "A senha precisa ter pelo menos 10 caracteres." : "Não foi possível definir a senha.",
         );
       if (versaoTermosAceita) await exec(sb.rpc("fn_aceitar_termos", { p_versao: versaoTermosAceita }));
-      await c.carregarPerfil();
+      const p = await c.carregarPerfil();
+      // D-50: a senha foi criada, mas o acesso só vale depois da aprovação no painel
+      if (p?.situacao === "AGUARDANDO_APROVACAO") {
+        await sb.auth.signOut({ scope: "local" });
+        c.definirPerfil(null);
+        throw new ErroApi("NEGADO", "Senha criada. Seu acesso ainda aguarda a aprovação da escola; você poderá entrar assim que for aprovado.");
+      }
     },
   } satisfies Partial<PeiVivoApi>;
 }

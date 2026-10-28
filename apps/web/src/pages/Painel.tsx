@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { api, type Estudante, type Papel, type Consentimento } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
 import { useSessao } from "../hooks/useSessao";
@@ -36,6 +36,9 @@ export function Painel() {
     );
   }, [usuario?.id]);
 
+  // D-50: o Administrador Geral não tem estudantes; a casa dele é o painel administrativo
+  if (usuario?.papelPlataforma === "ADMIN_GERAL") return <Navigate to="/admin" replace />;
+
   return (
     <>
       <div className="cabecalho-pagina">
@@ -43,7 +46,14 @@ export function Painel() {
           <h1>Meus estudantes</h1>
           <p>Olá, {usuario?.nome}. Aqui estão os estudantes aos quais você está vinculado(a) e o que você pode fazer por cada um.</p>
         </div>
-        {usuario?.papelInstitucional === "COORDENACAO" && <LinkBotao to="/coordenacao/cadastrar">Cadastrar estudante</LinkBotao>}
+        {usuario?.papelInstitucional === "COORDENACAO" && (
+          <div className="grupo-botoes">
+            <LinkBotao to="/coordenacao/cadastrar">Cadastrar estudante</LinkBotao>
+            <LinkBotao to="/admin" variante="secundario">
+              Administrar acessos
+            </LinkBotao>
+          </div>
+        )}
       </div>
 
       {usuario?.papelInstitucional === "COORDENACAO" && <ResumoEscola />}

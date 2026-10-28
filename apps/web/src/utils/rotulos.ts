@@ -187,3 +187,60 @@ export function descreverPerfil(p: ParametrosAdaptacao): string[] {
 
 export const EXPLICA_RITMO_PERFIL =
   "O perfil descreve o que funciona, não um diagnóstico. Ele só fica mais exigente depois de duas quinzenas seguidas de melhora; quando há dificuldade, se ajusta na hora.";
+
+// ------------------------------------------------------------------ administração (D-50)
+import type { Ferramenta, PapelBase, SituacaoAcesso } from "../services/tipos";
+
+export const PAPEL_BASE: Record<PapelBase, string> = {
+  ADMIN_GERAL: "Administração geral",
+  COORDENACAO: "Coordenação pedagógica",
+  DOCENTE: "Docente regente",
+  RESPONSAVEL: "Responsável legal",
+  PROFISSIONAL_SAUDE: "Profissional de saúde",
+};
+
+/** Situação do acesso: sempre texto + tom, nunca só cor (WCAG 1.4.1). */
+export const SITUACAO: Record<SituacaoAcesso, { texto: string; tom: "sucesso" | "aviso" | "erro" | "info" | "neutro"; explica: string }> = {
+  ATIVO: { texto: "Ativo", tom: "sucesso", explica: "Entra e usa o que o perfil permite." },
+  CONVITE_PENDENTE: { texto: "Convite pendente", tom: "info", explica: "Recebeu o convite por e-mail e ainda não criou a senha." },
+  CONVITE_EXPIRADO: { texto: "Convite expirado", tom: "aviso", explica: "O link do convite venceu (7 dias). Envie um novo." },
+  AGUARDANDO_APROVACAO: { texto: "Aguardando aprovação", tom: "aviso", explica: "Só entra depois que alguém da administração aprovar." },
+  SUSPENSO: { texto: "Suspenso", tom: "erro", explica: "Não entra até ser reativado." },
+  EXPIRADO: { texto: "Acesso expirado", tom: "erro", explica: "O prazo do acesso terminou. Defina uma nova validade." },
+  REMOVIDO: { texto: "Removido", tom: "neutro", explica: "O acesso foi encerrado. O histórico continua guardado." },
+};
+
+export const FERRAMENTA: Record<Ferramenta, { titulo: string; descricao: string }> = {
+  OBSERVACAO: { titulo: "Observação do ciclo", descricao: "Registrar o que se viu na quinzena, nas seis dimensões." },
+  GERACAO_MATERIAL: { titulo: "Material adaptado", descricao: "Gerar o material a partir do texto da turma e aprovar antes de chegar ao estudante." },
+  VALIDACAO: { titulo: "Validação de parâmetros", descricao: "O profissional de saúde aprova, pede revisão ou ajusta o perfil do ciclo." },
+  NOTAS_CLINICAS: { titulo: "Notas clínicas reservadas", descricao: "Anotações só do profissional de saúde, com cada leitura registrada." },
+  PAINEL_ESCOLA: { titulo: "Painel da escola", descricao: "Contagens e pendências da escola, sem nenhum conteúdo de estudante." },
+};
+
+export const ACAO: Record<"VER" | "EDITAR" | "APROVAR", string> = { VER: "Ver", EDITAR: "Registrar", APROVAR: "Aprovar" };
+
+/** "GERACAO_MATERIAL:APROVAR" → "Material adaptado · Aprovar" */
+export function rotuloPermissao(chave: string): string {
+  const [f, a] = chave.split(":") as [Ferramenta, keyof typeof ACAO];
+  return `${FERRAMENTA[f]?.titulo ?? f} · ${ACAO[a] ?? a}`;
+}
+
+export const EVENTO_ADMIN: Record<string, string> = {
+  CONVITE_EMITIDO: "Convite enviado",
+  ACESSO_SUSPENSO: "Acesso suspenso",
+  ACESSO_REATIVADO: "Acesso reativado",
+  ACESSO_REMOVIDO: "Acesso removido",
+  ACESSO_VALIDADE_DEFINIDA: "Validade do acesso alterada",
+  ACESSO_APROVADO: "Acesso aprovado",
+  ACESSO_RECUSADO: "Acesso recusado",
+  ACESSO_PERFIL_DEFINIDO: "Perfil de acesso alterado",
+  PERFIL_CRIADO: "Perfil criado",
+  PERFIL_ALTERADO: "Perfil alterado",
+  PERFIL_ARQUIVADO: "Perfil arquivado",
+  FERRAMENTA_LIGADA: "Ferramenta ligada",
+  FERRAMENTA_DESLIGADA: "Ferramenta desligada",
+  CONFIGURACOES_ALTERADAS: "Configurações alteradas",
+};
+
+export const AUTOR_ADMIN: Record<string, string> = { ADMIN_GERAL: "Administração geral", COORDENACAO: "Coordenação" };

@@ -4,12 +4,12 @@
  * o que faz, o que vê, o que nunca vê e como será o acesso real (P4.4).
  * Os perfis de demonstração são os usuários fictícios de mocks/dados.ts.
  */
-import type { Papel } from "../services/tipos";
+import type { PapelBase } from "../services/tipos";
 import { ID } from "../mocks/exemplos";
 
 export interface EspecificacaoLogin {
   slug: string;
-  papel: Papel;
+  papel: PapelBase;
   titulo: string;
   /** Quem é convidado a entrar por aqui (linguagem do usuário). */
   publico: string;
@@ -123,6 +123,29 @@ export const PERFIS_LOGIN: EspecificacaoLogin[] = [
     acessoReal: ["Papel institucional atribuído pela administração do sistema", "E-mail institucional + senha"],
     demo: [
       { usuarioId: ID.coordenacao, mostra: "Coordenação (fictícia): cadastre um estudante, vincule Beatriz como fonoaudióloga, abra o histórico do Miguel." },
+    ],
+  },
+  {
+    slug: "administracao",
+    papel: "ADMIN_GERAL",
+    titulo: "Administração geral",
+    publico: "Quem administra o sistema para todas as escolas.",
+    contexto: "Contas, acessos, perfis, ferramentas e a trilha de atividades — sem nunca abrir dado de estudante.",
+    glifo: "⚙",
+    faz: [
+      "Cria acessos com perfil, permissões, validade e aprovação; envia o convite por e-mail.",
+      "Suspende, reativa e remove acessos, sempre com confirmação e motivo.",
+      "Cria perfis derivados abaixo do teto de cada papel e liga ou desliga ferramentas.",
+      "Consulta a trilha de atividades: quem fez o quê e quando.",
+    ],
+    ve: ["Pessoas, situação e último login", "Perfis, ferramentas e configurações", "Trilha de mudanças de acesso"],
+    nuncaVe: ["Estudantes", "Observações, perfis de aprendizagem e materiais", "Notas clínicas"],
+    acessoReal: ["Criado só pelo script de implantação", "E-mail + senha + verificação em duas etapas"],
+    demo: [
+      {
+        usuarioId: ID.admin,
+        mostra: "Administração Geral (fictícia): aprove o Henrique, reative a Lúcia, crie um perfil derivado e veja a trilha de atividades.",
+      },
     ],
   },
 ];
