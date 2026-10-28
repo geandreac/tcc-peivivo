@@ -20,6 +20,7 @@ import { consentimento } from "./mock/consentimento";
 import { ciclo } from "./mock/ciclo";
 import { materiais } from "./mock/materiais";
 import { privacidade } from "./mock/privacidade";
+import { admin } from "./mock/admin";
 
 export type { OpcoesMock } from "./mock/contexto";
 export type { NovaObservacao, NovoEstudante, NovoVinculo } from "./api";
@@ -35,6 +36,7 @@ export function criarMockApi(opcoes: OpcoesMock = {}): PeiVivoApi {
     ...ciclo(ctx),
     ...materiais(ctx),
     ...privacidade(ctx),
+    ...admin(ctx),
   };
   ctx.api = api;
   return api;

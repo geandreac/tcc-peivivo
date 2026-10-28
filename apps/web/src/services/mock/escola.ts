@@ -1,4 +1,5 @@
 /** Estudantes, vínculos, convites e notificações (D-28). */
+import { TETO } from "@pei-vivo/contratos";
 import type { NovoConvite, PeiVivoApi } from "../api";
 import { ErroApi } from "../erros";
 import type { Estudante, Vinculo } from "../tipos";
@@ -139,11 +140,29 @@ export function escola(ctx: ContextoMock) {
     convidar: (dados: NovoConvite) =>
       ctx.chamada(() => {
         const u = ctx.eu();
-        if (u.papelInstitucional !== "COORDENACAO") throw new ErroApi("NEGADO", "Só a coordenação da escola convida pessoas.");
+        const admin = u.papelPlataforma === "ADMIN_GERAL";
+        if (u.papelInstitucional !== "COORDENACAO" && !admin) {
+          throw new ErroApi("NEGADO", "Só a coordenação da escola ou o Administrador Geral, com verificação em duas etapas, convida pessoas.");
+        }
+        // D-50: COORDENACAO só pelo Administrador Geral (para a coordenação continua papel inválido, como no banco)
+        if (!["DOCENTE", "RESPONSAVEL", "PROFISSIONAL_SAUDE"].includes(dados.papel) && !(admin && dados.papel === "COORDENACAO")) {
+          throw new ErroApi("VALIDACAO", "Papel inválido para convite.");
+        }
+        if (dados.perfilId) {
+          const perfil = ctx.estado.perfis.find((p) => p.id === dados.perfilId && !p.arquivadoEm);
+          if (perfil?.papelBase !== dados.papel) throw new ErroApi("VALIDACAO", "O perfil escolhido não é deste papel.");
+        }
+        if ((dados.permissoesRemovidas ?? []).some((x) => !(TETO[dados.papel] as readonly string[]).includes(x))) {
+          throw new ErroApi("VALIDACAO", "Permissão desconhecida para este papel.");
+        }
+        if (dados.acessoExpiraEm && new Date(dados.acessoExpiraEm).getTime() <= Date.now()) {
+          throw new ErroApi("VALIDACAO", "A validade do acesso precisa ser uma data futura.");
+        }
+        if ((dados.organizacao?.trim().length ?? 0) > 120) throw new ErroApi("VALIDACAO", "Organização com no máximo 120 caracteres.");
         const email = dados.email.trim().toLowerCase();
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/u.test(email)) throw new ErroApi("VALIDACAO", "Informe um e-mail válido.");
         if (email === u.email) throw new ErroApi("NEGADO", "Ninguém pode convidar a si mesmo.");
-        if (dados.papel !== "DOCENTE") {
+        if (dados.papel === "RESPONSAVEL" || dados.papel === "PROFISSIONAL_SAUDE") {
           if (!dados.estudanteId) throw new ErroApi("VALIDACAO", "Escolha um estudante.");
           ctx.exigirPapel(dados.estudanteId, "COORDENACAO");
         }
@@ -152,12 +171,39 @@ export function escola(ctx: ContextoMock) {
         }
         if (dados.papel === "PROFISSIONAL_SAUDE" && !dados.registroConselho?.trim())
           throw new ErroApi("VALIDACAO", "Informe o registro no conselho profissional.");
+        const externo = dados.papel === "RESPONSAVEL" || dados.papel === "PROFISSIONAL_SAUDE";
+        const exigeAprovacao = dados.exigeAprovacao ?? (externo && ctx.estado.configuracoes.exigirAprovacaoExternos);
         let pessoa = ctx.estado.usuarios.find((x) => x.email === email);
         if (!pessoa) {
-          pessoa = { id: uuid(), nome: dados.nome?.trim() || email.split("@")[0]!, email, papelInstitucional: null };
+          pessoa = {
+            id: uuid(),
+            nome: dados.nome?.trim() || email.split("@")[0]!,
+            email,
+            papelInstitucional: dados.papel === "COORDENACAO" ? "COORDENACAO" : null,
+          };
           ctx.estado.usuarios.push(pessoa);
+          // D-50: só quem é novo recebe perfil, validade e aprovação (quem já tem conta não perde outros papéis)
+          ctx.estado.acessos[pessoa.id] = {
+            papel: dados.papel,
+            perfilId: dados.perfilId ?? null,
+            permissoesRemovidas: dados.permissoesRemovidas ?? [],
+            organizacao: dados.organizacao?.trim() || null,
+            acessoExpiraEm: dados.acessoExpiraEm ?? null,
+            aguardandoAprovacao: exigeAprovacao,
+            convitePendente: true,
+          };
         }
-        if (dados.papel !== "DOCENTE" && dados.estudanteId) {
+        ctx.estado.eventosAdmin.push({
+          id: uuid(),
+          criadoEm: ctx.agora(),
+          evento: "CONVITE_EMITIDO",
+          autorId: u.id,
+          papelAutor: admin ? "ADMIN_GERAL" : "COORDENACAO",
+          entidade: "usuarios",
+          entidadeId: pessoa.id,
+          detalhes: { papel: dados.papel, exigeAprovacao },
+        });
+        if (externo && dados.estudanteId) {
           const ja = ctx.estado.vinculos.some(
             (v) => v.usuarioId === pessoa!.id && v.estudanteId === dados.estudanteId && (v.status === "ATIVO" || v.status === "PENDENTE_RESPONSAVEL"),
           );
@@ -178,7 +224,7 @@ export function escola(ctx: ContextoMock) {
           }
         }
         ctx.salvar();
-        return { emailEnviado: true, avisos: ["Demonstração: nenhum e-mail é enviado de verdade."] };
+        return { emailEnviado: true, exigeAprovacao, avisos: ["Demonstração: nenhum e-mail é enviado de verdade."] };
       }),
 
     // ---- notificações (D-28)

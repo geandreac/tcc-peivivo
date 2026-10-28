@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CorpoErro } from "@pei-vivo/contratos";
 import type { PeiVivoApi } from "../api";
 import { ErroApi, type CodigoErro } from "../erros";
-import type { Papel, Usuario, VersaoPerfil, Vinculo } from "../tipos";
+import type { Papel, SituacaoAcesso, Usuario, VersaoPerfil, Vinculo } from "../tipos";
 import { exec, type Linha } from "./infra";
 import { COL_VERSAO, COL_VINCULO, paraVersao, paraVinculo } from "./mapeadores";
 
@@ -13,7 +13,18 @@ export interface PerfilSessao {
   email: string;
   escolaCoordenada: string | null;
   exigeSegundoFator: boolean;
+  /** D-50 */
+  papelPlataforma?: "ADMIN_GERAL" | null;
+  situacao?: SituacaoAcesso;
 }
+
+/** D-50: situações em que o banco nega tudo (privado.usuario_atual() é nulo). */
+export const SITUACAO_BLOQUEADA: Partial<Record<SituacaoAcesso, string>> = {
+  SUSPENSO: "Seu acesso está suspenso. Fale com a coordenação da escola.",
+  REMOVIDO: "Seu acesso foi encerrado. Fale com a coordenação da escola.",
+  EXPIRADO: "O prazo do seu acesso terminou. Peça à coordenação da escola para renovar.",
+  AGUARDANDO_APROVACAO: "Seu acesso ainda aguarda a aprovação da escola. Você receberá um aviso quando for liberado.",
+};
 
 export const paraUsuario = (p: PerfilSessao): Usuario => ({
   id: p.id,
@@ -22,6 +33,7 @@ export const paraUsuario = (p: PerfilSessao): Usuario => ({
   papelInstitucional: p.escolaCoordenada ? "COORDENACAO" : null,
   escolaId: p.escolaCoordenada,
   exigeSegundoFator: p.exigeSegundoFator,
+  papelPlataforma: p.papelPlataforma ?? null,
 });
 
 export interface Contexto {
@@ -47,8 +59,11 @@ export function criarContexto(sb: SupabaseClient): Contexto {
       perfil = null;
       return null;
     }
-    perfil = await exec(sb.rpc("fn_meu_perfil"));
-    return perfil;
+    const p = await exec<PerfilSessao | null>(sb.rpc("fn_meu_perfil"));
+    // suspenso, removido ou expirado: a sessão não vale (entrarComSenha mostra o motivo). Quem aguarda
+    // aprovação mantém a sessão para criar a senha do convite; o banco nega todo o resto.
+    perfil = p && !(p.situacao && p.situacao !== "AGUARDANDO_APROVACAO" && SITUACAO_BLOQUEADA[p.situacao]) ? p : null;
+    return p;
   }
 
   function eu(): PerfilSessao {

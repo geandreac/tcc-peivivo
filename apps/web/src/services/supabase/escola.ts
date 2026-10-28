@@ -77,8 +77,9 @@ export function escola(c: Contexto) {
     },
 
     convidar: async (dados: NovoConvite) => {
-      const escola = c.eu().escolaCoordenada;
-      if (!escola) throw new ErroApi("NEGADO", "Só a coordenação da escola convida pessoas.");
+      // D-50: o Administrador Geral escolhe a escola; a coordenação usa a dela
+      const escola = dados.escolaId ?? c.eu().escolaCoordenada;
+      if (!escola) throw new ErroApi("NEGADO", "Só a coordenação da escola ou o Administrador Geral convida pessoas.");
       return c.funcao<RespostaConvite>("convidar", {
         escolaId: escola,
         email: dados.email,
@@ -87,6 +88,11 @@ export function escola(c: Contexto) {
         estudanteId: dados.estudanteId ?? null,
         registroConselho: dados.registroConselho?.trim() || null,
         conferidoPresencialmente: Boolean(dados.conferidoPresencialmente),
+        perfilId: dados.perfilId ?? null,
+        permissoesRemovidas: dados.permissoesRemovidas ?? [],
+        organizacao: dados.organizacao?.trim() || null,
+        acessoExpiraEm: dados.acessoExpiraEm ?? null,
+        exigeAprovacao: dados.exigeAprovacao ?? null,
       });
     },
 

@@ -910,6 +910,18 @@ begin
                                                    'validadePadraoDias', p_validade_padrao_dias));
 end $$;
 
+-- Escolas que o chamador administra (para o "Criar acesso"): só id e nome, nunca estudantes.
+create function public.fn_admin_listar_escolas()
+returns table (id uuid, nome text)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  perform privado.exigir_painel_admin();
+  return query
+    select e.id, e.nome from public.escolas e
+     where privado.admin_geral() or privado.coordena_escola(e.id)
+     order by e.nome;
+end $$;
+
 -- Atividades administrativas: nunca eventos de estudante (clínicos ou pedagógicos).
 create function public.fn_admin_listar_auditoria(p_busca text default null, p_limite integer default 50, p_deslocamento integer default 0)
 returns table (criado_em timestamptz, evento text, papel_autor text, autor_nome text, entidade text, alvo_nome text,
@@ -958,7 +970,7 @@ revoke execute on function
   public.fn_admin_salvar_perfil(uuid, text, text, text, text[]), public.fn_admin_arquivar_perfil(uuid),
   public.fn_admin_catalogo(), public.fn_admin_definir_ferramenta(public.ferramenta, boolean),
   public.fn_admin_configuracoes(), public.fn_admin_salvar_configuracoes(boolean, integer),
-  public.fn_admin_listar_auditoria(text, integer, integer)
+  public.fn_admin_listar_auditoria(text, integer, integer), public.fn_admin_listar_escolas()
 from public, anon;
 grant execute on function
   public.fn_meu_perfil(), public.fn_aceitar_termos(text),
@@ -971,7 +983,7 @@ grant execute on function
   public.fn_admin_salvar_perfil(uuid, text, text, text, text[]), public.fn_admin_arquivar_perfil(uuid),
   public.fn_admin_catalogo(), public.fn_admin_definir_ferramenta(public.ferramenta, boolean),
   public.fn_admin_configuracoes(), public.fn_admin_salvar_configuracoes(boolean, integer),
-  public.fn_admin_listar_auditoria(text, integer, integer)
+  public.fn_admin_listar_auditoria(text, integer, integer), public.fn_admin_listar_escolas()
 to authenticated;
 revoke execute on function
   public.fn_registrar_convite(uuid, uuid, text, text, uuid, public.papel_usuario, uuid, text, boolean, uuid, timestamptz, boolean, text, text[])

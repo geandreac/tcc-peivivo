@@ -10,6 +10,13 @@ export const ID = {
   coordenacao: "u-0004",
   docente2: "u-0005",
   fono: "u-0006",
+  // D-50: painel administrativo (todos fictícios)
+  admin: "u-0007",
+  docenteSuspensa: "u-0008",
+  profissionalExpirado: "u-0009",
+  externoAguardando: "u-0010",
+  docenteConvidada: "u-0011",
+  escola: "s-0001",
   estudanteA: "e-0010",
   estudanteB: "e-0011",
   ciclo1: "c-0021",

@@ -19,7 +19,14 @@ const erroBanco = (code: string) => Object.assign(new Error("negado pelo banco")
 describe("convidar · caminho negado primeiro", () => {
   it("corpo inválido ou com campo extra → 400, sem tocar no banco nem no Auth", async () => {
     const p = portas();
-    for (const corpo of [{}, { ...base, email: "x" }, { ...base, papel: "COORDENACAO" }, { ...base, autorId: "forjado" }]) {
+    for (const corpo of [
+      {},
+      { ...base, email: "x" },
+      { ...base, papel: "ADMIN_GERAL" },
+      { ...base, autorId: "forjado" },
+      { ...base, permissoesRemovidas: ["qualquer coisa"] },
+      { ...base, acessoExpiraEm: "amanhã" },
+    ]) {
       await expect(convidar(corpo, p)).rejects.toMatchObject({ status: 400 });
     }
     expect(p.preparar).not.toHaveBeenCalled();
@@ -37,7 +44,7 @@ describe("convidar · caminho negado primeiro", () => {
   });
   it.each([
     ["e-mail inválido", { ...base, email: "sem-arroba" }],
-    ["papel não convidável", { ...base, papel: "COORDENACAO" }],
+    ["papel não convidável", { ...base, papel: "ADMIN_GERAL" }],
     ["responsável sem estudante é recusado pelo banco", null],
   ])("%s → 400", async (_n, corpo) => {
     const p = corpo ? portas() : portas({ preparar: vi.fn(async () => Promise.reject(erroBanco("22023"))) });
@@ -73,7 +80,7 @@ describe("convidar · caminho negado primeiro", () => {
 describe("convidar · caminho permitido", () => {
   it("normaliza o e-mail, envia o convite e registra com o autor vindo do banco", async () => {
     const p = portas();
-    expect(await convidar(base, p)).toEqual({ emailEnviado: true, avisos: [] });
+    expect(await convidar(base, p)).toEqual({ emailEnviado: true, exigeAprovacao: false, avisos: [] });
     expect(p.convidarNoAuth).toHaveBeenCalledWith("nova.docente@example.test");
     expect(p.registrar).toHaveBeenCalledWith(
       expect.objectContaining({ autorId: "coord-do-banco", authUserId: "auth-novo", email: "nova.docente@example.test" }),
@@ -83,6 +90,7 @@ describe("convidar · caminho permitido", () => {
     const p = portas({}, true);
     expect(await convidar({ ...base, papel: "RESPONSAVEL", estudanteId: ESTUDANTE, conferidoPresencialmente: true }, p)).toEqual({
       emailEnviado: false,
+      exigeAprovacao: false,
       avisos: [],
     });
     expect(p.convidarNoAuth).not.toHaveBeenCalled();
@@ -90,6 +98,38 @@ describe("convidar · caminho permitido", () => {
   });
   it("convite pendente no Auth → registra e avisa como a pessoa entra", async () => {
     const p = portas({ convidarNoAuth: vi.fn(async () => null) });
-    expect(await convidar(base, p)).toEqual({ emailEnviado: false, avisos: [AVISO_CONTA_NO_AUTH] });
+    expect(await convidar(base, p)).toEqual({ emailEnviado: false, exigeAprovacao: false, avisos: [AVISO_CONTA_NO_AUTH] });
+  });
+  it("D-50: campos do painel chegam ao banco, e a exigência de aprovação vem do preparo, não do corpo", async () => {
+    const p = portas({
+      preparar: vi.fn(async (e: DadosConvite) => ({ autorId: "admin-do-banco", email: e.email, jaTemConta: false, exigeAprovacao: true })),
+    });
+    const corpo = {
+      ...base,
+      papel: "PROFISSIONAL_SAUDE",
+      estudanteId: ESTUDANTE,
+      registroConselho: "CONSELHO-FICTICIO-1",
+      perfilId: "50000000-0000-4000-8000-000000000001",
+      permissoesRemovidas: ["NOTAS_CLINICAS:EDITAR"],
+      organizacao: " Clínica fictícia ",
+      acessoExpiraEm: "2026-12-31T23:59:00-04:00",
+      exigeAprovacao: false,
+    };
+    expect(await convidar(corpo, p)).toMatchObject({ exigeAprovacao: true });
+    expect(p.preparar).toHaveBeenCalledWith(expect.objectContaining({ exigeAprovacao: false, organizacao: "Clínica fictícia" }));
+    expect(p.registrar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        autorId: "admin-do-banco",
+        exigeAprovacao: true,
+        perfilId: corpo.perfilId,
+        permissoesRemovidas: ["NOTAS_CLINICAS:EDITAR"],
+        acessoExpiraEm: corpo.acessoExpiraEm,
+      }),
+    );
+  });
+  it("coordenação convidando COORDENACAO: o banco recusa (22023) → 400, sem e-mail", async () => {
+    const p = portas({ preparar: vi.fn(async () => Promise.reject(erroBanco("22023"))) });
+    await expect(convidar({ ...base, papel: "COORDENACAO" }, p)).rejects.toMatchObject({ status: 400 });
+    expect(p.convidarNoAuth).not.toHaveBeenCalled();
   });
 });

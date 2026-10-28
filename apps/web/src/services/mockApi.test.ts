@@ -459,3 +459,136 @@ describe("R2.1 — convite por e-mail (coordenação)", () => {
     expect(v?.status).toBe("PENDENTE_RESPONSAVEL");
   });
 });
+
+// ------------------------------------------------------------------ D-50: painel administrativo
+describe("D-50 ⭐ — painel administrativo (mesmos cenários de packages/politicas/administracao.test.ts)", () => {
+  const motivo = "Motivo fictício de teste";
+
+  it("NEGADO: docente, responsável e profissional não abrem o painel", async () => {
+    for (const id of [ID.docente, ID.responsavel, ID.profissional]) {
+      await api.entrar(id);
+      await esperaNegado(api.adminResumo());
+      await esperaNegado(api.adminListarUsuarios());
+      await esperaNegado(api.adminSuspender(ID.docente2, motivo));
+      await esperaNegado(api.adminListarAuditoria());
+    }
+  });
+  it("NEGADO: coordenação não edita perfis, ferramentas nem configurações", async () => {
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.adminSalvarPerfil({ nome: "Perfil fictício", papelBase: "DOCENTE", permissoes: [] }));
+    await esperaNegado(api.adminDefinirFerramenta("GERACAO_MATERIAL", false));
+    await esperaNegado(api.adminSalvarConfiguracoes({ exigirAprovacaoExternos: false, validadePadraoDias: 30 }));
+  });
+  it("NEGADO: ninguém altera o próprio acesso nem o de um Administrador Geral", async () => {
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.adminSuspender(ID.coordenacao, motivo));
+    await esperaNegado(api.adminSuspender(ID.admin, motivo));
+    await api.entrar(ID.admin);
+    await esperaNegado(api.adminSuspender(ID.admin, motivo));
+  });
+  it("regra 1: o Administrador Geral não lê dado de estudante", async () => {
+    await api.entrar(ID.admin);
+    expect(await api.listarEstudantes()).toEqual([]);
+    await esperaNegado(api.obterEstudante(ID.estudanteA));
+    await esperaNegado(api.listarNotasClinicas(ID.estudanteA));
+    await esperaNegado(api.listarObservacoes(ID.estudanteA));
+    await esperaNegado(api.resumoEscola());
+  });
+  it("regra 2: perfil acima do teto é inválido; perfil base não muda", async () => {
+    await api.entrar(ID.admin);
+    await esperaNegado(api.adminSalvarPerfil({ nome: "Docente fictício", papelBase: "DOCENTE", permissoes: ["NOTAS_CLINICAS:VER"] }), "VALIDACAO");
+    await esperaNegado(api.adminSalvarPerfil({ id: "perfil-docente", nome: "Docente regente", papelBase: "DOCENTE", permissoes: [] }));
+    await esperaNegado(api.adminArquivarPerfil("perfil-docente"));
+    await esperaNegado(api.adminDefinirPerfil(ID.docente, "perfil-saude", []), "VALIDACAO");
+  });
+  it("regra 2: perfil derivado sem geração tira a geração do docente; sem perfil, volta", async () => {
+    await api.entrar(ID.admin);
+    const id = await api.adminSalvarPerfil({ nome: "Docente só observa (fictício)", papelBase: "DOCENTE", permissoes: ["OBSERVACAO:EDITAR"] });
+    await api.adminDefinirPerfil(ID.docente, id, []);
+    await api.entrar(ID.docente);
+    await esperaNegado(api.gerarMaterial(ID.estudanteA, "Título", "Texto fictício"));
+    await api.entrar(ID.admin);
+    await esperaNegado(api.adminArquivarPerfil(id), "CONFLITO");
+    await api.adminDefinirPerfil(ID.docente, null, []);
+    await api.entrar(ID.docente);
+    await expect(api.gerarMaterial(ID.estudanteA, "Título", "Texto fictício")).resolves.toBeTruthy();
+  });
+  it("regra 2: ferramenta desligada vale para todos; ligada de novo, volta", async () => {
+    await api.entrar(ID.admin);
+    await api.adminDefinirFerramenta("NOTAS_CLINICAS", false);
+    await esperaNegado(api.adminDefinirFerramenta("NOTAS_CLINICAS", false), "CONFLITO");
+    await api.entrar(ID.profissional);
+    await esperaNegado(api.listarNotasClinicas(ID.estudanteA));
+    await api.entrar(ID.admin);
+    await api.adminDefinirFerramenta("NOTAS_CLINICAS", true);
+    await api.entrar(ID.profissional);
+    await expect(api.listarNotasClinicas(ID.estudanteA)).resolves.toBeInstanceOf(Array);
+  });
+  it("regra 3: suspenso não entra nem age; reativado, volta", async () => {
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.adminSuspender(ID.docente, "x"), "VALIDACAO");
+    await api.adminSuspender(ID.docente, motivo);
+    await esperaNegado(api.adminSuspender(ID.docente, motivo), "CONFLITO");
+    await esperaNegado(api.entrar(ID.docente));
+    await api.adminReativar(ID.docente);
+    await expect(api.entrar(ID.docente)).resolves.toMatchObject({ id: ID.docente });
+  });
+  it("regra 3: quem está suspenso, expirado, aguardando aprovação ou com convite pendente na semente não entra", async () => {
+    for (const id of [ID.docenteSuspensa, ID.profissionalExpirado, ID.externoAguardando, ID.docenteConvidada]) {
+      await esperaNegado(api.entrar(id));
+    }
+  });
+  it("aprovar libera; aprovar de novo é conflito; validade no passado é inválida", async () => {
+    await api.entrar(ID.coordenacao);
+    await api.adminAprovarAcesso(ID.externoAguardando);
+    await esperaNegado(api.adminAprovarAcesso(ID.externoAguardando), "CONFLITO");
+    await esperaNegado(api.adminDefinirValidade(ID.docente, new Date(Date.now() - 86_400_000).toISOString()), "VALIDACAO");
+  });
+  it("listagem: situação de cada um, busca, filtro e escopo", async () => {
+    await api.entrar(ID.admin);
+    const { itens, total } = await api.adminListarUsuarios();
+    expect(total).toBe(itens.length);
+    const sit = Object.fromEntries(itens.map((u) => [u.id, u.situacao]));
+    expect(sit).toMatchObject({
+      [ID.docente]: "ATIVO",
+      [ID.docenteSuspensa]: "SUSPENSO",
+      [ID.profissionalExpirado]: "EXPIRADO",
+      [ID.externoAguardando]: "AGUARDANDO_APROVACAO",
+      [ID.docenteConvidada]: "CONVITE_PENDENTE",
+    });
+    expect((await api.adminListarUsuarios({ situacao: "SUSPENSO" })).itens.map((u) => u.id)).toEqual([ID.docenteSuspensa]);
+    expect((await api.adminListarUsuarios({ busca: "girassol" })).itens.map((u) => u.id)).toEqual([ID.profissionalExpirado]);
+    await api.entrar(ID.coordenacao);
+    const ids = (await api.adminListarUsuarios()).itens.map((u) => u.id);
+    expect(ids).not.toContain(ID.admin);
+    expect((await api.adminObterUsuario(ID.coordenacao)).editavel).toBe(false);
+  });
+  it("auditoria: cada ação com responsável, ação e data; resumo com escopo", async () => {
+    await api.entrar(ID.coordenacao);
+    await api.adminSuspender(ID.docente, motivo);
+    await api.adminReativar(ID.docente);
+    const { itens } = await api.adminListarAuditoria();
+    expect(itens.map((e) => e.evento)).toEqual(expect.arrayContaining(["ACESSO_SUSPENSO", "ACESSO_REATIVADO"]));
+    expect(itens.find((e) => e.evento === "ACESSO_SUSPENSO")).toMatchObject({ autorNome: "Coordenação (fictícia)", alvoNome: "Márcia (fictícia)" });
+    expect(JSON.stringify(itens)).not.toContain(motivo);
+    expect((await api.adminResumo()).escopo).toBe("ESCOLA");
+    await api.entrar(ID.admin);
+    expect(await api.adminResumo()).toMatchObject({ escopo: "GERAL", ferramentasDisponiveis: 5, ferramentasTotal: 5 });
+  });
+  it("convite pelo painel: coordenação não convida coordenação; externo nasce aguardando aprovação", async () => {
+    await api.entrar(ID.coordenacao);
+    await esperaNegado(api.convidar({ email: "coord.nova@example.test", papel: "COORDENACAO" }), "VALIDACAO");
+    const r = await api.convidar({
+      email: "externo.novo@example.test",
+      papel: "PROFISSIONAL_SAUDE",
+      estudanteId: ID.estudanteA,
+      registroConselho: "CONSELHO-FICTICIO-9",
+      organizacao: "Clínica fictícia",
+    });
+    expect(r.exigeAprovacao).toBe(true);
+    const [novo] = (await api.adminListarUsuarios({ busca: "externo.novo" })).itens;
+    expect(novo).toMatchObject({ situacao: "AGUARDANDO_APROVACAO", organizacao: "Clínica fictícia" });
+    await api.entrar(ID.admin);
+    await expect(api.convidar({ email: "coord.nova@example.test", papel: "COORDENACAO" })).resolves.toMatchObject({ exigeAprovacao: false });
+  });
+});

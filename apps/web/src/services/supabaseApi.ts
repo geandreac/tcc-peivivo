@@ -19,6 +19,7 @@ import { consentimento } from "./supabase/consentimento";
 import { ciclo } from "./supabase/ciclo";
 import { materiais } from "./supabase/materiais";
 import { privacidade } from "./supabase/privacidade";
+import { admin } from "./supabase/admin";
 
 export { VERSAO_TERMO } from "./api";
 export { traduzirErro } from "./supabase/infra";
@@ -34,6 +35,7 @@ export function criarSupabaseApi(sb: SupabaseClient): PeiVivoApi {
     ...ciclo(c),
     ...materiais(c),
     ...privacidade(c),
+    ...admin(c),
   };
   c.api = api;
   return api;

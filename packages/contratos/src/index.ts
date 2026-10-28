@@ -134,16 +134,49 @@ export interface CorpoErro {
   erro: { codigo: CodigoErro; mensagem: string };
 }
 
+// ------------------------------------------------------------------ permissões (D-50)
+/** Teto do banco (catalogo_permissoes, 0012): só o que o banco impõe. */
+export const PERMISSOES = [
+  "OBSERVACAO:EDITAR",
+  "GERACAO_MATERIAL:EDITAR",
+  "GERACAO_MATERIAL:APROVAR",
+  "VALIDACAO:APROVAR",
+  "NOTAS_CLINICAS:VER",
+  "NOTAS_CLINICAS:EDITAR",
+  "PAINEL_ESCOLA:VER",
+] as const;
+export type Permissao = (typeof PERMISSOES)[number];
+const PERMISSAO = /^[A-Z_]+:[A-Z]+$/u;
+export const FERRAMENTAS = ["OBSERVACAO", "GERACAO_MATERIAL", "VALIDACAO", "NOTAS_CLINICAS", "PAINEL_ESCOLA"] as const;
+export type Ferramenta = (typeof FERRAMENTAS)[number];
+export type PapelBase = "ADMIN_GERAL" | "COORDENACAO" | "DOCENTE" | "RESPONSAVEL" | "PROFISSIONAL_SAUDE";
+/** Mesmo teto da semente de catalogo_permissoes (o teste de políticas confere). */
+export const TETO: Readonly<Record<PapelBase, readonly Permissao[]>> = {
+  ADMIN_GERAL: [],
+  COORDENACAO: ["PAINEL_ESCOLA:VER"],
+  DOCENTE: ["OBSERVACAO:EDITAR", "GERACAO_MATERIAL:EDITAR", "GERACAO_MATERIAL:APROVAR"],
+  RESPONSAVEL: ["OBSERVACAO:EDITAR"],
+  PROFISSIONAL_SAUDE: ["OBSERVACAO:EDITAR", "VALIDACAO:APROVAR", "NOTAS_CLINICAS:VER", "NOTAS_CLINICAS:EDITAR"],
+};
+
 // ------------------------------------------------------------------ convidar (F1/F2/F4/F5, D-32)
 export const EntradaConviteSchema = z
   .object({
     escolaId: id("Escola inválida."),
     email: z.string().trim().toLowerCase().email("Informe um e-mail válido."),
     nome: z.string().trim().max(120).default(""),
-    papel: z.enum(["DOCENTE", "RESPONSAVEL", "PROFISSIONAL_SAUDE"]),
+    // COORDENACAO só pelo Administrador Geral: quem decide é o banco (fn_preparar_convite, D-50)
+    papel: z.enum(["DOCENTE", "RESPONSAVEL", "PROFISSIONAL_SAUDE", "COORDENACAO"]),
     estudanteId: id().nullable().default(null),
     registroConselho: z.string().trim().max(60).nullable().default(null),
     conferidoPresencialmente: z.boolean().default(false),
+    // D-50: acesso criado pelo painel administrativo
+    perfilId: id("Perfil inválido.").nullable().default(null),
+    permissoesRemovidas: z.array(z.string().regex(PERMISSAO, "Permissão inválida.")).max(PERMISSOES.length).default([]),
+    organizacao: z.string().trim().max(120).nullable().default(null),
+    acessoExpiraEm: z.string().datetime({ offset: true, message: "Validade inválida." }).nullable().default(null),
+    /** null = o banco aplica a configuração do sistema (externos exigem aprovação por padrão). */
+    exigeAprovacao: z.boolean().nullable().default(null),
   })
   .strict();
 export type EntradaConvite = z.infer<typeof EntradaConviteSchema>;
@@ -151,5 +184,7 @@ export type EntradaConvite = z.infer<typeof EntradaConviteSchema>;
 export interface RespostaConvite {
   /** false quando a pessoa já tinha conta: o acesso novo vale sem e-mail. */
   emailEnviado: boolean;
+  /** D-50: o acesso só passa a valer depois da aprovação no painel. */
+  exigeAprovacao: boolean;
   avisos: string[];
 }

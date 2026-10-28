@@ -5,6 +5,7 @@
  * remoção, validade vencida e aprovação pendente bloqueiam o banco inteiro.
  * Dados 100 % fictícios, desfeitos no savepoint.
  */
+import { TETO } from "@pei-vivo/contratos";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { ID, NEGADO, PARAMETROS_OK, abrirBanco, usuarioId, type Banco, type Resultado } from "./banco";
 
@@ -49,6 +50,7 @@ describe("painel administrativo · negado primeiro", () => {
     "select * from fn_admin_catalogo()",
     "select fn_admin_configuracoes()",
     "select * from fn_admin_listar_auditoria(null, 50, 0)",
+    "select * from fn_admin_listar_escolas()",
   ];
   it("docente, responsável, profissional de saúde e anônimo não abrem nenhuma RPC do painel", async () => {
     for (const sql of rpcs) {
@@ -257,6 +259,13 @@ describe("painel · permitido", () => {
     expect(ok(r[1]).map((l) => l.id)).toEqual([DOCENTE]);
     expect(ok(await db.como("admin", listar("'docente2'"))).map((l) => l.id)).toEqual([usuarioId("docente2")]);
   });
+  it("escolas: o admin vê todas; a coordenação, só a dela (só id e nome)", async () => {
+    expect(ok(await db.como("admin", "select * from fn_admin_listar_escolas()")).map((e) => e.nome)).toEqual([
+      "Escola fictícia 1 (teste)",
+      "Escola fictícia 2 (teste)",
+    ]);
+    expect(ok(await db.como("coordenacao", "select * from fn_admin_listar_escolas()"))).toEqual([{ id: ID.escola1, nome: "Escola fictícia 1 (teste)" }]);
+  });
   it("resumo: escopo, contagens e ferramentas disponíveis", async () => {
     const r = ok(await db.como("admin", "select fn_admin_resumo() as r"))[0]!.r as Record<string, unknown>;
     expect(r).toMatchObject({ escopo: "GERAL", ferramentasDisponiveis: 5, ferramentasTotal: 5, suspensos: 0 });
@@ -302,6 +311,15 @@ describe("painel · permitido", () => {
       teto: ["OBSERVACAO:EDITAR", "VALIDACAO:APROVAR", "NOTAS_CLINICAS:VER", "NOTAS_CLINICAS:EDITAR"],
       sistema: false,
     });
+  });
+});
+
+describe("contrato = banco", () => {
+  it("o TETO de @pei-vivo/contratos (mock e telas) é o mesmo da semente de catalogo_permissoes", async () => {
+    for (const papel of Object.keys(TETO) as (keyof typeof TETO)[]) {
+      const r = ok(await db.sistema(`select privado.teto('${papel}') as t`));
+      expect([...(r[0]!.t as string[])].sort(), papel).toEqual([...TETO[papel]].sort());
+    }
   });
 });
 

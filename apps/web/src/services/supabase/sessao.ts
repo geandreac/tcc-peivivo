@@ -2,7 +2,7 @@
 import type { PeiVivoApi } from "../api";
 import { ErroApi } from "../erros";
 import { exec } from "./infra";
-import { paraUsuario, type Contexto } from "./contexto";
+import { SITUACAO_BLOQUEADA, paraUsuario, type Contexto } from "./contexto";
 import { lembrarSessao } from "./armazenamento";
 
 export function sessao(c: Contexto) {
@@ -23,8 +23,9 @@ export function sessao(c: Contexto) {
     },
     usuarioAtual: () => c.usuarioAtual(),
     carregarSessao: async () => {
-      const p = await c.carregarPerfil();
-      return p ? paraUsuario(p) : null;
+      await c.carregarPerfil();
+      // usuarioAtual() já descarta a situação bloqueada (suspenso, expirado…)
+      return c.usuarioAtual();
     },
     entrarComSenha: async (email, senha, lembrar = false) => {
       lembrarSessao(lembrar); // antes do login: o token já é gravado no lugar escolhido
@@ -32,9 +33,11 @@ export function sessao(c: Contexto) {
       // mensagem genérica: não revela se o e-mail existe (prompt §4.1)
       if (error) throw new ErroApi("NAO_AUTENTICADO", "E-mail ou senha incorretos.");
       const p = await c.carregarPerfil();
-      if (!p) {
+      const bloqueio = p?.situacao ? SITUACAO_BLOQUEADA[p.situacao] : undefined;
+      if (!p || bloqueio) {
         await sb.auth.signOut({ scope: "local" });
-        throw new ErroApi("NEGADO", "Sua conta ainda não foi liberada pela escola.");
+        c.definirPerfil(null);
+        throw new ErroApi("NEGADO", bloqueio ?? "Sua conta ainda não foi liberada pela escola.");
       }
       const n = await c.nivel();
       return { usuario: paraUsuario(p), exigeSegundoFator: p.exigeSegundoFator && n.atual !== "aal2", temFatorCadastrado: n.temFatorCadastrado };

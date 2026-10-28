@@ -30,6 +30,17 @@ import type {
   ResultadoEntrada,
   VersaoPerfil,
   Vinculo,
+  ConfiguracoesSistema,
+  DetalheUsuarioAdmin,
+  EventoAdmin,
+  Ferramenta,
+  ItemCatalogo,
+  ListaPaginada,
+  NovoPerfil,
+  PerfilAcesso,
+  ResumoAdmin,
+  SituacaoAcesso,
+  UsuarioAdmin,
 } from "./tipos";
 
 /** Versão do termo de consentimento e de uso apresentada nesta versão do app. */
@@ -71,9 +82,20 @@ export interface NovoConvite {
   estudanteId?: string | null;
   registroConselho?: string | null;
   conferidoPresencialmente?: boolean;
+  /** D-50 (painel): sem escola, vale a que a coordenação coordena. O Administrador Geral sempre escolhe. */
+  escolaId?: string | null;
+  perfilId?: string | null;
+  permissoesRemovidas?: string[];
+  organizacao?: string | null;
+  /** ISO 8601 com fuso; null = sem validade. */
+  acessoExpiraEm?: string | null;
+  /** null = configuração do sistema (externos exigem aprovação por padrão). */
+  exigeAprovacao?: boolean | null;
 }
 
 export interface RespostaConvite {
+  /** D-50: o acesso só vale depois da aprovação no painel. */
+  exigeAprovacao?: boolean;
   emailEnviado: boolean;
   avisos: string[];
 }
@@ -163,6 +185,30 @@ export interface PeiVivoApi {
   listarAuditoria(estudanteId: string, pagina?: Pagina): Promise<Auditoria[]>;
   exportarDados(estudanteId: string): Promise<ExportacaoEstudante>;
   excluirEstudante(estudanteId: string, confirmacaoNome: string): Promise<void>;
+
+  // administração (D-50) — Administrador Geral (tudo) e coordenação (só a própria escola).
+  // Nunca devolve dado de estudante; quem decide é o banco (fn_admin_*).
+  adminResumo(): Promise<ResumoAdmin>;
+  adminListarUsuarios(filtro?: { busca?: string; situacao?: SituacaoAcesso }, pagina?: Pagina): Promise<ListaPaginada<UsuarioAdmin>>;
+  adminObterUsuario(id: string): Promise<DetalheUsuarioAdmin>;
+  adminSuspender(id: string, motivo: string): Promise<void>;
+  adminReativar(id: string): Promise<void>;
+  /** Admin geral: encerra o acesso no sistema todo. Coordenação: só na escola dela. A pessoa e a auditoria ficam. */
+  adminRemoverAcesso(id: string, motivo: string): Promise<void>;
+  adminDefinirValidade(id: string, expiraEm: string | null): Promise<void>;
+  adminAprovarAcesso(id: string): Promise<void>;
+  adminRecusarAcesso(id: string, motivo: string): Promise<void>;
+  adminDefinirPerfil(id: string, perfilId: string | null, permissoesRemovidas: string[]): Promise<void>;
+  adminListarPerfis(): Promise<PerfilAcesso[]>;
+  /** Só o Administrador Geral. Devolve o id. */
+  adminSalvarPerfil(perfil: NovoPerfil): Promise<string>;
+  adminArquivarPerfil(id: string): Promise<void>;
+  adminCatalogo(): Promise<ItemCatalogo[]>;
+  adminDefinirFerramenta(ferramenta: Ferramenta, disponivel: boolean): Promise<void>;
+  adminConfiguracoes(): Promise<ConfiguracoesSistema>;
+  adminSalvarConfiguracoes(c: Pick<ConfiguracoesSistema, "exigirAprovacaoExternos" | "validadePadraoDias">): Promise<void>;
+  adminListarAuditoria(busca?: string, pagina?: Pagina): Promise<ListaPaginada<EventoAdmin>>;
+  adminListarEscolas(): Promise<{ id: string; nome: string }[]>;
 
   // utilidades de demonstração
   reiniciarDados(): Promise<void>;
