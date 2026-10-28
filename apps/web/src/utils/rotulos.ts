@@ -3,7 +3,17 @@
  * A escala REDUZIDA / ESTÁVEL / AMPLIADA ganha um significado leigo por
  * dimensão (HU-R.03) — a mesma tela serve aos três papéis, mudando só o texto.
  */
-import type { DimensaoObservada, EscalaObservacao, Papel, StatusValidacao, StatusAprovacao, ResultadoDesfecho, EscopoConsentimento, EventoAuditoria, TipoNotificacao } from "../services/tipos";
+import type {
+  DimensaoObservada,
+  EscalaObservacao,
+  Papel,
+  StatusValidacao,
+  StatusAprovacao,
+  ResultadoDesfecho,
+  EscopoConsentimento,
+  EventoAuditoria,
+  TipoNotificacao,
+} from "../services/tipos";
 import type { ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 
 export const PAPEL: Record<Papel, string> = {
@@ -54,10 +64,22 @@ export const ESCALA: Record<EscalaObservacao, string> = {
 
 export const PARAMETRO: Record<keyof ParametrosAdaptacao, { titulo: string; explica: string; valor: (v: unknown) => string }> = {
   maxLinhasPorBloco: { titulo: "Linhas por bloco", explica: "Tamanho máximo de cada trecho de leitura.", valor: (v) => `${String(v)} linhas` },
-  formatoEnunciado: { titulo: "Formato do enunciado", explica: "Instruções em uma etapa por vez ou em várias.", valor: (v) => (v === "ETAPA_UNICA" ? "Etapa única" : "Múltiplas etapas") },
-  nivelVocabulario: { titulo: "Nível de vocabulário", explica: "Quanto o texto pode ser simplificado pela camada de IA.", valor: (v) => ({ BASICO: "Básico", INTERMEDIARIO: "Intermediário", ORIGINAL: "Original" })[String(v)] ?? String(v) },
+  formatoEnunciado: {
+    titulo: "Formato do enunciado",
+    explica: "Instruções em uma etapa por vez ou em várias.",
+    valor: (v) => (v === "ETAPA_UNICA" ? "Etapa única" : "Múltiplas etapas"),
+  },
+  nivelVocabulario: {
+    titulo: "Nível de vocabulário",
+    explica: "Quanto o texto pode ser simplificado pela camada de IA.",
+    valor: (v) => ({ BASICO: "Básico", INTERMEDIARIO: "Intermediário", ORIGINAL: "Original" })[String(v)] ?? String(v),
+  },
   blocosPorMaterial: { titulo: "Blocos por material", explica: "Quantos trechos entram num único material.", valor: (v) => `${String(v)} blocos` },
-  contrasteMinimo: { titulo: "Contraste mínimo", explica: "Razão de contraste do material (4,5 padrão ou 7 reforçado).", valor: (v) => `${String(v).replace(".", ",")}:1` },
+  contrasteMinimo: {
+    titulo: "Contraste mínimo",
+    explica: "Razão de contraste do material (4,5 padrão ou 7 reforçado).",
+    valor: (v) => `${String(v).replace(".", ",")}:1`,
+  },
   interesseAncora: { titulo: "Âncora de interesse", explica: "Tema usado para recontextualizar exemplos.", valor: (v) => (v ? String(v) : "nenhuma") },
 };
 
@@ -82,10 +104,19 @@ export const DESFECHO: Record<ResultadoDesfecho, { texto: string; descricao: str
 };
 
 export const ESCOPO: Record<EscopoConsentimento, { titulo: string; descricao: string }> = {
-  observacao_pedagogica: { titulo: "Observações da escola", descricao: "A professora registra, a cada 15 dias, como o estudante lida com leitura e tarefas. Nunca diagnóstico." },
+  observacao_pedagogica: {
+    titulo: "Observações da escola",
+    descricao: "A professora registra, a cada 15 dias, como o estudante lida com leitura e tarefas. Nunca diagnóstico.",
+  },
   observacao_domiciliar: { titulo: "Observações da família", descricao: "Você registra o que percebe em casa: o que ajuda, o que atrapalha, o que interessa." },
-  validacao_clinica: { titulo: "Validação pelo profissional de saúde", descricao: "Um profissional de saúde que você confirmar pode conferir os ajustes do material. Sem isso, só a escola e a família ajustam." },
-  geracao_material: { titulo: "Geração de material adaptado", descricao: "A professora recebe textos adaptados ao perfil do estudante. Ela revisa tudo antes de usar." },
+  validacao_clinica: {
+    titulo: "Validação pelo profissional de saúde",
+    descricao: "Um profissional de saúde que você confirmar pode conferir os ajustes do material. Sem isso, só a escola e a família ajustam.",
+  },
+  geracao_material: {
+    titulo: "Geração de material adaptado",
+    descricao: "A professora recebe textos adaptados ao perfil do estudante. Ela revisa tudo antes de usar.",
+  },
 };
 
 export const EVENTO: Record<EventoAuditoria, string> = {
@@ -142,7 +173,11 @@ export function descreverPerfil(p: ParametrosAdaptacao): string[] {
   const frases = [
     `Textos em trechos curtos, de até ${p.maxLinhasPorBloco} linhas.`,
     p.formatoEnunciado === "ETAPA_UNICA" ? "Uma instrução por vez, em passos numerados." : "Instruções podem ter mais de uma etapa.",
-    { BASICO: "Palavras simples (aplicado quando a camada de IA estiver ligada).", INTERMEDIARIO: "Vocabulário do dia a dia (aplicado quando a camada de IA estiver ligada).", ORIGINAL: "Vocabulário do texto original." }[p.nivelVocabulario],
+    {
+      BASICO: "Palavras simples (aplicado quando a camada de IA estiver ligada).",
+      INTERMEDIARIO: "Vocabulário do dia a dia (aplicado quando a camada de IA estiver ligada).",
+      ORIGINAL: "Vocabulário do texto original.",
+    }[p.nivelVocabulario],
     `No máximo ${p.blocosPorMaterial} trechos por atividade, para não cansar.`,
     p.contrasteMinimo === 7 ? "Letras bem escuras sobre fundo claro (contraste reforçado)." : "Contraste de leitura padrão.",
   ];
@@ -152,3 +187,60 @@ export function descreverPerfil(p: ParametrosAdaptacao): string[] {
 
 export const EXPLICA_RITMO_PERFIL =
   "O perfil descreve o que funciona, não um diagnóstico. Ele só fica mais exigente depois de duas quinzenas seguidas de melhora; quando há dificuldade, se ajusta na hora.";
+
+// ------------------------------------------------------------------ administração (D-50)
+import type { Ferramenta, PapelBase, SituacaoAcesso } from "../services/tipos";
+
+export const PAPEL_BASE: Record<PapelBase, string> = {
+  ADMIN_GERAL: "Administração geral",
+  COORDENACAO: "Coordenação pedagógica",
+  DOCENTE: "Docente regente",
+  RESPONSAVEL: "Responsável legal",
+  PROFISSIONAL_SAUDE: "Profissional de saúde",
+};
+
+/** Situação do acesso: sempre texto + tom, nunca só cor (WCAG 1.4.1). */
+export const SITUACAO: Record<SituacaoAcesso, { texto: string; tom: "sucesso" | "aviso" | "erro" | "info" | "neutro"; explica: string }> = {
+  ATIVO: { texto: "Ativo", tom: "sucesso", explica: "Entra e usa o que o perfil permite." },
+  CONVITE_PENDENTE: { texto: "Convite pendente", tom: "info", explica: "Recebeu o convite por e-mail e ainda não criou a senha." },
+  CONVITE_EXPIRADO: { texto: "Convite expirado", tom: "aviso", explica: "O link do convite venceu (7 dias). Envie um novo." },
+  AGUARDANDO_APROVACAO: { texto: "Aguardando aprovação", tom: "aviso", explica: "Só entra depois que alguém da administração aprovar." },
+  SUSPENSO: { texto: "Suspenso", tom: "erro", explica: "Não entra até ser reativado." },
+  EXPIRADO: { texto: "Acesso expirado", tom: "erro", explica: "O prazo do acesso terminou. Defina uma nova validade." },
+  REMOVIDO: { texto: "Removido", tom: "neutro", explica: "O acesso foi encerrado. O histórico continua guardado." },
+};
+
+export const FERRAMENTA: Record<Ferramenta, { titulo: string; descricao: string }> = {
+  OBSERVACAO: { titulo: "Observação do ciclo", descricao: "Registrar o que se viu na quinzena, nas seis dimensões." },
+  GERACAO_MATERIAL: { titulo: "Material adaptado", descricao: "Gerar o material a partir do texto da turma e aprovar antes de chegar ao estudante." },
+  VALIDACAO: { titulo: "Validação de parâmetros", descricao: "O profissional de saúde aprova, pede revisão ou ajusta o perfil do ciclo." },
+  NOTAS_CLINICAS: { titulo: "Notas clínicas reservadas", descricao: "Anotações só do profissional de saúde, com cada leitura registrada." },
+  PAINEL_ESCOLA: { titulo: "Painel da escola", descricao: "Contagens e pendências da escola, sem nenhum conteúdo de estudante." },
+};
+
+export const ACAO: Record<"VER" | "EDITAR" | "APROVAR", string> = { VER: "Ver", EDITAR: "Registrar", APROVAR: "Aprovar" };
+
+/** "GERACAO_MATERIAL:APROVAR" → "Material adaptado · Aprovar" */
+export function rotuloPermissao(chave: string): string {
+  const [f, a] = chave.split(":") as [Ferramenta, keyof typeof ACAO];
+  return `${FERRAMENTA[f]?.titulo ?? f} · ${ACAO[a] ?? a}`;
+}
+
+export const EVENTO_ADMIN: Record<string, string> = {
+  CONVITE_EMITIDO: "Convite enviado",
+  ACESSO_SUSPENSO: "Acesso suspenso",
+  ACESSO_REATIVADO: "Acesso reativado",
+  ACESSO_REMOVIDO: "Acesso removido",
+  ACESSO_VALIDADE_DEFINIDA: "Validade do acesso alterada",
+  ACESSO_APROVADO: "Acesso aprovado",
+  ACESSO_RECUSADO: "Acesso recusado",
+  ACESSO_PERFIL_DEFINIDO: "Perfil de acesso alterado",
+  PERFIL_CRIADO: "Perfil criado",
+  PERFIL_ALTERADO: "Perfil alterado",
+  PERFIL_ARQUIVADO: "Perfil arquivado",
+  FERRAMENTA_LIGADA: "Ferramenta ligada",
+  FERRAMENTA_DESLIGADA: "Ferramenta desligada",
+  CONFIGURACOES_ALTERADAS: "Configurações alteradas",
+};
+
+export const AUTOR_ADMIN: Record<string, string> = { ADMIN_GERAL: "Administração geral", COORDENACAO: "Coordenação" };

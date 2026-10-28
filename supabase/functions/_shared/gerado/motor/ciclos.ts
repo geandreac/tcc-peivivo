@@ -18,9 +18,7 @@ import type { DimensaoObservada, Observacao, ObservacaoHistorica } from "./tipos
  * - AMPLIADA, AMPLIADA, AMPLIADA → 3.
  * - AMPLIADA, ESTAVEL, AMPLIADA (mais recente por último) → 1.
  */
-export function calcularCiclosConsecutivos(
-  historico: ObservacaoHistorica[]
-): Map<DimensaoObservada, number> {
+export function calcularCiclosConsecutivos(historico: ObservacaoHistorica[]): Map<DimensaoObservada, number> {
   const resultado = new Map<DimensaoObservada, number>();
   if (historico.length === 0) return resultado;
 

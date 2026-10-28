@@ -3,12 +3,7 @@
  * `supabase/migrations/0001_core_schema.sql` (+ revisões de `0004`, D-01…D-13),
  * em camelCase. `ParametrosAdaptacao` vem do motor (contrato único, CLAUDE.md).
  */
-import type {
-  DimensaoObservada,
-  EscalaObservacao,
-  ParametrosAdaptacao,
-  TextoAdaptado,
-} from "@pei-vivo/motor-adaptacao";
+import type { DimensaoObservada, EscalaObservacao, ParametrosAdaptacao, TextoAdaptado } from "@pei-vivo/motor-adaptacao";
 
 export type { DimensaoObservada, EscalaObservacao, ParametrosAdaptacao, TextoAdaptado };
 
@@ -35,6 +30,8 @@ export interface Usuario {
   escolaId?: string | null;
   /** D-32: profissional de saúde e coordenação só operam com segundo fator (aal2). */
   exigeSegundoFator?: boolean;
+  /** D-50: papel de plataforma (gerencia contas; nunca lê dado de estudante). */
+  papelPlataforma?: "ADMIN_GERAL" | null;
 }
 
 /** D-32: nível de garantia da sessão (Supabase Auth). */
@@ -255,4 +252,107 @@ export interface ExportacaoEstudante {
   materiaisAprovados: Material[];
   desfechos: Desfecho[];
   auditoria: Auditoria[];
+}
+
+// ------------------------------------------------------------------ administração (D-50)
+export type { Ferramenta, PapelBase, Permissao } from "@pei-vivo/contratos";
+import type { Ferramenta, PapelBase } from "@pei-vivo/contratos";
+
+/** Situação do acesso, derivada pelo banco (privado.situacao_usuario). */
+export type SituacaoAcesso = "ATIVO" | "CONVITE_PENDENTE" | "CONVITE_EXPIRADO" | "AGUARDANDO_APROVACAO" | "SUSPENSO" | "EXPIRADO" | "REMOVIDO";
+
+export interface ResumoAdmin {
+  /** GERAL = Administrador Geral; ESCOLA = coordenação (só a própria escola). */
+  escopo: "GERAL" | "ESCOLA";
+  usuariosAtivos: number;
+  convitesPendentes: number;
+  aguardandoAprovacao: number;
+  suspensos: number;
+  expirados: number;
+  expiramEm7Dias: number;
+  ferramentasDisponiveis: number;
+  ferramentasTotal: number;
+  atividadesRecentes: number;
+}
+
+export interface UsuarioAdmin {
+  id: string;
+  nome: string;
+  email: string;
+  organizacao: string | null;
+  perfilId: string | null;
+  perfilNome: string | null;
+  papeis: PapelBase[];
+  situacao: SituacaoAcesso;
+  ultimoLogin: string | null;
+  acessoExpiraEm: string | null;
+}
+
+export interface EventoHistorico {
+  evento: string;
+  criadoEm: string;
+  papelAutor: string | null;
+  autorNome: string | null;
+}
+
+export interface DetalheUsuarioAdmin extends Omit<UsuarioAdmin, "perfilNome"> {
+  escolas: { id: string; nome: string }[];
+  permissoesRemovidas: string[];
+  suspensoEm: string | null;
+  motivoSuspensao: string | null;
+  removidoEm: string | null;
+  /** false quando é o próprio usuário (ninguém altera o próprio acesso). */
+  editavel: boolean;
+  historico: EventoHistorico[];
+}
+
+export interface PerfilAcesso {
+  id: string;
+  nome: string;
+  descricao: string | null;
+  papelBase: PapelBase;
+  permissoes: string[];
+  /** Teto do papel base: nenhuma permissão fora daqui é aceita. */
+  teto: string[];
+  sistema: boolean;
+  arquivadoEm: string | null;
+  usuarios: number;
+}
+
+export interface NovoPerfil {
+  id?: string;
+  nome: string;
+  descricao?: string | null;
+  papelBase: Exclude<PapelBase, "ADMIN_GERAL">;
+  permissoes: string[];
+}
+
+export interface ItemCatalogo {
+  ferramenta: Ferramenta;
+  acao: "VER" | "EDITAR" | "APROVAR";
+  papeis: PapelBase[];
+  descricao: string;
+  disponivel: boolean;
+  alteradoEm: string | null;
+}
+
+export interface ConfiguracoesSistema {
+  exigirAprovacaoExternos: boolean;
+  validadePadraoDias: number;
+  alteradoEm: string | null;
+}
+
+export interface EventoAdmin {
+  criadoEm: string;
+  evento: string;
+  papelAutor: string | null;
+  autorNome: string | null;
+  entidade: string;
+  alvoNome: string | null;
+  detalhes: Record<string, unknown>;
+}
+
+export interface ListaPaginada<T> {
+  itens: T[];
+  total: number;
 }

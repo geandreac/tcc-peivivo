@@ -30,7 +30,27 @@ import type {
   ResultadoEntrada,
   VersaoPerfil,
   Vinculo,
+  ConfiguracoesSistema,
+  DetalheUsuarioAdmin,
+  EventoAdmin,
+  Ferramenta,
+  ItemCatalogo,
+  ListaPaginada,
+  NovoPerfil,
+  PerfilAcesso,
+  ResumoAdmin,
+  SituacaoAcesso,
+  UsuarioAdmin,
 } from "./tipos";
+
+/** Versão do termo de consentimento e de uso apresentada nesta versão do app. */
+export const VERSAO_TERMO = "v1-2026-10";
+
+/** D-48: página de uma listagem. Sem página, a lista vem inteira (no modo real, buscada em lotes). */
+export interface Pagina {
+  limite: number;
+  deslocamento?: number;
+}
 
 export interface NovaObservacao {
   dimensao: DimensaoObservada;
@@ -62,9 +82,20 @@ export interface NovoConvite {
   estudanteId?: string | null;
   registroConselho?: string | null;
   conferidoPresencialmente?: boolean;
+  /** D-50 (painel): sem escola, vale a que a coordenação coordena. O Administrador Geral sempre escolhe. */
+  escolaId?: string | null;
+  perfilId?: string | null;
+  permissoesRemovidas?: string[];
+  organizacao?: string | null;
+  /** ISO 8601 com fuso; null = sem validade. */
+  acessoExpiraEm?: string | null;
+  /** null = configuração do sistema (externos exigem aprovação por padrão). */
+  exigeAprovacao?: boolean | null;
 }
 
 export interface RespostaConvite {
+  /** D-50: o acesso só vale depois da aprovação no painel. */
+  exigeAprovacao?: boolean;
   emailEnviado: boolean;
   avisos: string[];
 }
@@ -82,7 +113,8 @@ export interface PeiVivoApi {
   // sessão — modo real (D-32): convite, senha, segundo fator, recuperação
   /** Restaura a sessão salva pelo Auth (ao abrir o app ou voltar de um link de e-mail). */
   carregarSessao(): Promise<Usuario | null>;
-  entrarComSenha(email: string, senha: string): Promise<ResultadoEntrada>;
+  /** `lembrar` (D-49): a sessão sobrevive ao fechar o navegador; sem ele, acaba junto. */
+  entrarComSenha(email: string, senha: string, lembrar?: boolean): Promise<ResultadoEntrada>;
   nivelSessao(): Promise<{ atual: NivelSessao; temFatorCadastrado: boolean }>;
   iniciarCadastroSegundoFator(): Promise<CadastroSegundoFator>;
   /** Verifica o código de 6 dígitos: conclui o cadastro (fatorId) ou o desafio do fator existente. */
@@ -123,7 +155,7 @@ export interface PeiVivoApi {
   listarCiclos(estudanteId: string): Promise<Ciclo[]>;
   obterCicloAberto(estudanteId: string): Promise<Ciclo | null>;
   abrirCiclo(estudanteId: string): Promise<Ciclo>;
-  listarObservacoes(estudanteId: string): Promise<ObservacaoRegistro[]>;
+  listarObservacoes(estudanteId: string, pagina?: Pagina): Promise<ObservacaoRegistro[]>;
   registrarObservacao(cicloId: string, dados: NovaObservacao): Promise<ObservacaoRegistro>;
 
   // versões de perfil (RF05–RF07)
@@ -137,7 +169,7 @@ export interface PeiVivoApi {
   resumoEscola(): Promise<ResumoEscola>;
 
   // materiais (RF08–RF13)
-  listarMateriais(estudanteId: string): Promise<Material[]>;
+  listarMateriais(estudanteId: string, pagina?: Pagina): Promise<Material[]>;
   obterMaterial(id: string): Promise<Material>;
   gerarMaterial(estudanteId: string, titulo: string, texto: string): Promise<Material>;
   aprovarMaterial(id: string, textoRevisado?: string): Promise<Material>;
@@ -150,9 +182,33 @@ export interface PeiVivoApi {
   registrarNotaClinica(estudanteId: string, conteudo: string): Promise<NotaClinica>;
 
   // auditoria e LGPD (D-05, D-06)
-  listarAuditoria(estudanteId: string): Promise<Auditoria[]>;
+  listarAuditoria(estudanteId: string, pagina?: Pagina): Promise<Auditoria[]>;
   exportarDados(estudanteId: string): Promise<ExportacaoEstudante>;
   excluirEstudante(estudanteId: string, confirmacaoNome: string): Promise<void>;
+
+  // administração (D-50) — Administrador Geral (tudo) e coordenação (só a própria escola).
+  // Nunca devolve dado de estudante; quem decide é o banco (fn_admin_*).
+  adminResumo(): Promise<ResumoAdmin>;
+  adminListarUsuarios(filtro?: { busca?: string | undefined; situacao?: SituacaoAcesso | undefined }, pagina?: Pagina): Promise<ListaPaginada<UsuarioAdmin>>;
+  adminObterUsuario(id: string): Promise<DetalheUsuarioAdmin>;
+  adminSuspender(id: string, motivo: string): Promise<void>;
+  adminReativar(id: string): Promise<void>;
+  /** Admin geral: encerra o acesso no sistema todo. Coordenação: só na escola dela. A pessoa e a auditoria ficam. */
+  adminRemoverAcesso(id: string, motivo: string): Promise<void>;
+  adminDefinirValidade(id: string, expiraEm: string | null): Promise<void>;
+  adminAprovarAcesso(id: string): Promise<void>;
+  adminRecusarAcesso(id: string, motivo: string): Promise<void>;
+  adminDefinirPerfil(id: string, perfilId: string | null, permissoesRemovidas: string[]): Promise<void>;
+  adminListarPerfis(): Promise<PerfilAcesso[]>;
+  /** Só o Administrador Geral. Devolve o id. */
+  adminSalvarPerfil(perfil: NovoPerfil): Promise<string>;
+  adminArquivarPerfil(id: string): Promise<void>;
+  adminCatalogo(): Promise<ItemCatalogo[]>;
+  adminDefinirFerramenta(ferramenta: Ferramenta, disponivel: boolean): Promise<void>;
+  adminConfiguracoes(): Promise<ConfiguracoesSistema>;
+  adminSalvarConfiguracoes(c: Pick<ConfiguracoesSistema, "exigirAprovacaoExternos" | "validadePadraoDias">): Promise<void>;
+  adminListarAuditoria(busca?: string | undefined, pagina?: Pagina): Promise<ListaPaginada<EventoAdmin>>;
+  adminListarEscolas(): Promise<{ id: string; nome: string }[]>;
 
   // utilidades de demonstração
   reiniciarDados(): Promise<void>;

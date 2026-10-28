@@ -57,8 +57,18 @@ test.describe("Docente", () => {
     await page.goto(`/estudantes/${MIGUEL}/observar`);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     const inicio = Date.now();
-    for (const dimensao of ["Atenção sustentada", "Compreensão de enunciados", "Autonomia com palavras", "Interesse manifesto", "Sensibilidade visual", "Cansaço na tarefa"]) {
-      await page.getByRole("group", { name: dimensao }).getByRole("radio", { name: /^Estável/ }).check();
+    for (const dimensao of [
+      "Atenção sustentada",
+      "Compreensão de enunciados",
+      "Autonomia com palavras",
+      "Interesse manifesto",
+      "Sensibilidade visual",
+      "Cansaço na tarefa",
+    ]) {
+      await page
+        .getByRole("group", { name: dimensao })
+        .getByRole("radio", { name: /^Estável/ })
+        .check();
     }
     await page.getByRole("button", { name: "Registrar observações" }).click();
     await expect(page.getByRole("list", { name: "Observações deste ciclo" })).toBeVisible();

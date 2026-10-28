@@ -1,6 +1,9 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
+import { iniciarApi } from "../services";
+
+await iniciarApi();
 
 afterEach(() => {
   cleanup();
@@ -19,5 +22,14 @@ if (typeof HTMLDialogElement !== "undefined" && !HTMLDialogElement.prototype.sho
 }
 if (typeof window !== "undefined" && !window.matchMedia) {
   window.matchMedia = (query: string) =>
-    ({ matches: false, media: query, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false }) as MediaQueryList;
+    ({
+      matches: false,
+      media: query,
+      addEventListener() {},
+      removeEventListener() {},
+      addListener() {},
+      removeListener() {},
+      onchange: null,
+      dispatchEvent: () => false,
+    }) as MediaQueryList;
 }

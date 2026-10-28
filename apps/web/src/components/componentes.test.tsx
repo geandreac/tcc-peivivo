@@ -23,7 +23,7 @@ describe("Botao", () => {
     rerender(
       <Botao carregando textoCarregando="Salvando…">
         Salvar
-      </Botao>
+      </Botao>,
     );
     const b = screen.getByRole("button");
     expect(b).toBeDisabled();
@@ -35,7 +35,9 @@ describe("Botao", () => {
 
 describe("Campo", () => {
   it("associa label, dica e erro ao controle (aria-describedby, aria-invalid)", async () => {
-    const { container } = render(<Campo id="nome" rotulo="Nome" dica="Como aparece no documento." erro="Informe o nome." required value="" onChange={() => {}} />);
+    const { container } = render(
+      <Campo id="nome" rotulo="Nome" dica="Como aparece no documento." erro="Informe o nome." required value="" onChange={() => {}} />,
+    );
     const input = screen.getByLabelText(/Nome/);
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(input).toHaveAccessibleDescription("Como aparece no documento. Informe o nome.");
@@ -49,7 +51,7 @@ describe("Campo", () => {
         <Campo tipo="select" rotulo="Papel" value="" onChange={() => {}}>
           <option value="">Escolha</option>
         </Campo>
-      </>
+      </>,
     );
     expect(screen.getByLabelText(/Evidência/)).not.toHaveAttribute("aria-invalid");
     expect(screen.getByLabelText(/Papel/).tagName).toBe("SELECT");
@@ -112,7 +114,7 @@ describe("Modal", () => {
     render(
       <Modal aberto titulo="T" onFechar={onFechar}>
         <p>x</p>
-      </Modal>
+      </Modal>,
     );
     await userEvent.click(screen.getByRole("button", { name: "Cancelar" }));
     expect(onFechar).toHaveBeenCalled();
@@ -132,7 +134,7 @@ describe("Feedback", () => {
         <Carregando />
         <EstadoVazio titulo="Nada aqui" />
         <Badge tom="sucesso">Aprovado</Badge>
-      </>
+      </>,
     );
     expect(screen.getByRole("alert")).toHaveTextContent("Falhou");
     expect(screen.getAllByRole("status")).toHaveLength(2);
@@ -144,7 +146,7 @@ describe("Feedback", () => {
       <>
         <Esqueleto texto="Carregando seus estudantes…" forma="cartao" itens={2} />
         <VazioSecao>Ninguém leu as notas reservadas até agora.</VazioSecao>
-      </>
+      </>,
     );
     const status = screen.getByRole("status");
     expect(status).toHaveTextContent("Carregando seus estudantes…");
@@ -160,7 +162,7 @@ describe("Feedback", () => {
       <>
         <ResumoErros erros={[{ campo: "nome", mensagem: "Informe o nome." }]} />
         <input id="nome" aria-label="Nome" />
-      </>
+      </>,
     );
     expect(document.activeElement).toHaveClass("resumo-erros");
     await userEvent.click(screen.getByRole("link", { name: "Informe o nome." }));
@@ -216,7 +218,14 @@ describe("MaterialAdaptado — apoios de leitura (D-43)", () => {
 
     const speak = vi.fn();
     vi.stubGlobal("speechSynthesis", { speak, cancel: vi.fn() });
-    vi.stubGlobal("SpeechSynthesisUtterance", class { lang = ""; rate = 1; constructor(public text: string) {} });
+    vi.stubGlobal(
+      "SpeechSynthesisUtterance",
+      class {
+        lang = "";
+        rate = 1;
+        constructor(public text: string) {}
+      },
+    );
     try {
       const { container } = render(<MaterialAdaptado adaptado={adaptado} />);
       await userEvent.click(screen.getByRole("button", { name: "Ouvir o trecho 1" }));

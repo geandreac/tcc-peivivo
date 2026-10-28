@@ -16,15 +16,16 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@pei-vivo/contratos": "0.1.0",
     "@pei-vivo/motor-adaptacao": "0.1.0"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^5.0.5",
     "typescript": "^5.5.0",
-    "vitest": "^2.0.0",
-    "@vitest/coverage-v8": "^2.0.0"
+    "vitest": "^5.0.5"
   }
 }

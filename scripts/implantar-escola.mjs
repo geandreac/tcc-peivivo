@@ -1,13 +1,15 @@
 // Implantação de uma escola (F1, D-23): cria a escola e convida o PRIMEIRO
-// coordenador. É a única operação feita "de fora" do app — não há painel de
-// super-administrador (prompt §13). Usa a service role: rode só na máquina da
-// dupla, com a chave em variável de ambiente, NUNCA commitada.
+// coordenador. Com --admin (D-50), convida um Administrador Geral (sem escola):
+// é o único jeito de criar um, porque o painel não gere administradores.
+// Usa a service role: rode só na máquina da dupla, com a chave em variável de
+// ambiente, NUNCA commitada.
 //
 // Uso:
 //   SUPABASE_URL=https://xxx.supabase.co SUPABASE_SERVICE_ROLE_KEY=... \
 //   node scripts/implantar-escola.mjs --escola "Escola Municipal X" \
 //        --email coordenacao@escola.exemplo --nome "Nome da coordenadora" \
 //        --site https://endereco-do-app
+//   SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… //   node scripts/implantar-escola.mjs --admin --email admin@exemplo --nome "…" --site https://…
 //
 // O e-mail leva ao link /definir-senha?convite=1 (senha + termos). No primeiro
 // acesso, a coordenação cadastra o aplicativo autenticador (TOTP obrigatório).
@@ -24,9 +26,13 @@ const escola = argumento("escola")?.trim();
 const email = argumento("email")?.trim().toLowerCase();
 const nome = argumento("nome")?.trim() ?? "";
 const site = (argumento("site") ?? "http://localhost:5173").replace(/\/$/u, "");
+const admin = process.argv.includes("--admin");
 
-if (!url || !chave || !escola || !email) {
-  console.error("Uso: SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/implantar-escola.mjs --escola \"Nome\" --email coord@… [--nome \"…\"] [--site https://…]");
+if (!url || !chave || !email || (!admin && !escola)) {
+  console.error(
+    'Uso: SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/implantar-escola.mjs --escola "Nome" --email coord@… [--nome "…"] [--site https://…]\n' +
+      '     ou: … node scripts/implantar-escola.mjs --admin --email admin@… [--nome "…"] [--site https://…]',
+  );
   process.exit(1);
 }
 
@@ -36,9 +42,11 @@ const falhar = (passo, erro) => {
   process.exit(1);
 };
 
-// 1. escola (nome único)
-let { data: e } = await sb.from("escolas").select("id").eq("nome", escola).maybeSingle();
-if (!e) {
+// 1. escola (nome único); o Administrador Geral não tem escola
+let { data: e } = admin ? { data: null } : await sb.from("escolas").select("id").eq("nome", escola).maybeSingle();
+if (admin) {
+  console.log("• Administrador Geral: sem escola (D-50)");
+} else if (!e) {
   const r = await sb.from("escolas").insert({ nome: escola }).select("id").single();
   if (r.error) falhar("criar escola", r.error);
   e = r.data;
@@ -61,9 +69,19 @@ if (convite.error) {
 // 3. usuário + membro COORDENACAO + registro do convite (criado_por = null: implantação)
 let { data: u } = await sb.from("usuarios").select("id").eq("email", email).maybeSingle();
 if (!u) {
-  const r = await sb.from("usuarios").insert({ auth_user_id: authId, nome: nome || email.split("@")[0], email }).select("id").single();
+  const r = await sb
+    .from("usuarios")
+    .insert({ auth_user_id: authId, nome: nome || email.split("@")[0], email })
+    .select("id")
+    .single();
   if (r.error) falhar("criar usuário", r.error);
   u = r.data;
+}
+if (admin) {
+  const r = await sb.from("administradores").insert({ usuario_id: u.id });
+  if (r.error && r.error.code !== "23505") falhar("registrar Administrador Geral", r.error);
+  console.log(`✓ ${email} é Administrador Geral. Próximo passo: aceitar o convite e cadastrar o TOTP.`);
+  process.exit(0);
 }
 const membro = await sb.from("membros_escola").insert({ usuario_id: u.id, escola_id: e.id, papel: "COORDENACAO" });
 if (membro.error && membro.error.code !== "23505") falhar("registrar coordenação", membro.error);

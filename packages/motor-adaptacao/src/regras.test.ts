@@ -39,10 +39,7 @@ describe("RN03 — assimetria conservadora", () => {
       valorEscala: "REDUZIDA",
       ciclosConsecutivos: 1,
     };
-    const jaNoPiso = aplicarObservacao(
-      { ...PARAMETROS_PADRAO, nivelVocabulario: "BASICO" },
-      reduzida
-    );
+    const jaNoPiso = aplicarObservacao({ ...PARAMETROS_PADRAO, nivelVocabulario: "BASICO" }, reduzida);
     expect(jaNoPiso.nivelVocabulario).toBe("BASICO");
   });
 });

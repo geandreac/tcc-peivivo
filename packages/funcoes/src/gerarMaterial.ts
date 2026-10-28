@@ -96,9 +96,8 @@ export async function gerarMaterial(corpo: unknown, portas: PortasGerarMaterial)
 
   const regras = adaptar(textoBase, parametros.data);
   // D-43: o glossário da IA só acrescenta termos ao das regras (curado).
-  const adaptado = regras.apoios && glossario
-    ? { ...regras, apoios: { ...regras.apoios, glossario: juntarGlossarios(regras.apoios.glossario, glossario) } }
-    : regras;
+  const adaptado =
+    regras.apoios && glossario ? { ...regras, apoios: { ...regras.apoios, glossario: juntarGlossarios(regras.apoios.glossario, glossario) } } : regras;
   try {
     const { materialId, emCache } = await portas.registrar({
       docenteId: preparo.docenteId, // do banco (auth.uid()), nunca do corpo

@@ -99,8 +99,8 @@ export function Privacidade() {
             <section aria-labelledby="titulo-pendentes" className="bloco-destaque">
               <h2 id="titulo-pendentes">Aguardando a sua decisão</h2>
               <p>
-                A escola propôs um profissional de saúde. Se você permitir, ele vê as observações e o perfil de aprendizagem e pode validar
-                os ajustes. Ele nunca vê rascunhos, e você pode remover o acesso quando quiser.
+                A escola propôs um profissional de saúde. Se você permitir, ele vê as observações e o perfil de aprendizagem e pode validar os ajustes. Ele
+                nunca vê rascunhos, e você pode remover o acesso quando quiser.
               </p>
               {confirmar.erro && (
                 <Alerta tom="erro" vivo>
@@ -118,10 +118,21 @@ export function Privacidade() {
                       </div>
                     </div>
                     <div className="grupo-botoes">
-                      <Botao pequeno onClick={() => confirmar.executar({ v, aceitar: true })} disabled={confirmar.ocupado} aria-label={`Permitir acesso de ${v.nomeUsuario ?? "profissional"}`}>
+                      <Botao
+                        pequeno
+                        onClick={() => confirmar.executar({ v, aceitar: true })}
+                        disabled={confirmar.ocupado}
+                        aria-label={`Permitir acesso de ${v.nomeUsuario ?? "profissional"}`}
+                      >
                         Permitir
                       </Botao>
-                      <Botao pequeno variante="secundario" onClick={() => confirmar.executar({ v, aceitar: false })} disabled={confirmar.ocupado} aria-label={`Recusar ${v.nomeUsuario ?? "profissional"}`}>
+                      <Botao
+                        pequeno
+                        variante="secundario"
+                        onClick={() => confirmar.executar({ v, aceitar: false })}
+                        disabled={confirmar.ocupado}
+                        aria-label={`Recusar ${v.nomeUsuario ?? "profissional"}`}
+                      >
                         Recusar
                       </Botao>
                     </div>
@@ -257,8 +268,8 @@ export function Privacidade() {
         }
       >
         <p>
-          {removendo?.nomeUsuario ?? "O profissional"} deixa de ver os dados agora. O que ele já registrou continua no histórico. Para voltar,
-          a escola ou você precisa propor de novo.
+          {removendo?.nomeUsuario ?? "O profissional"} deixa de ver os dados agora. O que ele já registrou continua no histórico. Para voltar, a escola ou você
+          precisa propor de novo.
         </p>
         {remover.erro && (
           <Alerta tom="erro" vivo>

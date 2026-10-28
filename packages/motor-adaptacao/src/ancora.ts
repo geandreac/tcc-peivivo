@@ -20,18 +20,9 @@ export function normalizarAncora(evidencia: string): string | null {
   return limpa.length > 0 ? limpa : null;
 }
 
-export function derivarInteresseAncora(
-  observacoes: ObservacaoHistorica[],
-  anterior: string | null
-): string | null {
+export function derivarInteresseAncora(observacoes: ObservacaoHistorica[], anterior: string | null): string | null {
   const elegiveis = observacoes
-    .filter(
-      (o) =>
-        o.dimensao === "INTERESSE_MANIFESTO" &&
-        o.valorEscala === "AMPLIADA" &&
-        typeof o.evidencia === "string" &&
-        o.evidencia.trim().length > 0
-    )
+    .filter((o) => o.dimensao === "INTERESSE_MANIFESTO" && o.valorEscala === "AMPLIADA" && typeof o.evidencia === "string" && o.evidencia.trim().length > 0)
     .sort((a, b) => a.numeroCiclo - b.numeroCiclo);
 
   const ultima = elegiveis[elegiveis.length - 1];

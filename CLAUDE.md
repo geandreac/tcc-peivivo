@@ -23,13 +23,13 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (44) + funções (31) + políticas RLS (114, PGlite) + web (119, axe) — 100%
+npm test                                    # motor (44) + funções (77) + políticas RLS (166, PGlite) + web (216, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
 npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
 node scripts/sondar-rls.mjs                 # evidência histórica: 25/31 ataques passavam em 0002
 node scripts/sincronizar-funcoes.mjs        # copia motor/contratos/funcoes p/ supabase/functions/_shared/gerado (Deno)
-npm run test:e2e                            # Playwright (Chrome local, porta 5179): 20 E2E em 390/1280 px + axe com contraste real
+npm run test:e2e                            # Playwright (Chrome local, porta 5179): 32 E2E em 390/1280 px + axe com contraste real
 npx supabase db push                        # aplica as migrations (sem seed) no projeto linkado
 ```
 
@@ -123,16 +123,25 @@ da escola (só contagens), notificações tipadas, tema escuro e leitura facilit
 (`docs/padroes-de-interface.md`, `docs/diagnostico-de-interface.md`, D-44), coordenação em violeta
 (D-45). **Tudo integrado (14/10):** a pilha #98–#108 entrou em `development` e `main`; branches
 de feature apagadas, só restam `main` e `development`. Push em `main` publica sozinho na Vercel
-(`https://tcc-peivivo.vercel.app`). **Nuvem (14/10):** projeto `tcc-peivivo` (ref `xjjuugpybbxifwfxjigu`,
-sa-east-1, plano gratuito) com 0001–0009 (0009: aviso de proposta de profissional marcado como lido ao decidir), RLS em 15/15 tabelas, cron RN05 e as 3 EFs republicadas (v2).
+(`https://tcc-peivivo.vercel.app`). Desde 28/10 (D-49) a Vercel tem `VITE_API=supabase` + URL + chave anon só em
+**Production**: o site publicado é o sistema real (login em cartão, conta só por convite); previews e E2E seguem em demonstração. **Nuvem (14/10):** projeto `tcc-peivivo` (ref `xjjuugpybbxifwfxjigu`,
+sa-east-1, plano gratuito) com 0001–0012 (0009: aviso de proposta de profissional marcado como lido ao decidir; 0010–0012 em 28/10), RLS em 15/15 tabelas, cron RN05 e as 3 EFs republicadas (v2).
 Auth configurado no painel (cadastro aberto desligado, senha ≥ 10, Site URL/redirect na Vercel). Primeira
 escola "Escola Piloto PEI Vivo" com "Coordenação Piloto" (convite pendente de aceite). Limites do plano
 gratuito: sem limite de sessão e sem modelo de e-mail em português (exige SMTP próprio). **Nunca** rode
 `config push` com o `supabase/config.toml` do repositório (Site URL localhost). Estado e passos em
 `IMPLANTACAO.md` §0.
+**Painel administrativo (28/10, D-50):** migration `0012` (Administrador Geral que nunca lê dado de estudante; perfis com teto
+fixo em `catalogo_permissoes`; ferramentas que ligam/desligam módulos via `privado.pode`; suspensão/validade/aprovação
+bloqueiam tudo em `privado.usuario_atual()`), telas `/admin/*` (Administrador Geral sempre; coordenação = admin limitado da
+própria escola) e `e2e/admin.spec.ts`. Teto do contrato (`TETO` em `@pei-vivo/contratos`) = semente do banco (teste).
+Na nuvem desde 28/10 (0010–0012 + EF `convidar` republicada); ainda sem Administrador Geral criado (`implantar-escola.mjs --admin`).
 **R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v3 (N1: até a
 Metodologia) em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera `Artigo_PEI_Vivo_v3.docx`; a v2 fica
-preservada). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`
+preservada). **v4 (28/10)**, no modelo do artigo REWORK aprovado para a pré-banca (sem capa/resumo,
+notas de autoria no rodapé, Tabelas 1–3 para RF/RNF/RN, seções 4–5 para a N2): `docs/tcc/artigo/artigo_v4.md`
+→ `python scripts/artigo/gerar_docx.py docs/tcc/artigo/artigo_v4.md docs/tcc/artigo/Artigo_PEI_Vivo_v4.docx`
+(o modo pré-banca liga com `@autores-rodape`; as versões antigas saem idênticas). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`
 recaptura as telas com o protótipo em `VITE_API=mock` na 5179. Diagramas UML gerados do código por
 `npm run diagramas`: completos em `docs/tcc/*_diagram.svg` e, para impressão, repartidos em
 `docs/tcc/artigo/figuras/` (`scripts/diagramas/impressao.mjs`). Marcadores `[PREENCHER]`/`[CONFERIR]` = dados

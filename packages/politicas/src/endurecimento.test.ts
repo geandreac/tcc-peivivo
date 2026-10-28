@@ -12,9 +12,7 @@ let membroCoordenacao: string;
 beforeAll(async () => {
   db = await abrirBanco();
   const membro = async (pessoa: "docente" | "coordenacao", papel: string) => {
-    const r = await db.sistema(
-      `select id from membros_escola where usuario_id = '${usuarioId(pessoa)}' and papel = '${papel}' and status = 'ATIVO'`,
-    );
+    const r = await db.sistema(`select id from membros_escola where usuario_id = '${usuarioId(pessoa)}' and papel = '${papel}' and status = 'ATIVO'`);
     return String(r.rows[0]?.id);
   };
   membroDocente = await membro("docente", "DOCENTE");

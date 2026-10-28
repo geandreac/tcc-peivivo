@@ -17,6 +17,9 @@ import type {
   Vinculo,
 } from "../services/tipos";
 import { adaptar } from "@pei-vivo/motor-adaptacao";
+import { ID, PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA } from "./exemplos";
+
+export { ID, PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA };
 
 const diasAtras = (n: number, hora = 20) => {
   const d = new Date();
@@ -26,25 +29,6 @@ const diasAtras = (n: number, hora = 20) => {
 };
 const dataAtras = (n: number) => diasAtras(n).slice(0, 10);
 
-export const ID = {
-  docente: "u-0001",
-  responsavel: "u-0002",
-  profissional: "u-0003",
-  coordenacao: "u-0004",
-  docente2: "u-0005",
-  fono: "u-0006",
-  estudanteA: "e-0010",
-  estudanteB: "e-0011",
-  ciclo1: "c-0021",
-  ciclo2: "c-0022",
-  ciclo3: "c-0023",
-  ciclo4: "c-0024",
-  cicloB1: "c-0031",
-  versao3: "v-0030",
-  materialAprovado: "m-0040",
-  materialRascunho: "m-0041",
-} as const;
-
 export const USUARIOS: Usuario[] = [
   { id: ID.docente, nome: "Márcia (fictícia)", email: "docente.dev@example.test", papelInstitucional: null },
   { id: ID.responsavel, nome: "Rosa (fictícia)", email: "responsavel.dev@example.test", papelInstitucional: null },
@@ -52,6 +36,12 @@ export const USUARIOS: Usuario[] = [
   { id: ID.coordenacao, nome: "Coordenação (fictícia)", email: "coordenacao.dev@example.test", papelInstitucional: "COORDENACAO" },
   { id: ID.docente2, nome: "Paulo (fictício)", email: "docente2.dev@example.test", papelInstitucional: null },
   { id: ID.fono, nome: "Beatriz (fictícia)", email: "fono.dev@example.test", papelInstitucional: null },
+  // D-50: Administrador Geral e acessos em cada situação do painel (sem vínculo com estudante)
+  { id: ID.admin, nome: "Administração Geral (fictícia)", email: "admin.dev@example.test", papelInstitucional: null, papelPlataforma: "ADMIN_GERAL" },
+  { id: ID.docenteSuspensa, nome: "Lúcia (fictícia)", email: "docente3.dev@example.test", papelInstitucional: null },
+  { id: ID.profissionalExpirado, nome: "Ricardo (fictício)", email: "terapeuta.dev@example.test", papelInstitucional: null },
+  { id: ID.externoAguardando, nome: "Henrique (fictício)", email: "externo.dev@example.test", papelInstitucional: null },
+  { id: ID.docenteConvidada, nome: "Joana (fictícia)", email: "convidada.dev@example.test", papelInstitucional: null },
 ];
 
 export const ESTUDANTES: Estudante[] = [
@@ -75,13 +65,53 @@ export const ESTUDANTES: Estudante[] = [
 
 export const VINCULOS: Vinculo[] = [
   { id: "vin-1", usuarioId: ID.docente, estudanteId: ID.estudanteA, papel: "DOCENTE", dataVinculo: diasAtras(90), status: "ATIVO", registroConselho: null },
-  { id: "vin-2", usuarioId: ID.responsavel, estudanteId: ID.estudanteA, papel: "RESPONSAVEL", dataVinculo: diasAtras(89), status: "ATIVO", registroConselho: null },
-  { id: "vin-3", usuarioId: ID.profissional, estudanteId: ID.estudanteA, papel: "PROFISSIONAL_SAUDE", dataVinculo: diasAtras(85), status: "ATIVO", registroConselho: "CREFITO-DEV-000" },
-  { id: "vin-4", usuarioId: ID.coordenacao, estudanteId: ID.estudanteA, papel: "COORDENACAO", dataVinculo: diasAtras(90), status: "ATIVO", registroConselho: null },
+  {
+    id: "vin-2",
+    usuarioId: ID.responsavel,
+    estudanteId: ID.estudanteA,
+    papel: "RESPONSAVEL",
+    dataVinculo: diasAtras(89),
+    status: "ATIVO",
+    registroConselho: null,
+  },
+  {
+    id: "vin-3",
+    usuarioId: ID.profissional,
+    estudanteId: ID.estudanteA,
+    papel: "PROFISSIONAL_SAUDE",
+    dataVinculo: diasAtras(85),
+    status: "ATIVO",
+    registroConselho: "CREFITO-DEV-000",
+  },
+  {
+    id: "vin-4",
+    usuarioId: ID.coordenacao,
+    estudanteId: ID.estudanteA,
+    papel: "COORDENACAO",
+    dataVinculo: diasAtras(90),
+    status: "ATIVO",
+    registroConselho: null,
+  },
   // Estudante B: cadastrado há 3 dias; sem consentimento ainda (RN01) e sem profissional (RN06)
-  { id: "vin-5", usuarioId: ID.coordenacao, estudanteId: ID.estudanteB, papel: "COORDENACAO", dataVinculo: diasAtras(3), status: "ATIVO", registroConselho: null },
+  {
+    id: "vin-5",
+    usuarioId: ID.coordenacao,
+    estudanteId: ID.estudanteB,
+    papel: "COORDENACAO",
+    dataVinculo: diasAtras(3),
+    status: "ATIVO",
+    registroConselho: null,
+  },
   { id: "vin-6", usuarioId: ID.docente, estudanteId: ID.estudanteB, papel: "DOCENTE", dataVinculo: diasAtras(2), status: "ATIVO", registroConselho: null },
-  { id: "vin-7", usuarioId: ID.responsavel, estudanteId: ID.estudanteB, papel: "RESPONSAVEL", dataVinculo: diasAtras(2), status: "ATIVO", registroConselho: null },
+  {
+    id: "vin-7",
+    usuarioId: ID.responsavel,
+    estudanteId: ID.estudanteB,
+    papel: "RESPONSAVEL",
+    dataVinculo: diasAtras(2),
+    status: "ATIVO",
+    registroConselho: null,
+  },
 ];
 
 export const CONSENTIMENTOS: Consentimento[] = [
@@ -112,7 +142,7 @@ const obs = (
   dimensao: ObservacaoRegistro["dimensao"],
   valorEscala: ObservacaoRegistro["valorEscala"],
   evidencia: string | null,
-  dias: number
+  dias: number,
 ): ObservacaoRegistro => ({
   id: `obs-${++seq}`,
   cicloId,
@@ -144,22 +174,20 @@ export const OBSERVACOES: ObservacaoRegistro[] = [
   obs(ID.ciclo4, 4, ID.responsavel, "RESPONSAVEL", "FADIGA_TAREFA", "AMPLIADA", "Cansa depois de 10 min de tarefa em casa.", 5),
 ];
 
-export const PARAMETROS_CENARIO_A = {
-  maxLinhasPorBloco: 4,
-  nivelVocabulario: "BASICO" as const,
-  interesseAncora: "dinossauros",
-  formatoEnunciado: "ETAPA_UNICA" as const,
-  contrasteMinimo: 7 as const,
-  blocosPorMaterial: 8,
-};
-
 export const VERSOES: VersaoPerfil[] = [
   {
     id: "v-0010",
     estudanteId: ID.estudanteA,
     cicloOrigemId: ID.ciclo1,
     numeroCiclo: 1,
-    parametros: { maxLinhasPorBloco: 5, nivelVocabulario: "INTERMEDIARIO", interesseAncora: null, formatoEnunciado: "ETAPA_UNICA", contrasteMinimo: 7, blocosPorMaterial: 8 },
+    parametros: {
+      maxLinhasPorBloco: 5,
+      nivelVocabulario: "INTERMEDIARIO",
+      interesseAncora: null,
+      formatoEnunciado: "ETAPA_UNICA",
+      contrasteMinimo: 7,
+      blocosPorMaterial: 8,
+    },
     statusValidacao: "SUBSTITUIDA",
     validadorId: ID.profissional,
     dataVigencia: diasAtras(41),
@@ -171,7 +199,14 @@ export const VERSOES: VersaoPerfil[] = [
     estudanteId: ID.estudanteA,
     cicloOrigemId: ID.ciclo2,
     numeroCiclo: 2,
-    parametros: { maxLinhasPorBloco: 4, nivelVocabulario: "BASICO", interesseAncora: "dinossauros", formatoEnunciado: "ETAPA_UNICA", contrasteMinimo: 7, blocosPorMaterial: 8 },
+    parametros: {
+      maxLinhasPorBloco: 4,
+      nivelVocabulario: "BASICO",
+      interesseAncora: "dinossauros",
+      formatoEnunciado: "ETAPA_UNICA",
+      contrasteMinimo: 7,
+      blocosPorMaterial: 8,
+    },
     statusValidacao: "SUBSTITUIDA",
     validadorId: ID.profissional,
     dataVigencia: diasAtras(27),
@@ -191,12 +226,6 @@ export const VERSOES: VersaoPerfil[] = [
     createdAt: diasAtras(14),
   },
 ];
-
-export const TEXTO_CICLO_DA_AGUA = `O ciclo da água é o movimento contínuo da água na Terra. A água dos rios, lagos e oceanos evapora com o calor do sol e sobe para o céu em forma de vapor. Lá em cima, o vapor esfria e vira pequenas gotinhas, formando as nuvens. Quando as gotinhas ficam pesadas, caem como chuva, neve ou granizo. Essa água volta para os rios, para o solo e para os oceanos, e o ciclo recomeça.
-
-Leia o texto acima e depois responda às perguntas com suas palavras.
-
-Circule as palavras que você não conhece, em seguida escreva uma frase com cada uma delas.`;
 
 const TEXTO_FRACOES = `Uma fração representa uma parte de um todo. Quando dividimos uma pizza em quatro pedaços iguais e comemos um pedaço, comemos um quarto da pizza. O número de cima se chama numerador e mostra quantas partes pegamos. O número de baixo se chama denominador e mostra em quantas partes o todo foi dividido.
 
@@ -259,8 +288,67 @@ export const NOTAS_CLINICAS: NotaClinica[] = [
 export const AUDITORIA: Auditoria[] = [
   { id: "a-1", entidade: "estudantes", entidadeId: ID.estudanteA, evento: "CADASTRO", autorId: ID.coordenacao, data: diasAtras(90), detalhes: {} },
   { id: "a-2", entidade: "consentimentos", entidadeId: "con-1", evento: "CONCESSAO", autorId: ID.responsavel, data: diasAtras(88), detalhes: { escopo: 3 } },
-  { id: "a-3", entidade: "versoes_perfil", entidadeId: "v-0010", evento: "VALIDACAO", autorId: ID.profissional, data: diasAtras(41), detalhes: { numeroCiclo: 1 } },
-  { id: "a-4", entidade: "versoes_perfil", entidadeId: "v-0020", evento: "VALIDACAO", autorId: ID.profissional, data: diasAtras(27), detalhes: { numeroCiclo: 2 } },
-  { id: "a-5", entidade: "materiais_adaptados", entidadeId: ID.materialAprovado, evento: "APROVACAO_MATERIAL", autorId: ID.docente, data: diasAtras(20, 21), detalhes: {} },
-  { id: "a-6", entidade: "versoes_perfil", entidadeId: ID.versao3, evento: "VALIDACAO", autorId: ID.profissional, data: diasAtras(13), detalhes: { numeroCiclo: 3 } },
+  {
+    id: "a-3",
+    entidade: "versoes_perfil",
+    entidadeId: "v-0010",
+    evento: "VALIDACAO",
+    autorId: ID.profissional,
+    data: diasAtras(41),
+    detalhes: { numeroCiclo: 1 },
+  },
+  {
+    id: "a-4",
+    entidade: "versoes_perfil",
+    entidadeId: "v-0020",
+    evento: "VALIDACAO",
+    autorId: ID.profissional,
+    data: diasAtras(27),
+    detalhes: { numeroCiclo: 2 },
+  },
+  {
+    id: "a-5",
+    entidade: "materiais_adaptados",
+    entidadeId: ID.materialAprovado,
+    evento: "APROVACAO_MATERIAL",
+    autorId: ID.docente,
+    data: diasAtras(20, 21),
+    detalhes: {},
+  },
+  {
+    id: "a-6",
+    entidade: "versoes_perfil",
+    entidadeId: ID.versao3,
+    evento: "VALIDACAO",
+    autorId: ID.profissional,
+    data: diasAtras(13),
+    detalhes: { numeroCiclo: 3 },
+  },
 ];
+
+// ------------------------------------------------------------------ D-50: administração (fictícia)
+import type { AcessoMock } from "../services/mock/contexto";
+
+export const ESCOLA = { id: ID.escola, nome: "Escola Municipal Aurora (fictícia)" };
+
+/** Situação de acesso de quem aparece no painel. Quem não está aqui está ATIVO, sem perfil derivado. */
+export const ACESSOS: Record<string, AcessoMock> = {
+  [ID.docenteSuspensa]: {
+    papel: "DOCENTE",
+    suspensoEm: diasAtras(3),
+    motivoSuspensao: "Afastamento temporário (fictício)",
+    ultimoLogin: diasAtras(12),
+  },
+  [ID.profissionalExpirado]: {
+    papel: "PROFISSIONAL_SAUDE",
+    organizacao: "Clínica Girassol (fictícia)",
+    acessoExpiraEm: diasAtras(2),
+    ultimoLogin: diasAtras(40),
+  },
+  [ID.externoAguardando]: {
+    papel: "PROFISSIONAL_SAUDE",
+    organizacao: "Centro Terapêutico Horizonte (fictício)",
+    aguardandoAprovacao: true,
+  },
+  [ID.docenteConvidada]: { papel: "DOCENTE", convitePendente: true },
+};

@@ -22,12 +22,17 @@
   font-weight: var(--peso-negrito);
   text-decoration: none;
   cursor: pointer;
-  transition: background-color var(--duracao), border-color var(--duracao), transform var(--duracao);
+  transition:
+    background-color var(--duracao),
+    border-color var(--duracao),
+    transform var(--duracao);
   text-align: center;
 }
 .botao:hover {
   --botao-fundo: var(--cor-primaria-escura);
   --botao-borda: var(--cor-primaria-escura);
+  /* `a.botao`: sem isto, `a:hover` (base.css) pinta o texto com a cor do fundo e ele some. */
+  color: var(--botao-texto);
 }
 .botao:active {
   transform: translateY(1px);
@@ -917,6 +922,89 @@ ul.perfis {
 .entrar-capa p {
   color: var(--cor-texto-secundario);
   max-width: var(--largura-leitura);
+}
+
+/* login real (D-49): cartão central sobre o fundo da página */
+.autenticacao {
+  display: grid;
+  place-items: center;
+  padding-block: var(--esp-6);
+}
+.cartao-login {
+  width: 100%;
+  max-width: 27rem;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-suave);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-2);
+  overflow: hidden;
+}
+.cartao-login__destaque {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 9rem;
+  background: linear-gradient(120deg, var(--papel-escola-tint), var(--papel-familia-tint) 55%, var(--papel-saude-tint));
+}
+.cartao-login__destaque img {
+  height: 7rem;
+  width: auto;
+}
+.cartao-login__corpo {
+  padding: var(--esp-5) var(--esp-6) var(--esp-5);
+}
+.cartao-login__corpo h1 {
+  margin: 0 0 var(--esp-2);
+}
+.cartao-login__corpo > .texto-apoio {
+  margin: 0 0 var(--esp-5);
+}
+.cartao-login__mostrar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(-1 * var(--esp-3));
+}
+.cartao-login__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2) var(--esp-4);
+  margin-block: var(--esp-3) var(--esp-5);
+}
+.caixa {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--alvo-minimo);
+  cursor: pointer;
+}
+.caixa input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--cor-primaria);
+}
+.cartao-login__rodape {
+  margin: 0;
+  padding: var(--esp-4) var(--esp-6);
+  border-top: 1px solid var(--cor-borda-suave);
+  text-align: center;
+}
+@media (max-width: 30rem) {
+  .autenticacao {
+    padding-block: var(--esp-4);
+  }
+  .cartao-login__destaque {
+    height: 7rem;
+  }
+  .cartao-login__destaque img {
+    height: 5.5rem;
+  }
+  .cartao-login__corpo,
+  .cartao-login__rodape {
+    padding-inline: var(--esp-4);
+  }
 }
 
 /* progresso (gerar material) */

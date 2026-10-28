@@ -4,12 +4,12 @@
  * o que faz, o que vê, o que nunca vê e como será o acesso real (P4.4).
  * Os perfis de demonstração são os usuários fictícios de mocks/dados.ts.
  */
-import type { Papel } from "../services/tipos";
-import { ID } from "../mocks/dados";
+import type { PapelBase } from "../services/tipos";
+import { ID } from "../mocks/exemplos";
 
 export interface EspecificacaoLogin {
   slug: string;
-  papel: Papel;
+  papel: PapelBase;
   titulo: string;
   /** Quem é convidado a entrar por aqui (linguagem do usuário). */
   publico: string;
@@ -42,7 +42,11 @@ export const PERFIS_LOGIN: EspecificacaoLogin[] = [
     ],
     ve: ["Observações de todos", "Parâmetros vigentes do perfil", "Materiais aprovados e desfechos", "Trilha de auditoria"],
     nuncaVe: ["Nota clínica do profissional de saúde", "Rascunhos de material"],
-    acessoReal: ["Convite por e-mail enviado pela coordenação", "Senha definida no primeiro acesso (pode colar do gerenciador de senhas)", "Sem CAPTCHA nem teste cognitivo (WCAG 3.3.8)"],
+    acessoReal: [
+      "Convite por e-mail enviado pela coordenação",
+      "Senha definida no primeiro acesso (pode colar do gerenciador de senhas)",
+      "Sem CAPTCHA nem teste cognitivo (WCAG 3.3.8)",
+    ],
     demo: [{ usuarioId: ID.responsavel, mostra: "Responsável do Miguel (fictício) e do Estudante B — o B ainda aguarda o seu consentimento." }],
   },
   {
@@ -58,7 +62,11 @@ export const PERFIS_LOGIN: EspecificacaoLogin[] = [
       "Gera, revisa lado a lado, edita e aprova o material — nada chega ao estudante sem o seu toque.",
       "Registra o desfecho em dois toques.",
     ],
-    ve: ["Observações de todos (inclusive da família e do profissional)", "Parâmetros vigentes e status da validação", "Todos os materiais do estudante, inclusive rascunhos"],
+    ve: [
+      "Observações de todos (inclusive da família e do profissional)",
+      "Parâmetros vigentes e status da validação",
+      "Todos os materiais do estudante, inclusive rascunhos",
+    ],
     nuncaVe: ["Nota clínica reservada", "Laudo ou diagnóstico (o sistema não os armazena)"],
     acessoReal: ["Conta criada pela coordenação da escola", "E-mail institucional + senha", "Vínculo com cada estudante feito pela coordenação"],
     demo: [
@@ -79,9 +87,19 @@ export const PERFIS_LOGIN: EspecificacaoLogin[] = [
       "Escreve notas clínicas reservadas, que só profissionais de saúde vinculados leem.",
       "Acompanha o resultado real em sala pelos desfechos.",
     ],
-    ve: ["Observações de todos", "Histórico completo de versões do perfil", "Materiais aprovados e desfechos", "Data em que o laudo foi apresentado", "Notas clínicas de outros profissionais do mesmo estudante"],
+    ve: [
+      "Observações de todos",
+      "Histórico completo de versões do perfil",
+      "Materiais aprovados e desfechos",
+      "Data em que o laudo foi apresentado",
+      "Notas clínicas de outros profissionais do mesmo estudante",
+    ],
     nuncaVe: ["Rascunhos de material"],
-    acessoReal: ["Conta criada pela coordenação com registro no conselho profissional obrigatório (CREFITO, CRFa, CRP…)", "E-mail + senha", "Se não houver profissional vinculado, o sistema opera em modo pedagógico: o perfil é ajustado sem validação clínica"],
+    acessoReal: [
+      "Conta criada pela coordenação com registro no conselho profissional obrigatório (CREFITO, CRFa, CRP…)",
+      "E-mail + senha",
+      "Se não houver profissional vinculado, o sistema opera em modo pedagógico: o perfil é ajustado sem validação clínica",
+    ],
     demo: [
       { usuarioId: ID.profissional, mostra: "Terapeuta ocupacional do Miguel (fictício): há notas reservadas e o próximo ciclo virá para validação." },
       { usuarioId: ID.fono, mostra: "Fonoaudióloga SEM vínculo: use a coordenação para vinculá-la e veja o acesso aparecer." },
@@ -103,7 +121,32 @@ export const PERFIS_LOGIN: EspecificacaoLogin[] = [
     ve: ["Tudo que os outros leem: observações, parâmetros, materiais aprovados, desfechos, consentimentos, auditoria"],
     nuncaVe: ["Nota clínica reservada", "Rascunhos de material"],
     acessoReal: ["Papel institucional atribuído pela administração do sistema", "E-mail institucional + senha"],
-    demo: [{ usuarioId: ID.coordenacao, mostra: "Coordenação (fictícia): cadastre um estudante, vincule Beatriz como fonoaudióloga, abra o histórico do Miguel." }],
+    demo: [
+      { usuarioId: ID.coordenacao, mostra: "Coordenação (fictícia): cadastre um estudante, vincule Beatriz como fonoaudióloga, abra o histórico do Miguel." },
+    ],
+  },
+  {
+    slug: "administracao",
+    papel: "ADMIN_GERAL",
+    titulo: "Administração geral",
+    publico: "Quem administra o sistema para todas as escolas.",
+    contexto: "Contas, acessos, perfis, ferramentas e a trilha de atividades — sem nunca abrir dado de estudante.",
+    glifo: "⚙",
+    faz: [
+      "Cria acessos com perfil, permissões, validade e aprovação; envia o convite por e-mail.",
+      "Suspende, reativa e remove acessos, sempre com confirmação e motivo.",
+      "Cria perfis derivados abaixo do teto de cada papel e liga ou desliga ferramentas.",
+      "Consulta a trilha de atividades: quem fez o quê e quando.",
+    ],
+    ve: ["Pessoas, situação e último login", "Perfis, ferramentas e configurações", "Trilha de mudanças de acesso"],
+    nuncaVe: ["Estudantes", "Observações, perfis de aprendizagem e materiais", "Notas clínicas"],
+    acessoReal: ["Criado só pelo script de implantação", "E-mail + senha + verificação em duas etapas"],
+    demo: [
+      {
+        usuarioId: ID.admin,
+        mostra: "Administração Geral (fictícia): aprove o Henrique, reative a Lúcia, crie um perfil derivado e veja a trilha de atividades.",
+      },
+    ],
   },
 ];
 

@@ -31,7 +31,10 @@ const P = JSON.stringify(PARAMETROS_OK);
 const ADAPTADO = JSON.stringify({ blocos: [{ linhas: ["texto fictício"] }], enunciados: [], parametros: PARAMETROS_OK, blocosExcedentes: [] });
 const registrarMaterial = (docente: string, versao: string = ID.vigenteE1, ia = false, hash = "h1") =>
   `select fn_registrar_material('${docente}','${ID.e1}','${versao}','Título','Texto fictício','${ADAPTADO}','${hash}',${ia}) as r`;
-const observar = { ator: "docente" as const, sql: `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloE1}','FADIGA_TAREFA','REDUZIDA')` };
+const observar = {
+  ator: "docente" as const,
+  sql: `insert into observacoes (ciclo_id, dimensao, valor_escala) values ('${ID.cicloE1}','FADIGA_TAREFA','REDUZIDA')`,
+};
 
 // =============================================================================
 describe("gerar-material · fn_preparar_geracao (como o usuário)", () => {

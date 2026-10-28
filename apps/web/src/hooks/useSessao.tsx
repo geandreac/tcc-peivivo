@@ -12,7 +12,7 @@ interface Sessao {
   /** Demonstração (D-16): entra escolhendo um perfil fictício. */
   entrar: (usuarioId: string) => Promise<Usuario>;
   /** Sistema real (D-32): e-mail + senha. */
-  entrarComSenha: (email: string, senha: string) => Promise<ResultadoEntrada>;
+  entrarComSenha: (email: string, senha: string, lembrar?: boolean) => Promise<ResultadoEntrada>;
   /** Relê usuário e nível (depois de verificar o código ou definir a senha). */
   atualizar: () => Promise<void>;
   sair: () => Promise<void>;
@@ -35,6 +35,8 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (api.modo !== "real") return;
     let ativo = true;
+    // `atualizar` é assíncrona (o setState vem depois do await); a regra não distingue
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     atualizar().finally(() => ativo && setCarregando(false));
     return () => {
       ativo = false;
@@ -47,8 +49,8 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
     return u;
   }, []);
 
-  const entrarComSenha = useCallback(async (email: string, senha: string) => {
-    const r = await api.entrarComSenha(email, senha);
+  const entrarComSenha = useCallback(async (email: string, senha: string, lembrar?: boolean) => {
+    const r = await api.entrarComSenha(email, senha, lembrar);
     setUsuario(r.usuario);
     setNivel(r.exigeSegundoFator ? "aal1" : (await api.nivelSessao()).atual);
     return r;

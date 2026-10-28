@@ -10,21 +10,13 @@
  * flexibilizar (subir nível) exige 2 ciclos consecutivos de melhora;
  * restringir (descer nível) é imediato, com 1 ciclo só.
  */
-import type {
-  Observacao,
-  ParametrosAdaptacao,
-  NivelVocabulario,
-} from "./tipos";
+import type { Observacao, ParametrosAdaptacao, NivelVocabulario } from "./tipos";
 import { PARAMETROS_PADRAO } from "./tipos";
 
 const NIVEIS: NivelVocabulario[] = ["BASICO", "INTERMEDIARIO", "ORIGINAL"];
 
 /** RN03: sobe exige 2 ciclos; desce é imediato (1 ciclo já basta). */
-function paraProximoNivel(
-  atual: NivelVocabulario,
-  direcao: "SUBIR" | "DESCER",
-  ciclosConsecutivos: number
-): NivelVocabulario {
+function paraProximoNivel(atual: NivelVocabulario, direcao: "SUBIR" | "DESCER", ciclosConsecutivos: number): NivelVocabulario {
   const idx = NIVEIS.indexOf(atual);
   if (direcao === "DESCER") {
     return NIVEIS[Math.max(0, idx - 1)] ?? atual;
@@ -41,10 +33,7 @@ function paraProximoNivel(
  * nova versão. Não muta o objeto recebido (facilita o snapshot em
  * `versoes_perfil.parametros`).
  */
-export function aplicarObservacao(
-  parametrosAtuais: ParametrosAdaptacao,
-  obs: Observacao
-): ParametrosAdaptacao {
+export function aplicarObservacao(parametrosAtuais: ParametrosAdaptacao, obs: Observacao): ParametrosAdaptacao {
   const p = { ...parametrosAtuais };
 
   switch (obs.dimensao) {
@@ -68,11 +57,7 @@ export function aplicarObservacao(
       if (obs.valorEscala === "REDUZIDA") {
         p.nivelVocabulario = paraProximoNivel(p.nivelVocabulario, "DESCER", 1);
       } else if (obs.valorEscala === "AMPLIADA") {
-        p.nivelVocabulario = paraProximoNivel(
-          p.nivelVocabulario,
-          "SUBIR",
-          obs.ciclosConsecutivos
-        );
+        p.nivelVocabulario = paraProximoNivel(p.nivelVocabulario, "SUBIR", obs.ciclosConsecutivos);
       }
       break;
 
@@ -104,10 +89,7 @@ export function aplicarObservacao(
 }
 
 /** Aplica uma lista de observações de um ciclo, em sequência. */
-export function aplicarCiclo(
-  parametrosVigentes: ParametrosAdaptacao,
-  observacoesDoCiclo: Observacao[]
-): ParametrosAdaptacao {
+export function aplicarCiclo(parametrosVigentes: ParametrosAdaptacao, observacoesDoCiclo: Observacao[]): ParametrosAdaptacao {
   return observacoesDoCiclo.reduce(aplicarObservacao, parametrosVigentes);
 }
 

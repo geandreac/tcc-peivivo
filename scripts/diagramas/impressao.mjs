@@ -18,9 +18,11 @@ const classe = (id) => ({ ...CLASSES.find((c) => c.id === id), w: WC });
 const resumo = (id, figura) => ({ id, nome: CLASSES.find((c) => c.id === id).nome, resumo: figura, w: WC, h: 46 });
 
 function desenharResumo(c) {
-  return `<rect x="${c.x}" y="${c.y}" width="${WC}" height="${c.h}" rx="4" fill="#FFFFFF" stroke="${COR.azul}" stroke-width="1.8" stroke-dasharray="7 4"/>` +
+  return (
+    `<rect x="${c.x}" y="${c.y}" width="${WC}" height="${c.h}" rx="4" fill="#FFFFFF" stroke="${COR.azul}" stroke-width="1.8" stroke-dasharray="7 4"/>` +
     texto(c.x + WC / 2, c.y + 21, c.nome, { tam: 16, cor: COR.azul, peso: "bold", ancora: "middle" }) +
-    texto(c.x + WC / 2, c.y + 38, `(atributos na ${c.resumo})`, { tam: 11.5, cor: COR.apagado, estilo: "italic", ancora: "middle" });
+    texto(c.x + WC / 2, c.y + 38, `(atributos na ${c.resumo})`, { tam: 11.5, cor: COR.apagado, estilo: "italic", ancora: "middle" })
+  );
 }
 
 /** Posiciona as classes em duas colunas, de cima para baixo. */
@@ -55,7 +57,15 @@ function nome(x, y, s, vertical = false) {
 // associação horizontal entre colunas vizinhas
 function horizontal(a, b, y, { ini, fim, rot, comp }) {
   const [p, q] = a.x < b.x ? [dir(a), b.x] : [a.x, dir(b)];
-  return associacao([[p, y], [q, y]], { ini, fim, composicaoNoInicio: comp }) + nome((p + q) / 2, y + 20, rot);
+  return (
+    associacao(
+      [
+        [p, y],
+        [q, y],
+      ],
+      { ini, fim, composicaoNoInicio: comp },
+    ) + nome((p + q) / 2, y + 20, rot)
+  );
 }
 
 // associação vertical entre classes vizinhas da mesma coluna
@@ -63,31 +73,53 @@ function vertical(a, b, { ini, fim, rot, comp, dx = 0 }) {
   // multiplicidades à esquerda do traço, nome à direita: nada se sobrepõe no vão curto
   const x = meioX(a) + dx;
   const m = { tam: 12, cor: COR.azul, peso: "bold", ancora: "end" };
-  return associacao([[x, baixo(a)], [x, b.y]], { composicaoNoInicio: comp }) +
-    texto(x - 8, baixo(a) + (comp ? 34 : 16), ini, m) + texto(x - 8, b.y - 6, fim, m) +
-    rotulo(x + 12, (baixo(a) + b.y) / 2 + 5, rot, { ancora: "start" });
+  return (
+    associacao(
+      [
+        [x, baixo(a)],
+        [x, b.y],
+      ],
+      { composicaoNoInicio: comp },
+    ) +
+    texto(x - 8, baixo(a) + (comp ? 34 : 16), ini, m) +
+    texto(x - 8, b.y - 6, fim, m) +
+    rotulo(x + 12, (baixo(a) + b.y) / 2 + 5, rot, { ancora: "start" })
+  );
 }
 
 // associação por um canal vertical (margem ou vão entre colunas), com nome girado
 function canal(a, ya, b, yb, xc, { ini, fim, rot, ladoA = "esq", ladoB = "esq" }) {
   const xa = ladoA === "esq" ? a.x : dir(a);
   const xb = ladoB === "esq" ? b.x : dir(b);
-  return associacao([[xa, ya], [xc, ya], [xc, yb], [xb, yb]], { ini, fim }) +
-    nome(xc - 9, (ya + yb) / 2, rot, true);
+  return (
+    associacao(
+      [
+        [xa, ya],
+        [xc, ya],
+        [xc, yb],
+        [xb, yb],
+      ],
+      { ini, fim },
+    ) + nome(xc - 9, (ya + yb) / 2, rot, true)
+  );
 }
 
 function figuraClasses(colunas, ligar, margens) {
   const { mapa, largura, alturaTotal } = montar(colunas, margens);
   const linhas = ligar(mapa);
-  const caixas = Object.values(mapa).map((c) => (c.resumo ? desenharResumo(c) : desenharClasse(c, WC))).join("\n");
+  const caixas = Object.values(mapa)
+    .map((c) => (c.resumo ? desenharResumo(c) : desenharClasse(c, WC)))
+    .join("\n");
   return documento(largura, alturaTotal, linhas + caixas);
 }
 
 /** Figura 1 — escola, pessoas, convites e vínculos. */
 export function classesPessoas() {
   return figuraClasses(
-    [[classe("escola"), classe("membro"), resumo("estudante", "Figura 2"), classe("convite")],
-      [classe("usuario"), classe("vinculo"), classe("notificacao")]],
+    [
+      [classe("escola"), classe("membro"), resumo("estudante", "Figura 2"), classe("convite")],
+      [classe("usuario"), classe("vinculo"), classe("notificacao")],
+    ],
     (m) => {
       const { escola: esc, membro: mem, estudante: est, convite: con, usuario: usu, vinculo: vin, notificacao: not } = m;
       return [
@@ -99,14 +131,18 @@ export function classesPessoas() {
         canal(esc, esc.y + 70, con, con.y + 40, esc.x - 64, { ini: "1", fim: "0..*", rot: "emite" }),
         canal(usu, usu.y + 60, not, not.y + 40, dir(usu) + 40, { ini: "1", fim: "0..*", rot: "recebe", ladoA: "dir", ladoB: "dir" }),
       ].join("\n");
-    }, { esq: 82, dir: 54 });
+    },
+    { esq: 82, dir: 54 },
+  );
 }
 
 /** Figura 2 — estudante, consentimento, nota clínica e auditoria. */
 export function classesEstudante() {
   return figuraClasses(
-    [[resumo("escola", "Figura 1"), classe("consentimento"), classe("auditoria")],
-      [classe("estudante"), classe("nota")]],
+    [
+      [resumo("escola", "Figura 1"), classe("consentimento"), classe("auditoria")],
+      [classe("estudante"), classe("nota")],
+    ],
     (m) => {
       const { escola: esc, consentimento: cons, estudante: est, nota } = m;
       return [
@@ -114,14 +150,17 @@ export function classesEstudante() {
         horizontal(cons, est, cons.y + 60, { ini: "0..*", fim: "1", rot: "autoriza" }),
         vertical(est, nota, { ini: "1", fim: "0..*", rot: "tem notas reservadas" }),
       ].join("\n");
-    });
+    },
+  );
 }
 
 /** Figura 3 — ciclo de observação, versão do perfil e material. */
 export function classesCiclo() {
   return figuraClasses(
-    [[resumo("estudante", "Figura 2"), classe("ciclo"), classe("observacao"), classe("desfecho")],
-      [classe("versao"), classe("parametros"), classe("material"), classe("textoAdaptado")]],
+    [
+      [resumo("estudante", "Figura 2"), classe("ciclo"), classe("observacao"), classe("desfecho")],
+      [classe("versao"), classe("parametros"), classe("material"), classe("textoAdaptado")],
+    ],
     (m) => {
       const { estudante: est, ciclo: cic, observacao: obs, desfecho: des, versao: ver, parametros: par, material: mat, textoAdaptado: txt } = m;
       return [
@@ -134,7 +173,8 @@ export function classesCiclo() {
         horizontal(mat, des, des.y + 44, { ini: "1", fim: "0..1", rot: "resulta em", comp: true }),
         vertical(mat, txt, { ini: "1", fim: "0..1", rot: "texto adaptado", comp: true }),
       ].join("\n");
-    });
+    },
+  );
 }
 
 // ───────────────────────── casos de uso ─────────────────────────
@@ -215,10 +255,12 @@ function figuraCasos({ atores, casos, assoc = [], deps = [], extra = "", fundoEx
 /** Casos em arco ao redor do ator: nenhuma linha de associação atravessa outra elipse. */
 function arco(at, raio, passo, ids) {
   const meio = (ids.length - 1) / 2;
-  return Object.fromEntries(ids.map((id, i) => {
-    const dy = (i - meio) * passo;
-    return [id, { x: at.x + Math.sqrt(raio * raio - dy * dy), y: at.y + dy, t: T[id] }];
-  }));
+  return Object.fromEntries(
+    ids.map((id, i) => {
+      const dy = (i - meio) * passo;
+      return [id, { x: at.x + Math.sqrt(raio * raio - dy * dy), y: at.y + dy, t: T[id] }];
+    }),
+  );
 }
 
 const T = {
@@ -267,11 +309,29 @@ export function casosUsuario() {
   };
   const yBarra = yPerfis - 90;
   const linha = (pts, fim = "") => `<path d="${caminho(pts)}" fill="none" stroke="${COR.linha}" stroke-width="1.7"${fim}/>`;
-  let ger = Object.values(perfis).map((p) => linha([[p.x, p.y - 54], [p.x, yBarra]])).join("");
-  ger += linha([[perfis.resp.x, yBarra], [perfis.prof.x, yBarra]]);
-  ger += linha([[usuario.x, yBarra], [usuario.x, usuario.y + 108]], ' marker-end="url(#trianguloVazado)"');
+  let ger = Object.values(perfis)
+    .map((p) =>
+      linha([
+        [p.x, p.y - 54],
+        [p.x, yBarra],
+      ]),
+    )
+    .join("");
+  ger += linha([
+    [perfis.resp.x, yBarra],
+    [perfis.prof.x, yBarra],
+  ]);
+  ger += linha(
+    [
+      [usuario.x, yBarra],
+      [usuario.x, usuario.y + 108],
+    ],
+    ' marker-end="url(#trianguloVazado)"',
+  );
   return figuraCasos({
-    atores: { usuario, ...perfis }, casos, extra: ger,
+    atores: { usuario, ...perfis },
+    casos,
+    extra: ger,
     assoc: ["entrar", "convite", "recuperar", "notif"].map((c) => ["usuario", c]),
     deps: [["totp", "entrar", "extend", ["[saúde ou", "coordenação]"]]],
   });
@@ -298,7 +358,8 @@ export function casosDocente() {
   });
   casos.ia.x = casos.regras.x;
   return figuraCasos({
-    atores: { doc }, casos,
+    atores: { doc },
+    casos,
     assoc: ids.map((c) => ["doc", c]),
     deps: [
       ["abrir", "observar", "extend", ["[docente, sem", "ciclo aberto]"]],
@@ -324,7 +385,8 @@ export function casosSaude() {
   const casos = arco(prof, 380, 104, ids);
   casos.expirar = { x: casos.pendencias.x, y: tempo.y, t: T.expirar };
   return figuraCasos({
-    atores: { prof, tempo }, casos,
+    atores: { prof, tempo },
+    casos,
     assoc: [...ids.map((c) => ["prof", c]), ["tempo", "expirar"]],
   });
 }

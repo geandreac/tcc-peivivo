@@ -53,13 +53,17 @@ export function ResumoErros({ erros }: { erros: ErroCampo[] }) {
   if (erros.length === 0) return null;
   return (
     <div className="resumo-erros" ref={ref} tabIndex={-1} role="alert" aria-labelledby="resumo-erros-titulo">
-      <h2 id="resumo-erros-titulo">
-        {erros.length === 1 ? "Há 1 problema no formulário" : `Há ${erros.length} problemas no formulário`}
-      </h2>
+      <h2 id="resumo-erros-titulo">{erros.length === 1 ? "Há 1 problema no formulário" : `Há ${erros.length} problemas no formulário`}</h2>
       <ul>
         {erros.map((e) => (
           <li key={e.campo}>
-            <a href={`#${e.campo}`} onClick={(ev) => { ev.preventDefault(); document.getElementById(e.campo)?.focus(); }}>
+            <a
+              href={`#${e.campo}`}
+              onClick={(ev) => {
+                ev.preventDefault();
+                document.getElementById(e.campo)?.focus();
+              }}
+            >
               {e.mensagem}
             </a>
           </li>

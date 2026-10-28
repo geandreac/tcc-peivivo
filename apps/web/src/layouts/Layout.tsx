@@ -3,10 +3,35 @@ import { useSessao } from "../hooks/useSessao";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { Toasts } from "../components/Toasts";
 import { PAPEL } from "../utils/rotulos";
-import { Accessibility, Bell, CircleHelp, ClipboardCheck, LogOut, UserRound, UsersRound, type LucideIcon } from "lucide-react";
+import {
+  Accessibility,
+  Bell,
+  CircleHelp,
+  ClipboardCheck,
+  History,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  ShieldCheck,
+  UserCog,
+  UserRound,
+  UsersRound,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 import { useInatividade } from "../hooks/useInatividade";
 import { api } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
+
+/** D-50: barra lateral do painel administrativo (Administrador Geral sempre; coordenação dentro de /admin). */
+const ITENS_ADMIN: { rota: string; rotulo: string; Icone: LucideIcon; fim?: boolean }[] = [
+  { rota: "/admin", rotulo: "Visão geral", Icone: LayoutDashboard, fim: true },
+  { rota: "/admin/usuarios", rotulo: "Usuários e acessos", Icone: UserCog },
+  { rota: "/admin/perfis", rotulo: "Perfis e permissões", Icone: ShieldCheck },
+  { rota: "/admin/ferramentas", rotulo: "Ferramentas", Icone: Wrench },
+  { rota: "/admin/auditoria", rotulo: "Atividades e auditoria", Icone: History },
+  { rota: "/admin/configuracoes", rotulo: "Configurações", Icone: Settings },
+];
 
 const ITENS_NAV: { rota: string; rotulo: string; Icone: LucideIcon; soQuemValida?: boolean }[] = [
   { rota: "/painel", rotulo: "Estudantes", Icone: UsersRound },
@@ -39,7 +64,7 @@ export function Layout() {
   // Contagem de não lidas: recarrega a cada troca de tela (sem polling, sem push).
   const naoLidas = useConsulta<number>(
     async () => (usuario ? (await api.listarNotificacoes()).filter((n) => !n.lidaEm).length : 0),
-    [usuario?.id, location.pathname]
+    [usuario?.id, location.pathname],
   );
   const contagem = naoLidas.dados ?? 0;
 
@@ -51,6 +76,7 @@ export function Layout() {
     return papeis.includes("PROFISSIONAL_SAUDE");
   }, [usuario?.id]);
   const itensNav = ITENS_NAV.filter((i) => !i.soQuemValida || acompanhaValidacoes.dados);
+  const areaAdmin = Boolean(usuario) && (usuario?.papelPlataforma === "ADMIN_GERAL" || location.pathname.startsWith("/admin"));
 
   // D-32: 30 min sem interação encerram a sessão de quem vê dado de saúde ou administra.
   useInatividade(api.modo === "real" && Boolean(usuario?.exigeSegundoFator), 30, async () => {
@@ -60,9 +86,10 @@ export function Layout() {
   });
 
   async function aoSair() {
+    // sai da rota protegida antes de zerar a sessão: senão a RotaProtegida redireciona para /entrar primeiro
+    navigate("/");
     await sair();
     anunciar("Você saiu da sua conta.", "neutro");
-    navigate("/");
   }
 
   return (
@@ -72,13 +99,21 @@ export function Layout() {
       </a>
       <header className="cabecalho">
         <div className="container cabecalho__linha">
-          <NavLink to={usuario ? "/painel" : "/"} className="marca" aria-label="PEI Vivo — página inicial">
+          <NavLink
+            to={usuario ? (usuario.papelPlataforma === "ADMIN_GERAL" ? "/admin" : "/painel") : "/"}
+            className="marca"
+            aria-label="PEI Vivo — página inicial"
+          >
             <Logo />
             <span>PEI Vivo</span>
           </NavLink>
           {usuario ? (
             <div className="sessao">
-              <NavLink to="/notificacoes" className="sino" aria-label={contagem > 0 ? `Notificações, ${contagem} não lida${contagem > 1 ? "s" : ""}` : "Notificações"}>
+              <NavLink
+                to="/notificacoes"
+                className="sino"
+                aria-label={contagem > 0 ? `Notificações, ${contagem} não lida${contagem > 1 ? "s" : ""}` : "Notificações"}
+              >
                 <Bell aria-hidden="true" size={22} />
                 {contagem > 0 && (
                   <span className="sino__contagem" aria-hidden="true">
@@ -126,16 +161,25 @@ export function Layout() {
       <div className={usuario ? "app app--com-nav" : "app"}>
         {usuario && (
           /* Um único <nav>: lateral no desktop, barra inferior no celular (prompt §7.1). Só o CSS muda. */
-          <nav className="nav-app" aria-label="Principal">
+          <nav className={areaAdmin ? "nav-app nav-app--admin" : "nav-app"} aria-label={areaAdmin ? "Administração" : "Principal"}>
             <ul>
-              {itensNav.map(({ rota, rotulo, Icone }) => (
-                <li key={rota}>
-                  <NavLink to={rota}>
-                    <Icone aria-hidden="true" size={22} strokeWidth={2} />
-                    <span>{rotulo}</span>
-                  </NavLink>
-                </li>
-              ))}
+              {areaAdmin
+                ? ITENS_ADMIN.map(({ rota, rotulo, Icone, fim }) => (
+                    <li key={rota}>
+                      <NavLink to={rota} end={fim}>
+                        <Icone aria-hidden="true" size={22} strokeWidth={2} />
+                        <span>{rotulo}</span>
+                      </NavLink>
+                    </li>
+                  ))
+                : itensNav.map(({ rota, rotulo, Icone }) => (
+                    <li key={rota}>
+                      <NavLink to={rota}>
+                        <Icone aria-hidden="true" size={22} strokeWidth={2} />
+                        <span>{rotulo}</span>
+                      </NavLink>
+                    </li>
+                  ))}
             </ul>
           </nav>
         )}
@@ -154,7 +198,14 @@ export function Layout() {
       <footer className="rodape">
         <div className="container">
           <p>
-            PEI Vivo — TCC de Sistemas de Informação, CEUNI FAMETRO, 2026. Protótipo com dados <strong>fictícios</strong>; a camada de IA está desligada.
+            PEI Vivo — TCC de Sistemas de Informação, CEUNI FAMETRO, 2026.{" "}
+            {api.modo === "real" ? (
+              "A camada de IA está desligada."
+            ) : (
+              <>
+                Protótipo com dados <strong>fictícios</strong>; a camada de IA está desligada.
+              </>
+            )}
           </p>
           <ul>
             <li>

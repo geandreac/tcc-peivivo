@@ -4,11 +4,14 @@
 // - CORS restrito à origem do app (ORIGEM_APP), nunca "*".
 // - Exige JWT de usuário; o gateway do Supabase já valida a assinatura
 //   (verify_jwt = true, padrão) e o banco decide o papel (D-32: papel nunca no JWT).
-// - Erros saem com código estável e mensagem simples; logs sem dado pessoal.
+// - Erros saem com código estável e mensagem simples; logs sem dado pessoal,
+//   com `requestId` (também no header x-request-id) para correlacionar.
+// - Toda chamada ao banco/Auth tem tempo limite (TIMEOUT_REDE_MS).
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.4";
+import { ORIGEM_PADRAO_DEV } from "./gerado/contratos/index.ts";
 import { ErroFuncao } from "./gerado/funcoes/index.ts";
 
-const ORIGEM = Deno.env.get("ORIGEM_APP") ?? "http://localhost:5173";
+const ORIGEM = Deno.env.get("ORIGEM_APP") ?? ORIGEM_PADRAO_DEV;
 const CORS = {
   "Access-Control-Allow-Origin": ORIGEM,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -16,12 +19,20 @@ const CORS = {
   Vary: "Origin",
 };
 
-export function json(status: number, corpo: unknown): Response {
+export function json(status: number, corpo: unknown, requestId?: string): Response {
   return new Response(JSON.stringify(corpo), {
     status,
-    headers: { ...CORS, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
+    headers: { ...CORS, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...(requestId ? { "x-request-id": requestId } : {}) },
   });
 }
+
+const TIMEOUT_REDE_MS = 10_000;
+
+/** fetch com tempo limite: um banco lento não segura a função até o limite do runtime. */
+const fetchComTempo: typeof fetch = (url, init) => {
+  const tempo = AbortSignal.timeout(TIMEOUT_REDE_MS);
+  return fetch(url, { ...init, signal: init?.signal ? AbortSignal.any([init.signal, tempo]) : tempo });
+};
 
 function variavel(nome: string): string {
   const v = Deno.env.get(nome);
@@ -32,7 +43,7 @@ function variavel(nome: string): string {
 /** Cliente com o JWT do usuário: RLS e RPCs decidem como se fosse ele. */
 function clienteDoUsuario(autorizacao: string): SupabaseClient {
   return createClient(variavel("SUPABASE_URL"), variavel("SUPABASE_ANON_KEY"), {
-    global: { headers: { Authorization: autorizacao } },
+    global: { headers: { Authorization: autorizacao }, fetch: fetchComTempo },
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
@@ -40,6 +51,7 @@ function clienteDoUsuario(autorizacao: string): SupabaseClient {
 /** Cliente service role: só para as portas `fn_registrar_*`, que revalidam tudo. */
 function clienteServico(): SupabaseClient {
   return createClient(variavel("SUPABASE_URL"), variavel("SUPABASE_SERVICE_ROLE_KEY"), {
+    global: { fetch: fetchComTempo },
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
@@ -59,6 +71,7 @@ export interface Clientes {
 export function servir(nomeFuncao: string, caso: (corpo: unknown, clientes: Clientes) => Promise<unknown>) {
   Deno.serve(async (req) => {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
+    const requestId = crypto.randomUUID();
     if (req.method !== "POST") return json(405, { erro: { codigo: "VALIDACAO", mensagem: "Use POST." } });
 
     const autorizacao = req.headers.get("Authorization");
@@ -73,14 +86,18 @@ export function servir(nomeFuncao: string, caso: (corpo: unknown, clientes: Clie
     }
     try {
       const resposta = await caso(corpo, { usuario: clienteDoUsuario(autorizacao), servico: clienteServico() });
-      return json(200, resposta);
+      return json(200, resposta, requestId);
     } catch (e) {
       if (e instanceof ErroFuncao) {
-        console.info(JSON.stringify({ funcao: nomeFuncao, status: e.status, codigo: e.codigo })); // sem corpo, sem usuário
-        return json(e.status, { erro: { codigo: e.codigo, mensagem: e.message } });
+        console.info(JSON.stringify({ requestId, funcao: nomeFuncao, status: e.status, codigo: e.codigo })); // sem corpo, sem usuário
+        return json(e.status, { erro: { codigo: e.codigo, mensagem: e.message } }, requestId);
       }
-      console.error(JSON.stringify({ funcao: nomeFuncao, status: 500, tipo: (e as Error)?.name ?? "desconhecido" }));
-      return json(500, { erro: { codigo: "INTERNO", mensagem: "Algo deu errado do nosso lado. Tente de novo em instantes." } });
+      // nome e código do erro (ex.: TimeoutError, 57014), nunca a mensagem: ela pode carregar dado pessoal
+      const { name, code } = (e ?? {}) as { name?: string; code?: unknown };
+      console.error(
+        JSON.stringify({ requestId, funcao: nomeFuncao, status: 500, tipo: name ?? "desconhecido", ...(typeof code === "string" ? { code } : {}) }),
+      );
+      return json(500, { erro: { codigo: "INTERNO", mensagem: "Algo deu errado do nosso lado. Tente de novo em instantes." } }, requestId);
     }
   });
 }
