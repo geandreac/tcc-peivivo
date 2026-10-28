@@ -71,7 +71,17 @@ export function ConvidarPessoa({ estudanteId, aoConvidar }: { estudanteId: strin
         </Alerta>
       )}
       <Campo id="convite-nome" rotulo="Nome" opcional autoComplete="off" value={nome} onChange={(e) => setNome(e.target.value)} />
-      <Campo id="convite-email" rotulo="E-mail" type="email" inputMode="email" autoComplete="off" required value={email} onChange={(e) => setEmail(e.target.value)} erro={erroDe("convite-email")} />
+      <Campo
+        id="convite-email"
+        rotulo="E-mail"
+        type="email"
+        inputMode="email"
+        autoComplete="off"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        erro={erroDe("convite-email")}
+      />
       <fieldset>
         <legend>Papel</legend>
         {PAPEIS.map((p) => (
@@ -85,12 +95,27 @@ export function ConvidarPessoa({ estudanteId, aoConvidar }: { estudanteId: strin
         ))}
       </fieldset>
       {papel === "PROFISSIONAL_SAUDE" && (
-        <Campo id="convite-registro" rotulo="Registro no conselho profissional" dica="Ex.: CRFa, CRP, CREFITO. A escola confere depois." required value={registro} onChange={(e) => setRegistro(e.target.value)} erro={erroDe("convite-registro")} />
+        <Campo
+          id="convite-registro"
+          rotulo="Registro no conselho profissional"
+          dica="Ex.: CRFa, CRP, CREFITO. A escola confere depois."
+          required
+          value={registro}
+          onChange={(e) => setRegistro(e.target.value)}
+          erro={erroDe("convite-registro")}
+        />
       )}
       {papel === "RESPONSAVEL" && (
         <div className="campo">
           <label className="opcao" htmlFor="convite-conferido">
-            <input id="convite-conferido" type="checkbox" checked={conferido} onChange={(e) => setConferido(e.target.checked)} aria-invalid={erroDe("convite-conferido") ? true : undefined} aria-describedby={erroDe("convite-conferido") ? "convite-conferido-erro" : undefined} />
+            <input
+              id="convite-conferido"
+              type="checkbox"
+              checked={conferido}
+              onChange={(e) => setConferido(e.target.checked)}
+              aria-invalid={erroDe("convite-conferido") ? true : undefined}
+              aria-describedby={erroDe("convite-conferido") ? "convite-conferido-erro" : undefined}
+            />
             <span className="opcao__texto">
               <span>Conferi presencialmente, com documento, que esta pessoa é responsável legal</span>
             </span>

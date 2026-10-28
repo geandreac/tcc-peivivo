@@ -1,17 +1,42 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BadgeCheck, BookOpenCheck, Building2, EyeOff, FileX2, HeartHandshake, KeyRound, ListChecks, ScrollText, ShieldCheck, Stethoscope } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  BookOpenCheck,
+  Building2,
+  EyeOff,
+  FileX2,
+  HeartHandshake,
+  KeyRound,
+  ListChecks,
+  ScrollText,
+  ShieldCheck,
+  Stethoscope,
+} from "lucide-react";
 import { adaptar } from "@pei-vivo/motor-adaptacao";
 import { LinkBotao } from "../components/Botao";
 import { useTitulo } from "../hooks/useTitulo";
 import { useSessao } from "../hooks/useSessao";
-import { PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA } from "../mocks/dados";
+import { PARAMETROS_CENARIO_A, TEXTO_CICLO_DA_AGUA } from "../mocks/exemplos";
 
 /** Os quatro passos do ciclo — sequência real (a ordem é a informação). */
 const CICLO = [
-  { nome: "Observar", quem: "Escola, família e saúde", texto: "A cada 15 dias, cada um registra o que só ele vê: em sala, em casa, na terapia. Seis perguntas, três opções. Nunca diagnóstico." },
-  { nome: "Validar", quem: "Profissional de saúde", texto: "Regras fixas e auditáveis convertem as observações num perfil de leitura. O profissional valida o conjunto, não cada material." },
-  { nome: "Adaptar", quem: "Docente", texto: "A professora cola o texto da aula e recebe a versão do estudante: trechos curtos, uma instrução por vez, contraste reforçado." },
+  {
+    nome: "Observar",
+    quem: "Escola, família e saúde",
+    texto: "A cada 15 dias, cada um registra o que só ele vê: em sala, em casa, na terapia. Seis perguntas, três opções. Nunca diagnóstico.",
+  },
+  {
+    nome: "Validar",
+    quem: "Profissional de saúde",
+    texto: "Regras fixas e auditáveis convertem as observações num perfil de leitura. O profissional valida o conjunto, não cada material.",
+  },
+  {
+    nome: "Adaptar",
+    quem: "Docente",
+    texto: "A professora cola o texto da aula e recebe a versão do estudante: trechos curtos, uma instrução por vez, contraste reforçado.",
+  },
   { nome: "Retroalimentar", quem: "Docente", texto: "Ela revisa, aprova, aplica e registra se funcionou. O resultado refina o perfil do próximo ciclo." },
 ];
 
@@ -20,18 +45,38 @@ const PAPEIS = [
     chave: "familia",
     Icone: HeartHandshake,
     titulo: "Família",
-    texto: "Você decide o que é registrado, quem é o profissional de saúde e vê quem acessou os dados do seu filho. Pode retirar a autorização a qualquer momento.",
+    texto:
+      "Você decide o que é registrado, quem é o profissional de saúde e vê quem acessou os dados do seu filho. Pode retirar a autorização a qualquer momento.",
     destaque: true,
   },
-  { chave: "escola", Icone: BookOpenCheck, titulo: "Docente", texto: "Observa em poucos toques e gera o material da aula em segundos. Nada chega ao estudante sem a sua aprovação." },
-  { chave: "saude", Icone: Stethoscope, titulo: "Equipe de saúde", texto: "Suas estratégias viram ajustes concretos em sala, e você vê o resultado real. Suas notas ficam reservadas à equipe de saúde." },
-  { chave: "coordenacao", Icone: Building2, titulo: "Coordenação", texto: "Cadastra, convida e acompanha a escola por números e pendências, sem acesso a dado clínico." },
+  {
+    chave: "escola",
+    Icone: BookOpenCheck,
+    titulo: "Docente",
+    texto: "Observa em poucos toques e gera o material da aula em segundos. Nada chega ao estudante sem a sua aprovação.",
+  },
+  {
+    chave: "saude",
+    Icone: Stethoscope,
+    titulo: "Equipe de saúde",
+    texto: "Suas estratégias viram ajustes concretos em sala, e você vê o resultado real. Suas notas ficam reservadas à equipe de saúde.",
+  },
+  {
+    chave: "coordenacao",
+    Icone: Building2,
+    titulo: "Coordenação",
+    texto: "Cadastra, convida e acompanha a escola por números e pendências, sem acesso a dado clínico.",
+  },
 ] as const;
 
 const CONFIANCA = [
   { Icone: FileX2, titulo: "Laudo não é armazenado", texto: "O sistema não guarda diagnóstico nem CID. O perfil descreve o que funciona, não um rótulo." },
   { Icone: KeyRound, titulo: "A família tem a chave", texto: "Sem autorização, ninguém registra nada. É a família quem confirma o profissional de saúde." },
-  { Icone: EyeOff, titulo: "Cada um vê só o necessário", texto: "A professora nunca lê as notas da terapia. A coordenação acompanha a escola por números; observações, só no histórico do PEI." },
+  {
+    Icone: EyeOff,
+    titulo: "Cada um vê só o necessário",
+    texto: "A professora nunca lê as notas da terapia. A coordenação acompanha a escola por números; observações, só no histórico do PEI.",
+  },
   { Icone: ScrollText, titulo: "Todo acesso deixa rastro", texto: "A família vê quem leu as notas clínicas e quando, numa trilha que ninguém apaga." },
 ];
 
@@ -53,8 +98,8 @@ export function Inicio() {
             Cada estudante lê <span className="inicio-destaque">do seu jeito.</span>
           </h1>
           <p className="inicio-lead">
-            O PEI Vivo une escola, família e equipe de saúde num ciclo que aprende a cada quinze dias, e transforma o texto da aula no material
-            certo para cada estudante com TEA, TDAH ou dislexia.
+            O PEI Vivo une escola, família e equipe de saúde num ciclo que aprende a cada quinze dias, e transforma o texto da aula no material certo para cada
+            estudante com TEA, TDAH ou dislexia.
           </p>
           <div className="inicio-acoes">
             <LinkBotao to={entrar}>{usuario ? "Ir para meus estudantes" : "Entrar"}</LinkBotao>
@@ -98,8 +143,8 @@ export function Inicio() {
             <BadgeCheck size={18} /> Revisado pela professora
           </p>
           <figcaption id="legenda-demo" className="sr-only">
-            Exemplo fictício: o mesmo texto de ciências, antes e depois da adaptação ao perfil do Miguel. A versão adaptada é gerada agora pelo
-            motor de regras do PEI Vivo.
+            Exemplo fictício: o mesmo texto de ciências, antes e depois da adaptação ao perfil do Miguel. A versão adaptada é gerada agora pelo motor de regras
+            do PEI Vivo.
           </figcaption>
         </figure>
       </section>

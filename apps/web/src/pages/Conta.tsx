@@ -31,8 +31,8 @@ export function Conta() {
       </p>
       {!real && (
         <Alerta tom="info" titulo="Demonstração">
-          Nesta demonstração não há senha nem verificação em duas etapas. No sistema real, esta tela permite trocar a senha, cadastrar o
-          aplicativo autenticador e sair de todos os dispositivos.
+          Nesta demonstração não há senha nem verificação em duas etapas. No sistema real, esta tela permite trocar a senha, cadastrar o aplicativo autenticador
+          e sair de todos os dispositivos.
         </Alerta>
       )}
       <div className="grade-cards grade-cards--3">

@@ -47,7 +47,9 @@ for (const arquivo of arquivos) {
 }
 await executar("seed.sql", await readFile(join(raiz, "supabase", "seed.sql"), "utf8"));
 
-const { rows: [resumo] } = await db.query(`
+const {
+  rows: [resumo],
+} = await db.query(`
   select
     (select count(*) from information_schema.tables where table_schema = 'public')::int as tabelas,
     (select count(*) from pg_policies where schemaname = 'public')::int as politicas,

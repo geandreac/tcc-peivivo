@@ -1,12 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  adaptar,
-  dividirEmEtapas,
-  ehEnunciadoComposto,
-  quebrarEmLinhas,
-  textoDoAdaptado,
-  CARACTERES_POR_LINHA,
-} from "./adaptador";
+import { adaptar, dividirEmEtapas, ehEnunciadoComposto, quebrarEmLinhas, textoDoAdaptado, CARACTERES_POR_LINHA } from "./adaptador";
 import { PARAMETROS_PADRAO } from "./tipos";
 import type { ParametrosAdaptacao } from "./tipos";
 
@@ -87,14 +80,8 @@ describe("P2.4 — adaptar (RF09, D-10)", () => {
         expect(etapa.toLowerCase()).not.toMatch(/\be depois\b|\bem seguida\b/u);
       }
     }
-    expect(r.enunciados[0]!.etapas).toEqual([
-      "Leia o texto acima.",
-      "Responda às perguntas com suas palavras.",
-    ]);
-    expect(r.enunciados[1]!.etapas).toEqual([
-      "Circule as palavras que você não conhece.",
-      "Escreva uma frase com cada uma delas.",
-    ]);
+    expect(r.enunciados[0]!.etapas).toEqual(["Leia o texto acima.", "Responda às perguntas com suas palavras."]);
+    expect(r.enunciados[1]!.etapas).toEqual(["Circule as palavras que você não conhece.", "Escreva uma frase com cada uma delas."]);
   });
 
   it("não divide 'Observe a imagem e a legenda' (o 'e' não introduz outro comando)", () => {

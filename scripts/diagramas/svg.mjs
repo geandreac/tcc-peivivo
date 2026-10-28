@@ -28,8 +28,10 @@ export function rotulo(x, y, s, o = {}) {
   const w = s.length * tam * 0.5 + 8;
   const ancora = o.ancora ?? "middle";
   const x0 = ancora === "middle" ? x - w / 2 : ancora === "end" ? x - w : x - 4;
-  return `<rect x="${x0}" y="${y - tam}" width="${w}" height="${tam + 5}" fill="#FFFFFF"/>` +
-    texto(x, y, s, { tam, cor: o.cor ?? COR.apagado, estilo: o.estilo ?? "italic", ancora, peso: o.peso ?? "normal" });
+  return (
+    `<rect x="${x0}" y="${y - tam}" width="${w}" height="${tam + 5}" fill="#FFFFFF"/>` +
+    texto(x, y, s, { tam, cor: o.cor ?? COR.apagado, estilo: o.estilo ?? "italic", ancora, peso: o.peso ?? "normal" })
+  );
 }
 
 export const DEFS = `<defs>
@@ -59,8 +61,7 @@ ${corpo}
 }
 
 export function titulo(t, sub) {
-  return texto(40, 44, t, { tam: 22, cor: COR.azul, peso: "bold", fonte: SERIFA }) +
-    texto(40, 68, sub, { tam: 13, cor: COR.apagado, estilo: "italic" });
+  return texto(40, 44, t, { tam: 22, cor: COR.azul, peso: "bold", fonte: SERIFA }) + texto(40, 68, sub, { tam: 13, cor: COR.apagado, estilo: "italic" });
 }
 
 export const caminho = (pts) => pts.map((p, i) => `${i ? "L" : "M"}${p[0]},${p[1]}`).join(" ");

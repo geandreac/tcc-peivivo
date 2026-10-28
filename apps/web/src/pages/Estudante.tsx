@@ -1,20 +1,21 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, ehErroApi, type Ciclo, type Material, type VersaoPerfil } from "../services";
 import { useEstudante } from "../hooks/useEstudante";
 import { useConsulta } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";
 import { Alerta, Badge, Card, Carregando, ErroCarregamento, Esqueleto, EstadoVazio } from "../components/Feedback";
-import { LinkBotao } from "../components/Botao";
+import { Botao, LinkBotao } from "../components/Botao";
 import { EXPLICA_RITMO_PERFIL, PARAMETRO, STATUS_APROVACAO, STATUS_VALIDACAO, descreverPerfil } from "../utils/rotulos";
 import { formatarData, formatarDataHora, idade } from "../utils/datas";
 import type { ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
+
+const MATERIAIS_POR_PAGINA = 10;
 
 interface Dados {
   vigente: VersaoPerfil | null;
   versoes: VersaoPerfil[];
   cicloAberto: Ciclo | null;
-  materiais: Material[];
 }
 
 export function ParametrosLista({ parametros, tecnico = true }: { parametros: ParametrosAdaptacao; tecnico?: boolean }) {
@@ -52,14 +53,15 @@ export function Estudante() {
 
   const dados = useConsulta<Dados | null>(async () => {
     if (!id || !podeLerDados) return null;
-    const [vigente, versoes, cicloAberto, materiais] = await Promise.all([
-      api.obterVersaoVigente(id),
-      api.listarVersoes(id),
-      api.obterCicloAberto(id),
-      api.listarMateriais(id),
-    ]);
-    return { vigente, versoes, cicloAberto, materiais };
+    const [vigente, versoes, cicloAberto] = await Promise.all([api.obterVersaoVigente(id), api.listarVersoes(id), api.obterCicloAberto(id)]);
+    return { vigente, versoes, cicloAberto };
   }, [id, podeLerDados]);
+  // D-48: materiais em páginas; pede um a mais para saber se há outra página.
+  const [limiteMateriais, setLimiteMateriais] = useState(MATERIAIS_POR_PAGINA);
+  const materiais = useConsulta<Material[] | null>(
+    async () => (id && podeLerDados ? api.listarMateriais(id, { limite: limiteMateriais + 1 }) : null),
+    [id, podeLerDados, limiteMateriais],
+  );
 
   if (ctx.carregando) return <Carregando texto="Carregando estudante…" />;
   if (ctx.erro || !ctx.dados) {
@@ -97,7 +99,10 @@ export function Estudante() {
       </div>
 
       {!consentimentoAtivo && (
-        <Alerta tom={papel === "RESPONSAVEL" ? "aviso" : "erro"} titulo={papel === "RESPONSAVEL" ? "Falta o seu consentimento" : "Aguardando consentimento do responsável"}>
+        <Alerta
+          tom={papel === "RESPONSAVEL" ? "aviso" : "erro"}
+          titulo={papel === "RESPONSAVEL" ? "Falta o seu consentimento" : "Aguardando consentimento do responsável"}
+        >
           <p>
             {papel === "RESPONSAVEL"
               ? "Nenhum perfil é criado e nenhum material é gerado sem a sua autorização. Leia o termo e decida."
@@ -155,7 +160,11 @@ export function Estudante() {
               </LinkBotao>
             </Card>
             <Card titulo="Observação quinzenal" nivel={3} className="card--acao">
-              <p>{dados.dados?.cicloAberto ? `Ciclo ${dados.dados.cicloAberto.numero} aberto desde ${formatarData(dados.dados.cicloAberto.dataInicio)}.` : "Abra o próximo ciclo e registre as seis dimensões."}</p>
+              <p>
+                {dados.dados?.cicloAberto
+                  ? `Ciclo ${dados.dados.cicloAberto.numero} aberto desde ${formatarData(dados.dados.cicloAberto.dataInicio)}.`
+                  : "Abra o próximo ciclo e registre as seis dimensões."}
+              </p>
               <LinkBotao to={`/estudantes/${estudante.id}/observar`} variante="secundario" pequeno>
                 Registrar observação
               </LinkBotao>
@@ -225,7 +234,7 @@ export function Estudante() {
       {podeLerDados && (
         <>
           <h2>Perfil de aprendizagem vigente</h2>
-          {dados.carregando && <Esqueleto texto="Carregando perfil e materiais…" itens={2} />}
+          {dados.carregando && <Esqueleto texto="Carregando perfil…" itens={2} />}
           {dados.erro && <ErroCarregamento erro={dados.erro} tentarNovamente={dados.recarregar} />}
           {dados.dados && !dados.dados.vigente && (
             <EstadoVazio titulo="Ainda não há perfil vigente">
@@ -239,33 +248,49 @@ export function Estudante() {
                 <span className="meta">
                   Ciclo {dados.dados.vigente.numeroCiclo} · desde {formatarData(dados.dados.vigente.dataVigencia)}
                 </span>
-                {pendente && <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>Ciclo {pendente.numeroCiclo}: {STATUS_VALIDACAO[pendente.statusValidacao].texto}</Badge>}
+                {pendente && (
+                  <Badge tom={STATUS_VALIDACAO[pendente.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[pendente.statusValidacao].tom}>
+                    Ciclo {pendente.numeroCiclo}: {STATUS_VALIDACAO[pendente.statusValidacao].texto}
+                  </Badge>
+                )}
               </div>
               <ParametrosLista parametros={dados.dados.vigente.parametros} tecnico={papel === "PROFISSIONAL_SAUDE"} />
-              <p className="texto-apoio u-mt-3">
-                {EXPLICA_RITMO_PERFIL}
-              </p>
+              <p className="texto-apoio u-mt-3">{EXPLICA_RITMO_PERFIL}</p>
             </Card>
           )}
 
           <h2>Materiais</h2>
-          {dados.dados && dados.dados.materiais.length === 0 && (
+          {materiais.carregando && !materiais.dados && <Esqueleto texto="Carregando materiais…" itens={2} />}
+          {materiais.erro && <ErroCarregamento erro={materiais.erro} tentarNovamente={materiais.recarregar} />}
+          {materiais.dados && materiais.dados.length === 0 && (
             <EstadoVazio titulo={papel === "DOCENTE" ? "Nenhum material ainda" : "Nenhum material aprovado ainda"}>
               <p>{papel === "DOCENTE" ? "Gere o primeiro a partir de um texto da sua aula." : "Materiais aparecem aqui depois que a docente os aprova."}</p>
             </EstadoVazio>
           )}
-          {dados.dados && dados.dados.materiais.length > 0 && (
+          {materiais.dados && materiais.dados.length > 0 && (
             <ul className="lista-simples" aria-label="Materiais">
-              {dados.dados.materiais.map((m) => (
+              {materiais.dados.slice(0, limiteMateriais).map((m) => (
                 <li key={m.id}>
                   <div>
                     <Link to={m.statusAprovacao === "RASCUNHO" ? `/materiais/${m.id}/revisar` : `/materiais/${m.id}`}>{m.titulo}</Link>
-                    <div className="meta">Gerado em {formatarDataHora(m.dataGeracao)} · camada de IA {m.iaAplicada ? "aplicada" : "desligada"}</div>
+                    <div className="meta">
+                      Gerado em {formatarDataHora(m.dataGeracao)} · camada de IA {m.iaAplicada ? "aplicada" : "desligada"}
+                    </div>
                   </div>
                   <Badge tom={STATUS_APROVACAO[m.statusAprovacao].tom}>{STATUS_APROVACAO[m.statusAprovacao].texto}</Badge>
                 </li>
               ))}
             </ul>
+          )}
+          {materiais.dados && materiais.dados.length > limiteMateriais && (
+            <Botao
+              variante="secundario"
+              carregando={materiais.carregando}
+              textoCarregando="Carregando…"
+              onClick={() => setLimiteMateriais((n) => n + MATERIAIS_POR_PAGINA)}
+            >
+              Carregar mais materiais
+            </Botao>
           )}
         </>
       )}

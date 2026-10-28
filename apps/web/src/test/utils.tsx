@@ -20,7 +20,7 @@ export async function renderizarApp(rota: string, usuarioId?: string, preparar?:
           <Rotas />
         </MemoryRouter>
       </AnuncioProvider>
-    </SessaoProvider>
+    </SessaoProvider>,
   );
 }
 
@@ -35,7 +35,7 @@ export function envolver(ui: ReactNode) {
       <AnuncioProvider>
         <MemoryRouter initialEntries={["/"]}>{ui}</MemoryRouter>
       </AnuncioProvider>
-    </SessaoProvider>
+    </SessaoProvider>,
   );
 }
 

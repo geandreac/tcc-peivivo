@@ -48,19 +48,25 @@ export function DadosLgpd() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Dados do estudante" />
-        <Alerta tom="info" titulo="Exportação e exclusão são do responsável legal">A coordenação pode exportar o histórico; docente e profissional não têm esta função.</Alerta>
+        <Alerta tom="info" titulo="Exportação e exclusão são do responsável legal">
+          A coordenação pode exportar o histórico; docente e profissional não têm esta função.
+        </Alerta>
       </>
     );
   }
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Dados do estudante" descricao="Seus direitos pela LGPD: ver tudo em formato legível e, se for o responsável, apagar tudo." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Dados do estudante"
+        descricao="Seus direitos pela LGPD: ver tudo em formato legível e, se for o responsável, apagar tudo."
+      />
 
       <Card titulo="Exportar">
         <p>
-          Gera um arquivo com estudante, vínculos, consentimentos, ciclos, observações, versões de perfil, materiais aprovados, desfechos e
-          auditoria. <strong>Não inclui</strong> notas clínicas — elas não pertencem ao responsável.
+          Gera um arquivo com estudante, vínculos, consentimentos, ciclos, observações, versões de perfil, materiais aprovados, desfechos e auditoria.{" "}
+          <strong>Não inclui</strong> notas clínicas — elas não pertencem ao responsável.
         </p>
         {exportar.erro && (
           <Alerta tom="erro" vivo>
@@ -85,8 +91,8 @@ export function DadosLgpd() {
       {papel === "RESPONSAVEL" && (
         <Card titulo="Excluir definitivamente">
           <p>
-            Apaga o estudante e tudo ligado a ele — inclusive as anotações do profissional de saúde. Fica apenas um registro de que a exclusão
-            aconteceu, sem dados pessoais. <strong>Não dá para desfazer.</strong>
+            Apaga o estudante e tudo ligado a ele — inclusive as anotações do profissional de saúde. Fica apenas um registro de que a exclusão aconteceu, sem
+            dados pessoais. <strong>Não dá para desfazer.</strong>
           </p>
           <div className="grupo-botoes">
             <Botao variante="perigo" onClick={() => setModalExcluir(true)}>
@@ -119,7 +125,15 @@ export function DadosLgpd() {
             {mensagemAmigavel(excluir.erro)}
           </Alerta>
         )}
-        <Campo id="confirmacao" rotulo="Nome do estudante" required autoComplete="off" value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} erro={erroConfirmacao} />
+        <Campo
+          id="confirmacao"
+          rotulo="Nome do estudante"
+          required
+          autoComplete="off"
+          value={confirmacao}
+          onChange={(e) => setConfirmacao(e.target.value)}
+          erro={erroConfirmacao}
+        />
       </Modal>
     </>
   );

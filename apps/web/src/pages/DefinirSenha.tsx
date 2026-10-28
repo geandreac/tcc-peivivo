@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api, mensagemAmigavel } from "../services";
-import { VERSAO_TERMO } from "../services/supabaseApi";
+import { VERSAO_TERMO } from "../services";
 import { useSessao } from "../hooks/useSessao";
 import { useMutacao } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";
@@ -46,7 +46,8 @@ export function DefinirSenha() {
       <div className="pagina-estreita">
         <h1>{convite ? "Aceitar convite" : "Criar nova senha"}</h1>
         <Alerta tom="aviso" titulo="Link inválido ou expirado">
-          O link do e-mail vale por tempo limitado e só pode ser usado uma vez. {convite ? "Peça à coordenação da escola um novo convite." : <Link to="/recuperar-senha">Peça um novo link</Link>}
+          O link do e-mail vale por tempo limitado e só pode ser usado uma vez.{" "}
+          {convite ? "Peça à coordenação da escola um novo convite." : <Link to="/recuperar-senha">Peça um novo link</Link>}
         </Alerta>
       </div>
     );
@@ -70,12 +71,38 @@ export function DefinirSenha() {
             {mensagemAmigavel(salvar.erro)}
           </Alerta>
         )}
-        <Campo id="senha" rotulo="Nova senha" type="password" autoComplete="new-password" dica={`Pelo menos ${MINIMO} caracteres. Uma frase fácil de lembrar funciona bem.`} required value={senha} onChange={(e) => setSenha(e.target.value)} erro={erroDe("senha")} />
-        <Campo id="confirmacao" rotulo="Repita a nova senha" type="password" autoComplete="new-password" required value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} erro={erroDe("confirmacao")} />
+        <Campo
+          id="senha"
+          rotulo="Nova senha"
+          type="password"
+          autoComplete="new-password"
+          dica={`Pelo menos ${MINIMO} caracteres. Uma frase fácil de lembrar funciona bem.`}
+          required
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          erro={erroDe("senha")}
+        />
+        <Campo
+          id="confirmacao"
+          rotulo="Repita a nova senha"
+          type="password"
+          autoComplete="new-password"
+          required
+          value={confirmacao}
+          onChange={(e) => setConfirmacao(e.target.value)}
+          erro={erroDe("confirmacao")}
+        />
         {convite && (
           <div className="campo">
             <label className="opcao" htmlFor="aceite">
-              <input id="aceite" type="checkbox" checked={aceite} onChange={(e) => setAceite(e.target.checked)} aria-invalid={erroDe("aceite") ? true : undefined} aria-describedby={erroDe("aceite") ? "aceite-erro" : undefined} />
+              <input
+                id="aceite"
+                type="checkbox"
+                checked={aceite}
+                onChange={(e) => setAceite(e.target.checked)}
+                aria-invalid={erroDe("aceite") ? true : undefined}
+                aria-describedby={erroDe("aceite") ? "aceite-erro" : undefined}
+              />
               <span className="opcao__texto">
                 <span>
                   Li e aceito os <Link to="/termos">termos de uso e a política de privacidade</Link> (versão {VERSAO_TERMO})

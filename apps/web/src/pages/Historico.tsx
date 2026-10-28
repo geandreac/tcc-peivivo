@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api, type Auditoria, type Ciclo, type Desfecho, type Material, type ObservacaoRegistro, type VersaoPerfil } from "../services";
 import { useEstudante } from "../hooks/useEstudante";
@@ -5,7 +6,7 @@ import { useConsulta } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
 import { Alerta, Badge, Card, Carregando, ErroCarregamento, Esqueleto, EstadoVazio, FalhaPagina, VazioSecao } from "../components/Feedback";
-import { LinkBotao } from "../components/Botao";
+import { Botao, LinkBotao } from "../components/Botao";
 import { DESFECHO, DIMENSAO, ESCALA, EVENTO, PAPEL, STATUS_VALIDACAO } from "../utils/rotulos";
 import { formatarData, formatarDataHora } from "../utils/datas";
 
@@ -15,8 +16,9 @@ interface Dados {
   versoes: VersaoPerfil[];
   materiais: Material[];
   desfechos: Record<string, Desfecho | null>;
-  auditoria: Auditoria[];
 }
+
+const EVENTOS_POR_PAGINA = 20;
 
 /** P4.16 / P4.18 — HU-R.04 / HU-C.04: histórico do PEI como linha do tempo, por papel. */
 export function Historico() {
@@ -29,17 +31,22 @@ export function Historico() {
 
   const dados = useConsulta<Dados | null>(async () => {
     if (!id || !podeLer) return null;
-    const [ciclos, observacoes, versoes, materiais, auditoria] = await Promise.all([
+    const [ciclos, observacoes, versoes, materiais] = await Promise.all([
       api.listarCiclos(id),
       api.listarObservacoes(id),
       api.listarVersoes(id),
       api.listarMateriais(id),
-      veAuditoria ? api.listarAuditoria(id) : Promise.resolve([]),
     ]);
     const desfechos: Record<string, Desfecho | null> = {};
     for (const m of materiais) desfechos[m.id] = await api.obterDesfecho(m.id);
-    return { ciclos, observacoes, versoes, materiais, desfechos, auditoria };
-  }, [id, podeLer, veAuditoria]);
+    return { ciclos, observacoes, versoes, materiais, desfechos };
+  }, [id, podeLer]);
+  // D-48: a trilha cresce a cada leitura de nota clínica; vem em páginas (um a mais para saber se há outra).
+  const [limiteEventos, setLimiteEventos] = useState(EVENTOS_POR_PAGINA);
+  const trilha = useConsulta<Auditoria[]>(
+    async () => (id && veAuditoria ? api.listarAuditoria(id, { limite: limiteEventos + 1 }) : []),
+    [id, veAuditoria, limiteEventos],
+  );
 
   if (ctx.carregando) return <Carregando />;
   if (ctx.erro || !ctx.dados) return <FalhaPagina erro={ctx.erro} tentarNovamente={ctx.recarregar} />;
@@ -48,14 +55,20 @@ export function Historico() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Histórico" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">O histórico só fica disponível a docente e profissional com consentimento ativo.</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">
+          O histórico só fica disponível a docente e profissional com consentimento ativo.
+        </Alerta>
       </>
     );
   }
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Histórico do PEI" descricao="Tudo que aconteceu, em ordem: ciclos, observações de todos, versões do perfil, materiais aprovados e desfechos. Nunca a nota clínica." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Histórico do PEI"
+        descricao="Tudo que aconteceu, em ordem: ciclos, observações de todos, versões do perfil, materiais aprovados e desfechos. Nunca a nota clínica."
+      />
       {veAuditoria && (
         <div className="grupo-botoes grupo-botoes--topo nao-imprimir">
           <LinkBotao to={`/estudantes/${id}/dados`} variante="secundario">
@@ -100,7 +113,9 @@ export function Historico() {
                 <>
                   <h3>Versão do perfil</h3>
                   <div className="chips">
-                    <Badge tom={STATUS_VALIDACAO[versao.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[versao.statusValidacao].tom}>{STATUS_VALIDACAO[versao.statusValidacao].texto}</Badge>
+                    <Badge tom={STATUS_VALIDACAO[versao.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[versao.statusValidacao].tom}>
+                      {STATUS_VALIDACAO[versao.statusValidacao].texto}
+                    </Badge>
                     {versao.dataVigencia && <span className="meta">vigente desde {formatarDataHora(versao.dataVigencia)}</span>}
                   </div>
                 </>
@@ -128,17 +143,28 @@ export function Historico() {
           );
         })}
 
-      {veAuditoria && dados.dados && dados.dados.auditoria.length > 0 && (
+      {trilha.erro && <ErroCarregamento erro={trilha.erro} tentarNovamente={trilha.recarregar} />}
+      {veAuditoria && trilha.dados && trilha.dados.length > 0 && (
         <>
           <h2>Trilha de auditoria</h2>
           <ol className="linha-tempo">
-            {dados.dados.auditoria.map((a) => (
+            {trilha.dados.slice(0, limiteEventos).map((a) => (
               <li key={a.id}>
                 <time dateTime={a.data}>{formatarDataHora(a.data)}</time>
                 <span>{EVENTO[a.evento]}</span>
               </li>
             ))}
           </ol>
+          {trilha.dados.length > limiteEventos && (
+            <Botao
+              variante="secundario"
+              carregando={trilha.carregando}
+              textoCarregando="Carregando…"
+              onClick={() => setLimiteEventos((n) => n + EVENTOS_POR_PAGINA)}
+            >
+              Carregar mais eventos
+            </Botao>
+          )}
         </>
       )}
     </>

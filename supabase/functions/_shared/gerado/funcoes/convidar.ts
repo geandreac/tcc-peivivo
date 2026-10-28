@@ -24,6 +24,8 @@ export interface PortasConvidar {
   convidarNoAuth(email: string): Promise<string | null>;
   /** `fn_registrar_convite` com service role. */
   registrar(r: DadosConvite & { autorId: string; authUserId: string | null; nome: string }): Promise<unknown>;
+  /** Auth admin: apaga a conta criada por `convidarNoAuth` quando o registro falha (o link do e-mail deixa de valer). */
+  desfazerNoAuth?(authUserId: string): Promise<void>;
 }
 
 export const AVISO_CONTA_NO_AUTH =
@@ -66,6 +68,8 @@ export async function convidar(corpo: unknown, portas: PortasConvidar): Promise<
     // o autor vem do banco (auth.uid()), nunca do corpo
     await portas.registrar({ ...dados, email: preparo.email, autorId: preparo.autorId, authUserId, nome: e.nome });
   } catch (erro) {
+    // Compensação: conta criada agora, sem acesso registrado → apaga, senão o e-mail leva a uma conta vazia.
+    if (authUserId) await portas.desfazerNoAuth?.(authUserId).catch(() => undefined);
     throw deErroBanco(erro);
   }
   return { emailEnviado, avisos };

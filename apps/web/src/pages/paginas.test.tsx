@@ -2,7 +2,7 @@
  * Testes de tela (fluxo principal, validação, estados, rotas inválidas,
  * caminhos negados na UI — P4.19/P4.20 em jsdom). Cada tela passa no axe.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderizarApp, semViolacoesAxe } from "../test/utils";
@@ -12,6 +12,7 @@ import { api } from "../services";
 describe("Layout e navegação", () => {
   it("tem skip link, landmarks e um único h1 na tela inicial", async () => {
     const { container } = await renderizarApp("/");
+    await screen.findByRole("heading", { level: 1 }); // telas carregam sob demanda (React.lazy, D-48)
     const skip = screen.getByRole("link", { name: "Pular para o conteúdo principal" });
     expect(skip).toHaveAttribute("href", "#conteudo");
     expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -37,11 +38,11 @@ describe("Layout e navegação", () => {
 
   it("Ajuda e Acessibilidade existem e passam no axe", async () => {
     const a = await renderizarApp("/ajuda");
-    expect(screen.getByRole("heading", { level: 1, name: "Ajuda" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Ajuda" })).toBeInTheDocument();
     await semViolacoesAxe(a.container);
     a.unmount();
     const b = await renderizarApp("/acessibilidade");
-    expect(screen.getByRole("heading", { level: 1, name: "Acessibilidade" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Acessibilidade" })).toBeInTheDocument();
     await userEvent.click(screen.getByLabelText(/Alto contraste/));
     expect(document.documentElement).toHaveAttribute("data-contraste", "alto");
     await semViolacoesAxe(b.container);
@@ -165,7 +166,7 @@ describe("Caminhos negados na interface (P4.20)", () => {
       expect(screen.queryByRole("button", { name: "Tentar novamente" })).not.toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Voltar para meus estudantes" })).toBeInTheDocument();
       await semViolacoesAxe(container);
-    }
+    },
   );
 
   it("desfecho de material inexistente/oculto também tem h1", async () => {
@@ -291,7 +292,7 @@ describe("Reformulação R4 — navegação, linguagem e privacidade", () => {
 
   it("R4.6: tema escuro e leitura facilitada são preferências aplicadas no <html> e restauráveis", async () => {
     const { container } = await renderizarApp("/acessibilidade");
-    await userEvent.click(screen.getByRole("radio", { name: "Escuro" }));
+    await userEvent.click(await screen.findByRole("radio", { name: "Escuro" }));
     await userEvent.click(screen.getByRole("radio", { name: /Leitura facilitada/ }));
     expect(document.documentElement).toHaveAttribute("data-tema", "escuro");
     expect(document.documentElement).toHaveAttribute("data-leitura", "facilitada");
@@ -362,5 +363,32 @@ describe("R2.1 — convidar por e-mail na tela de vínculos", () => {
     await userEvent.click(within(form).getByRole("button", { name: "Enviar convite" }));
     const aguardando = await screen.findByRole("list", { name: "Aguardando a família" });
     expect(within(aguardando).getByText("Fono nova (fictícia)")).toBeInTheDocument();
+  });
+});
+
+describe("Paginação (D-48)", () => {
+  it("materiais do estudante: 10 por vez, 'Carregar mais' pede a próxima página e some no fim; passa no axe", async () => {
+    const reais = await (async () => {
+      await api.reiniciarDados();
+      await api.entrar(ID.docente);
+      return api.listarMateriais(ID.estudanteA);
+    })();
+    const muitos = Array.from({ length: 25 }, (_, i) => ({ ...reais[0]!, id: `m-${i}`, titulo: `Material fictício ${i + 1}` }));
+    const espiao = vi.spyOn(api, "listarMateriais").mockImplementation(async (_id, pagina) => muitos.slice(0, pagina?.limite ?? muitos.length));
+    try {
+      const { container } = await renderizarApp(`/estudantes/${ID.estudanteA}`, ID.docente);
+      const lista = await screen.findByRole("list", { name: "Materiais" });
+      expect(within(lista).getAllByRole("listitem")).toHaveLength(10);
+      expect(espiao).toHaveBeenLastCalledWith(ID.estudanteA, { limite: 11 });
+      await semViolacoesAxe(container);
+      await userEvent.click(screen.getByRole("button", { name: "Carregar mais materiais" }));
+      await waitFor(() => expect(within(screen.getByRole("list", { name: "Materiais" })).getAllByRole("listitem")).toHaveLength(20));
+      expect(espiao).toHaveBeenLastCalledWith(ID.estudanteA, { limite: 21 });
+      await userEvent.click(screen.getByRole("button", { name: "Carregar mais materiais" }));
+      await waitFor(() => expect(within(screen.getByRole("list", { name: "Materiais" })).getAllByRole("listitem")).toHaveLength(25));
+      expect(screen.queryByRole("button", { name: "Carregar mais materiais" })).not.toBeInTheDocument();
+    } finally {
+      espiao.mockRestore();
+    }
   });
 });

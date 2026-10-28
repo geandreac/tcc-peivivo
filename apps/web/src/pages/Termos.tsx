@@ -1,5 +1,5 @@
 import { useTitulo } from "../hooks/useTitulo";
-import { VERSAO_TERMO } from "../services/supabaseApi";
+import { VERSAO_TERMO } from "../services";
 
 /**
  * Termos de uso e política de privacidade em linguagem simples (prompt §4.1),
@@ -15,8 +15,8 @@ export function Termos() {
 
       <h2>Para que serve o PEI Vivo</h2>
       <p>
-        Ajudar a escola, a família e a equipe de saúde a adaptar o material de leitura de um estudante ao jeito como ele aprende, a cada 15
-        dias, com base no que cada um observa.
+        Ajudar a escola, a família e a equipe de saúde a adaptar o material de leitura de um estudante ao jeito como ele aprende, a cada 15 dias, com base no
+        que cada um observa.
       </p>
 
       <h2>O que guardamos</h2>
@@ -35,8 +35,8 @@ export function Termos() {
 
       <h2>Quem vê o quê</h2>
       <p>
-        Cada pessoa vê só o que precisa. A professora nunca vê as notas do profissional de saúde. A família decide quem é o profissional de
-        saúde e vê quem acessou os dados. A tela <strong>Privacidade</strong> mostra tudo isso.
+        Cada pessoa vê só o que precisa. A professora nunca vê as notas do profissional de saúde. A família decide quem é o profissional de saúde e vê quem
+        acessou os dados. A tela <strong>Privacidade</strong> mostra tudo isso.
       </p>
 
       <h2>Seus direitos (LGPD)</h2>
@@ -48,8 +48,8 @@ export function Termos() {
 
       <h2>Segurança</h2>
       <p>
-        O acesso é só por convite. Quem vê dados de saúde ou administra a escola usa verificação em duas etapas. As regras de quem vê o quê
-        ficam no banco de dados, não só na tela.
+        O acesso é só por convite. Quem vê dados de saúde ou administra a escola usa verificação em duas etapas. As regras de quem vê o quê ficam no banco de
+        dados, não só na tela.
       </p>
     </article>
   );

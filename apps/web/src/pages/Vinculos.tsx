@@ -38,16 +38,16 @@ export function Vinculos() {
   const vincular = useMutacao(async () => {
     const lista: { campo: string; mensagem: string }[] = [];
     if (!usuarioId) lista.push({ campo: "usuario", mensagem: "Escolha a pessoa a vincular." });
-    if (papel === "RESPONSAVEL" && !conferido) lista.push({ campo: "conferido", mensagem: "Confirme que o vínculo legal foi conferido presencialmente, com documento." });
-    if (papel === "PROFISSIONAL_SAUDE" && !registro.trim()) lista.push({ campo: "registro", mensagem: "Informe o registro no conselho profissional (obrigatório para profissional de saúde)." });
+    if (papel === "RESPONSAVEL" && !conferido)
+      lista.push({ campo: "conferido", mensagem: "Confirme que o vínculo legal foi conferido presencialmente, com documento." });
+    if (papel === "PROFISSIONAL_SAUDE" && !registro.trim())
+      lista.push({ campo: "registro", mensagem: "Informe o registro no conselho profissional (obrigatório para profissional de saúde)." });
     setErros(lista);
     if (lista.length > 0) return;
     const v = await api.vincular({ usuarioId, estudanteId: id!, papel, registroConselho: registro, conferidoPresencialmente: conferido });
     anunciar(
-      v.status === "PENDENTE_RESPONSAVEL"
-        ? "Proposta enviada. O profissional só terá acesso depois que a família confirmar."
-        : "Vínculo criado.",
-      "sucesso"
+      v.status === "PENDENTE_RESPONSAVEL" ? "Proposta enviada. O profissional só terá acesso depois que a família confirmar." : "Vínculo criado.",
+      "sucesso",
     );
     setUsuarioId("");
     setRegistro("");
@@ -68,7 +68,9 @@ export function Vinculos() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Vínculos" />
-        <Alerta tom="info" titulo="Só a coordenação gerencia vínculos">Você vê apenas o seu próprio vínculo com o estudante.</Alerta>
+        <Alerta tom="info" titulo="Só a coordenação gerencia vínculos">
+          Você vê apenas o seu próprio vínculo com o estudante.
+        </Alerta>
       </>
     );
   }
@@ -81,7 +83,11 @@ export function Vinculos() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Vínculos" descricao="Quem tem acesso a este estudante e com que papel. Trocou de professor? Desative um vínculo e crie outro — o histórico fica." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Vínculos"
+        descricao="Quem tem acesso a este estudante e com que papel. Trocou de professor? Desative um vínculo e crie outro — o histórico fica."
+      />
 
       {dados.carregando && <Carregando />}
       {dados.erro && <ErroCarregamento erro={dados.erro} tentarNovamente={dados.recarregar} />}
@@ -151,7 +157,16 @@ export function Vinculos() {
                 {mensagemAmigavel(vincular.erro)}
               </Alerta>
             )}
-            <Campo tipo="select" id="usuario" rotulo="Pessoa" dica="No sistema real, o responsável é convidado por e-mail." required value={usuarioId} onChange={(e) => setUsuarioId(e.target.value)} erro={erros.find((x) => x.campo === "usuario")?.mensagem ?? null}>
+            <Campo
+              tipo="select"
+              id="usuario"
+              rotulo="Pessoa"
+              dica="No sistema real, o responsável é convidado por e-mail."
+              required
+              value={usuarioId}
+              onChange={(e) => setUsuarioId(e.target.value)}
+              erro={erros.find((x) => x.campo === "usuario")?.mensagem ?? null}
+            >
               <option value="">Escolha…</option>
               {dados.dados.usuarios
                 .filter((u) => !jaVinculados.has(u.id) && !u.papelInstitucional)
@@ -197,7 +212,15 @@ export function Vinculos() {
               </div>
             )}
             {papel === "PROFISSIONAL_SAUDE" && (
-              <Campo id="registro" rotulo="Registro no conselho profissional" dica="Ex.: CREFITO, CRFa, CRP. Obrigatório para profissional de saúde." required value={registro} onChange={(e) => setRegistro(e.target.value)} erro={erros.find((x) => x.campo === "registro")?.mensagem ?? null} />
+              <Campo
+                id="registro"
+                rotulo="Registro no conselho profissional"
+                dica="Ex.: CREFITO, CRFa, CRP. Obrigatório para profissional de saúde."
+                required
+                value={registro}
+                onChange={(e) => setRegistro(e.target.value)}
+                erro={erros.find((x) => x.campo === "registro")?.mensagem ?? null}
+              />
             )}
             <div className="grupo-botoes">
               <Botao type="submit" carregando={vincular.ocupado} textoCarregando="Vinculando…">
@@ -234,7 +257,8 @@ export function Vinculos() {
         }
       >
         <p>
-          {desativando && `${nomeDe(desativando.usuarioId)} (${PAPEL[desativando.papel]})`} perde o acesso imediatamente. As observações e materiais que já registrou permanecem no histórico.
+          {desativando && `${nomeDe(desativando.usuarioId)} (${PAPEL[desativando.papel]})`} perde o acesso imediatamente. As observações e materiais que já
+          registrou permanecem no histórico.
         </p>
         {desativar.erro && (
           <Alerta tom="erro" vivo>

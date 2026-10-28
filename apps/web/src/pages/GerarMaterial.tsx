@@ -10,7 +10,7 @@ import { Alerta, Carregando, ErroCarregamento, EstadoVazio, ResumoErros, FalhaPa
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { PARAMETRO } from "../utils/rotulos";
-import { TEXTO_CICLO_DA_AGUA } from "../mocks/dados";
+import { TEXTO_CICLO_DA_AGUA } from "../mocks/exemplos";
 
 const MAX = 20_000;
 
@@ -52,7 +52,9 @@ export function GerarMaterial() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Gerar material" />
-        <Alerta tom="info" titulo="Só a docente gera material">Profissional de saúde, família e coordenação leem os materiais aprovados.</Alerta>
+        <Alerta tom="info" titulo="Só a docente gera material">
+          Profissional de saúde, família e coordenação leem os materiais aprovados.
+        </Alerta>
       </>
     );
   }
@@ -60,14 +62,20 @@ export function GerarMaterial() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Gerar material" />
-        <Alerta tom="erro" titulo="Geração bloqueada">Sem consentimento ativo do responsável, nenhum material é gerado.</Alerta>
+        <Alerta tom="erro" titulo="Geração bloqueada">
+          Sem consentimento ativo do responsável, nenhum material é gerado.
+        </Alerta>
       </>
     );
   }
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo={`Adaptar texto para ${estudante.nome}`} descricao="Cole o texto da aula. Você recebe um rascunho com blocos curtos e instruções em etapa única, conforme o perfil vigente. Nada é publicado sem a sua revisão." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo={`Adaptar texto para ${estudante.nome}`}
+        descricao="Cole o texto da aula. Você recebe um rascunho com blocos curtos e instruções em etapa única, conforme o perfil vigente. Nada é publicado sem a sua revisão."
+      />
 
       {vigente.carregando && <Carregando texto="Verificando o perfil vigente…" />}
       {vigente.erro && <ErroCarregamento erro={vigente.erro} tentarNovamente={vigente.recarregar} />}
@@ -98,12 +106,23 @@ export function GerarMaterial() {
           )}
           <Alerta tom="info" titulo={`Perfil vigente (ciclo ${vigente.dados.numeroCiclo})`}>
             <p>
-              {PARAMETRO.maxLinhasPorBloco.valor(vigente.dados.parametros.maxLinhasPorBloco)} por bloco · {PARAMETRO.formatoEnunciado.valor(vigente.dados.parametros.formatoEnunciado).toLowerCase()} · contraste {PARAMETRO.contrasteMinimo.valor(vigente.dados.parametros.contrasteMinimo)} · até {PARAMETRO.blocosPorMaterial.valor(vigente.dados.parametros.blocosPorMaterial)}
+              {PARAMETRO.maxLinhasPorBloco.valor(vigente.dados.parametros.maxLinhasPorBloco)} por bloco ·{" "}
+              {PARAMETRO.formatoEnunciado.valor(vigente.dados.parametros.formatoEnunciado).toLowerCase()} · contraste{" "}
+              {PARAMETRO.contrasteMinimo.valor(vigente.dados.parametros.contrasteMinimo)} · até{" "}
+              {PARAMETRO.blocosPorMaterial.valor(vigente.dados.parametros.blocosPorMaterial)}
               {vigente.dados.parametros.interesseAncora && <> · âncora: {vigente.dados.parametros.interesseAncora}</>}
             </p>
           </Alerta>
 
-          <Campo id="titulo" rotulo="Título do material" dica="Como você vai encontrar depois. Ex.: Ciências — O ciclo da água." required value={titulo} onChange={(e) => setTitulo(e.target.value)} erro={erros.find((x) => x.campo === "titulo")?.mensagem ?? null} />
+          <Campo
+            id="titulo"
+            rotulo="Título do material"
+            dica="Como você vai encontrar depois. Ex.: Ciências — O ciclo da água."
+            required
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            erro={erros.find((x) => x.campo === "titulo")?.mensagem ?? null}
+          />
           <Campo
             tipo="area"
             id="texto"

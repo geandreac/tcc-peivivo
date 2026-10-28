@@ -109,16 +109,25 @@ function generalizacao(tronco, filhos, alvo) {
   let s = "";
   const yTopo = alvo[1];
   for (const f of filhos) {
-    s += `<path d="${caminho([[f.x + (tronco < f.x ? -30 : 30), f.y - 6], [tronco, f.y - 6]])}" fill="none" stroke="${COR.linha}" stroke-width="1.6"/>`;
+    s += `<path d="${caminho([
+      [f.x + (tronco < f.x ? -30 : 30), f.y - 6],
+      [tronco, f.y - 6],
+    ])}" fill="none" stroke="${COR.linha}" stroke-width="1.6"/>`;
   }
   const yMax = Math.max(...filhos.map((f) => f.y - 6));
-  s += `<path d="${caminho([[tronco, yMax], [tronco, yTopo], [alvo[0], yTopo]])}" fill="none" stroke="${COR.linha}" stroke-width="1.6" marker-end="url(#trianguloVazado)"/>`;
+  s += `<path d="${caminho([
+    [tronco, yMax],
+    [tronco, yTopo],
+    [alvo[0], yTopo],
+  ])}" fill="none" stroke="${COR.linha}" stroke-width="1.6" marker-end="url(#trianguloVazado)"/>`;
   return s;
 }
 
 export function diagramaCasosDeUso() {
-  let s = titulo("DIAGRAMA DE CASOS DE USO — PEI VIVO",
-    "Funcionalidades do sistema implementado (apps/web + supabaseApi, RPCs e Edge Functions), por perfil. Atores concretos especializam o ator abstrato Usuário.");
+  let s = titulo(
+    "DIAGRAMA DE CASOS DE USO — PEI VIVO",
+    "Funcionalidades do sistema implementado (apps/web + supabaseApi, RPCs e Edge Functions), por perfil. Atores concretos especializam o ator abstrato Usuário.",
+  );
   s += `<rect x="${SIS.x}" y="${SIS.y}" width="${SIS.w}" height="${SIS.h}" rx="10" fill="${COR.fundoSistema}" stroke="${COR.azul}" stroke-width="2.4"/>`;
   s += texto(SIS.x + 22, SIS.y + 30, "PEI Vivo", { tam: 17, peso: "bold", cor: COR.azul, ancora: "start", fonte: "Cambria, Georgia, serif" });
 
@@ -163,12 +172,30 @@ export function diagramaCasosDeUso() {
   const yL = SIS.y + SIS.h + 40;
   let leg = `<rect x="40" y="${yL}" width="${LARG - 80}" height="112" rx="6" fill="${COR.fundoLegenda}" stroke="${COR.divisor}"/>`;
   leg += texto(58, yL + 26, "LEGENDA", { tam: 13, cor: COR.verdeAzul, peso: "bold" });
-  leg += `<line x1="58" y1="${yL + 52}" x2="128" y2="${yL + 52}" stroke="${COR.linha}" stroke-width="1.6"/>` + texto(140, yL + 56, "Associação ator — caso de uso", { tam: 12 });
-  leg += `<line x1="400" y1="${yL + 52}" x2="470" y2="${yL + 52}" stroke="${COR.linha}" stroke-width="1.6" marker-end="url(#trianguloVazado)"/>` + texto(482, yL + 56, "Generalização (o ator concreto é um Usuário)", { tam: 12 });
-  leg += `<line x1="820" y1="${yL + 52}" x2="890" y2="${yL + 52}" stroke="${COR.verdeAzul}" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#setaAbertaVerde)"/>` + texto(902, yL + 56, "«include» — sempre executado pelo caso de origem", { tam: 12 });
-  leg += `<line x1="1250" y1="${yL + 52}" x2="1320" y2="${yL + 52}" stroke="${COR.laranja}" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#setaAbertaLaranja)"/>` + texto(1332, yL + 56, "«extend» — a seta sai da extensão e aponta para o caso base [condição]", { tam: 12 });
-  leg += texto(58, yL + 84, "Elipse branca = subfluxo interno, não iniciado diretamente por um ator. Toda permissão é decidida no banco (RLS e RPCs): o diagrama mostra quem PODE iniciar cada caso; o consentimento ativo (RN01/RN08) é pré-condição dos casos de observação, ciclo e material.", { tam: 11.5, cor: COR.apagado, estilo: "italic" });
-  leg += texto(58, yL + 101, "Fora do diagrama por não existirem no sistema real: excluir dados do estudante (pendente de Edge Function), verificar registro no conselho e encerrar membro da escola (só no banco, sem tela).", { tam: 11.5, cor: COR.apagado, estilo: "italic" });
+  leg +=
+    `<line x1="58" y1="${yL + 52}" x2="128" y2="${yL + 52}" stroke="${COR.linha}" stroke-width="1.6"/>` +
+    texto(140, yL + 56, "Associação ator — caso de uso", { tam: 12 });
+  leg +=
+    `<line x1="400" y1="${yL + 52}" x2="470" y2="${yL + 52}" stroke="${COR.linha}" stroke-width="1.6" marker-end="url(#trianguloVazado)"/>` +
+    texto(482, yL + 56, "Generalização (o ator concreto é um Usuário)", { tam: 12 });
+  leg +=
+    `<line x1="820" y1="${yL + 52}" x2="890" y2="${yL + 52}" stroke="${COR.verdeAzul}" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#setaAbertaVerde)"/>` +
+    texto(902, yL + 56, "«include» — sempre executado pelo caso de origem", { tam: 12 });
+  leg +=
+    `<line x1="1250" y1="${yL + 52}" x2="1320" y2="${yL + 52}" stroke="${COR.laranja}" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#setaAbertaLaranja)"/>` +
+    texto(1332, yL + 56, "«extend» — a seta sai da extensão e aponta para o caso base [condição]", { tam: 12 });
+  leg += texto(
+    58,
+    yL + 84,
+    "Elipse branca = subfluxo interno, não iniciado diretamente por um ator. Toda permissão é decidida no banco (RLS e RPCs): o diagrama mostra quem PODE iniciar cada caso; o consentimento ativo (RN01/RN08) é pré-condição dos casos de observação, ciclo e material.",
+    { tam: 11.5, cor: COR.apagado, estilo: "italic" },
+  );
+  leg += texto(
+    58,
+    yL + 101,
+    "Fora do diagrama por não existirem no sistema real: excluir dados do estudante (pendente de Edge Function), verificar registro no conselho e encerrar membro da escola (só no banco, sem tela).",
+    { tam: 11.5, cor: COR.apagado, estilo: "italic" },
+  );
 
   return documento(LARG, yL + 112 + 40, s + leg);
 }

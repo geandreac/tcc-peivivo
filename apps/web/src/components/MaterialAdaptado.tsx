@@ -78,7 +78,8 @@ export function MaterialAdaptado({ adaptado, titulo, textoRevisado, mostrarExced
       )}
       {parametros.interesseAncora && (
         <p className="material__ancora">
-          Âncora de interesse do perfil: <strong>{parametros.interesseAncora}</strong> — a recontextualização de exemplos é feita pela camada de IA, desligada neste protótipo.
+          Âncora de interesse do perfil: <strong>{parametros.interesseAncora}</strong> — a recontextualização de exemplos é feita pela camada de IA, desligada
+          neste protótipo.
         </p>
       )}
     </article>

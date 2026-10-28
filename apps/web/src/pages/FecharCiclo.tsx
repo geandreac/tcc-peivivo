@@ -64,7 +64,10 @@ export function FecharCiclo() {
     const r = await api.fecharCiclo(previa.dados!.ciclo!.id);
     setModal(false);
     setResultado(r);
-    anunciar(r.modoPedagogico ? "Ciclo fechado. Nova versão já vigente (modo pedagógico)." : "Ciclo fechado. Versão enviada para validação clínica.", "sucesso");
+    anunciar(
+      r.modoPedagogico ? "Ciclo fechado. Nova versão já vigente (modo pedagógico)." : "Ciclo fechado. Versão enviada para validação clínica.",
+      "sucesso",
+    );
   });
 
   if (ctx.carregando) return <Carregando />;
@@ -74,7 +77,9 @@ export function FecharCiclo() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Fechar ciclo" />
-        <Alerta tom="info" titulo="Só a docente fecha o ciclo">O fechamento gera a proposta de parâmetros que o profissional de saúde valida.</Alerta>
+        <Alerta tom="info" titulo="Só a docente fecha o ciclo">
+          O fechamento gera a proposta de parâmetros que o profissional de saúde valida.
+        </Alerta>
       </>
     );
   }
@@ -82,7 +87,9 @@ export function FecharCiclo() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Fechar ciclo" />
-        <Alerta tom="erro" titulo="Sem consentimento ativo">Nenhum ciclo pode ser fechado até o responsável autorizar.</Alerta>
+        <Alerta tom="erro" titulo="Sem consentimento ativo">
+          Nenhum ciclo pode ser fechado até o responsável autorizar.
+        </Alerta>
       </>
     );
   }
@@ -113,7 +120,11 @@ export function FecharCiclo() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo="Fechar ciclo" descricao="O sistema converte as observações do ciclo em parâmetros por regras fixas. Você vê o que mudaria antes de confirmar." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo="Fechar ciclo"
+        descricao="O sistema converte as observações do ciclo em parâmetros por regras fixas. Você vê o que mudaria antes de confirmar."
+      />
 
       {previa.carregando && <Carregando texto="Calculando a proposta…" />}
       {previa.erro && <ErroCarregamento erro={previa.erro} tentarNovamente={previa.recarregar} />}
@@ -187,7 +198,9 @@ export function FecharCiclo() {
               </Botao>
             }
           >
-            <p>Depois de fechado, o ciclo não recebe mais observações e o próximo é aberto automaticamente. A proposta de parâmetros é gravada como nova versão.</p>
+            <p>
+              Depois de fechado, o ciclo não recebe mais observações e o próximo é aberto automaticamente. A proposta de parâmetros é gravada como nova versão.
+            </p>
           </Modal>
         </>
       )}

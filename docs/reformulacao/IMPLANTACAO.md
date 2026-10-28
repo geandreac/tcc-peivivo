@@ -99,6 +99,21 @@ VITE_SUPABASE_ANON_KEY=cole-a-chave-anon
 
 O app está publicado na **Vercel** (`https://tcc-peivivo.vercel.app`), com deploy automático a cada push em `main`. O host precisa servir a SPA com fallback para `index.html` e permitir os cabeçalhos de segurança/CSP (R5.5).
 
+### 7.1 Cabeçalhos de segurança (`apps/web/vercel.json`)
+A Vercel aplica, em todas as rotas: `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` e `Permissions-Policy` (câmera, microfone, localização e pagamento desligados).
+
+- **Domínio do Supabase na CSP.** O `connect-src` aceita `https://*.supabase.co` e `wss://*.supabase.co`. Esse curinga funciona para qualquer projeto sem editar o arquivo. Para restringir ao projeto real, troque `*` pelo ref (o mesmo de `VITE_SUPABASE_URL`, ex.: `https://SEU_REF.supabase.co wss://SEU_REF.supabase.co`). Faça a troca no mesmo PR em que validar a preview, porque um ref errado bloqueia o login.
+- **`style-src 'self'` sem `'unsafe-inline'`.** O build não tem estilo nem script inline, e o React aplica `style` via CSSOM, que a CSP não bloqueia.
+- **`img-src data:`.** Necessário para o QR do segundo fator, que o Supabase devolve como `data:`.
+- **Como validar numa preview** (antes de mesclar em `main`):
+  1. abra o link de preview que a Vercel comenta no PR;
+  2. faça login, cadastre o segundo fator e gere um material;
+  3. no DevTools → Console, não deve haver erro "Refused to … Content Security Policy";
+  4. em Network → documento, os 4 cabeçalhos devem aparecer.
+
+### 7.2 Backup dos dados
+O schema se reconstrói pelas migrations; os **dados** (escolas, pessoas, ciclos) não. `npm run db:backup` roda `supabase db dump --linked --data-only` e grava `backups/dados-AAAA-MM-DD-HHMM.sql` (pasta ignorada pelo git). Pede a senha do banco. Mova o arquivo para um local de acesso restrito fora do repositório: ele tem dados pessoais (LGPD). Sugestão: semanal e antes de todo `db push`.
+
 ## 8. Conferência pós-implantação (10 minutos)
 1. Entrar como coordenação → cadastrar o TOTP → ver o painel da escola.
 2. Cadastrar um estudante **fictício** → convidar um responsável **fictício** (e-mail de teste de vocês).

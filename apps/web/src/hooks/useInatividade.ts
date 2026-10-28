@@ -9,7 +9,9 @@ const EVENTOS = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
  */
 export function useInatividade(ativo: boolean, minutos: number, aoExpirar: () => void) {
   const callback = useRef(aoExpirar);
-  callback.current = aoExpirar;
+  useEffect(() => {
+    callback.current = aoExpirar;
+  });
 
   useEffect(() => {
     if (!ativo) return;

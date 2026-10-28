@@ -32,7 +32,7 @@ export function Painel() {
       estudantes.map(async (estudante) => {
         const [papel, consentimento] = await Promise.all([api.meuPapel(estudante.id), api.obterConsentimento(estudante.id)]);
         return { estudante, papel, consentimento };
-      })
+      }),
     );
   }, [usuario?.id]);
 
@@ -95,8 +95,8 @@ export function Painel() {
       {consulta.dados && consulta.dados.length > 0 && (
         <Card titulo="Como funciona o acesso" nivel={3} className="nao-imprimir">
           <p className="texto-apoio">
-            Sem consentimento ativo do responsável, docente e profissional de saúde não leem nem escrevem nada sobre o estudante. O
-            responsável e a coordenação continuam vendo o histórico. A nota clínica é exclusiva do profissional de saúde.
+            Sem consentimento ativo do responsável, docente e profissional de saúde não leem nem escrevem nada sobre o estudante. O responsável e a coordenação
+            continuam vendo o histórico. A nota clínica é exclusiva do profissional de saúde.
           </p>
         </Card>
       )}

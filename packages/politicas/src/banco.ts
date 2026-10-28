@@ -126,9 +126,13 @@ const P = JSON.stringify(PARAMETROS_OK);
 
 const FIXTURE = `
   insert into auth.users (id, aud, role, email) values
-    ${Object.entries(PESSOAS).map(([k, n]) => `('${a(n)}','authenticated','authenticated','${k.toLowerCase()}.auth@example.test')`).join(",")};
+    ${Object.entries(PESSOAS)
+      .map(([k, n]) => `('${a(n)}','authenticated','authenticated','${k.toLowerCase()}.auth@example.test')`)
+      .join(",")};
   insert into usuarios (id, auth_user_id, nome, email) values
-    ${Object.entries(PESSOAS).map(([k, n]) => `('${u(n)}','${a(n)}','${k} (fictício)','${k.toLowerCase()}@example.test')`).join(",")};
+    ${Object.entries(PESSOAS)
+      .map(([k, n]) => `('${u(n)}','${a(n)}','${k} (fictício)','${k.toLowerCase()}@example.test')`)
+      .join(",")};
   insert into escolas (id, nome) values ('${ID.escola1}','Escola fictícia 1 (teste)'), ('${ID.escola2}','Escola fictícia 2 (teste)');
   insert into membros_escola (usuario_id, escola_id, papel) values
     ('${u(7)}','${ID.escola1}','COORDENACAO'), ('${u(8)}','${ID.escola2}','COORDENACAO'),

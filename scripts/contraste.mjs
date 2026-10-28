@@ -36,9 +36,7 @@ const resolver = (tema, nome, visitados = new Set()) => {
 
 const lum = (hex) => {
   const c = hex.replace("#", "");
-  const [r, g, b] = [0, 2, 4]
-    .map((i) => parseInt(c.slice(i, i + 2), 16) / 255)
-    .map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(c.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
 const razao = (a, b) => {
@@ -164,7 +162,9 @@ for (const [tema, nome, frente, fundo, minimo] of PARES) {
   const ok = minimo === 0 || r >= minimo;
   if (!ok) falhas++;
   const rotulo = `${tema === "claro" ? "" : `${tema}: `}${nome}`;
-  console.log(`${ok ? "✓" : "✗"} ${rotulo.padEnd(46)} ${a.toUpperCase()} sobre ${b.toUpperCase()}  ${r.toFixed(2).replace(".", ",")}:1${minimo ? `  (mín. ${minimo})` : ""}`);
+  console.log(
+    `${ok ? "✓" : "✗"} ${rotulo.padEnd(46)} ${a.toUpperCase()} sobre ${b.toUpperCase()}  ${r.toFixed(2).replace(".", ",")}:1${minimo ? `  (mín. ${minimo})` : ""}`,
+  );
 }
 if (falhas > 0) {
   console.error(`\n✗ ${falhas} problema(s): par abaixo do mínimo ou tema escuro divergente.`);

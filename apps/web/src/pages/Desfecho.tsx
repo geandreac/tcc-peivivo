@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LIMITE_OBSERVACAO_DESFECHO } from "@pei-vivo/contratos";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, mensagemAmigavel, type Material, type ResultadoDesfecho } from "../services";
 import { useConsulta, useMutacao } from "../hooks/useConsulta";
@@ -45,14 +46,22 @@ export function Desfecho() {
     return (
       <>
         <CabecalhoEstudante contexto={ctx.dados} titulo="Registrar desfecho" />
-        <Alerta tom="info" titulo="Só a docente registra o desfecho">Você vê o resultado na página do material.</Alerta>
+        <Alerta tom="info" titulo="Só a docente registra o desfecho">
+          Você vê o resultado na página do material.
+        </Alerta>
       </>
     );
   }
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo={`Como foi: ${m.titulo}`} descricao="Dois toques: escolha o resultado e, se quiser, escreva uma linha. É isso que fecha o ciclo e refina o perfil." voltarPara={`/materiais/${m.id}`} voltarRotulo="Voltar para o material" />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo={`Como foi: ${m.titulo}`}
+        descricao="Dois toques: escolha o resultado e, se quiser, escreva uma linha. É isso que fecha o ciclo e refina o perfil."
+        voltarPara={`/materiais/${m.id}`}
+        voltarRotulo="Voltar para o material"
+      />
 
       <form
         noValidate
@@ -86,7 +95,17 @@ export function Desfecho() {
             </div>
           )}
         </fieldset>
-        <Campo tipo="area" id="observacao" rotulo="Observação livre" opcional rows={3} dica="Ex.: “Terminou sozinho. A âncora de interesse funcionou.”" value={observacao} onChange={(e) => setObservacao(e.target.value)} />
+        <Campo
+          tipo="area"
+          id="observacao"
+          rotulo="Observação livre"
+          opcional
+          rows={3}
+          maxLength={LIMITE_OBSERVACAO_DESFECHO}
+          dica="Ex.: “Terminou sozinho. A âncora de interesse funcionou.”"
+          value={observacao}
+          onChange={(e) => setObservacao(e.target.value)}
+        />
         <div className="grupo-botoes grupo-botoes--empilhado">
           <Botao type="submit" carregando={salvar.ocupado} textoCarregando="Registrando…">
             Registrar desfecho

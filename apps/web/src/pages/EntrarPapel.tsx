@@ -9,6 +9,7 @@ import { Botao } from "../components/Botao";
 import { PAPEL } from "../utils/rotulos";
 import { perfilPorSlug } from "../utils/perfisLogin";
 import { NaoEncontrada } from "./NaoEncontrada";
+import { destinoInterno } from "../utils/destino";
 
 /**
  * Tela de login de UM perfil (família, professores, equipe de saúde,
@@ -23,20 +24,18 @@ export function EntrarPapel() {
   const location = useLocation();
   const { entrar } = useSessao();
   const { anunciar } = useAnuncio();
-  const destino = (location.state as { de?: string } | null)?.de;
+  const destino = destinoInterno(location.state);
 
   const usuarios = useConsulta<Usuario[]>(() => api.listarPerfisDemo(), []);
   const mutacao = useMutacao(async (u: Usuario) => {
     await entrar(u.id);
     anunciar(`Você entrou como ${u.nome} (${espec ? espec.titulo : ""}).`, "sucesso");
-    navigate(destino && !destino.startsWith("/entrar") ? destino : "/painel");
+    navigate(destino);
   });
 
   if (!espec) return <NaoEncontrada />;
 
-  const demo = espec.demo
-    .map((d) => ({ ...d, usuario: usuarios.dados?.find((u) => u.id === d.usuarioId) }))
-    .filter((d) => d.usuario);
+  const demo = espec.demo.map((d) => ({ ...d, usuario: usuarios.dados?.find((u) => u.id === d.usuarioId) })).filter((d) => d.usuario);
 
   return (
     <>
@@ -87,9 +86,7 @@ export function EntrarPapel() {
 
       <section aria-labelledby="titulo-demo">
         <h2 id="titulo-demo">Escolha um perfil de demonstração</h2>
-        <p className="texto-apoio">
-          Papel no sistema: {PAPEL[espec.papel]}. Sem senha nesta demonstração; os dados são fictícios.
-        </p>
+        <p className="texto-apoio">Papel no sistema: {PAPEL[espec.papel]}. Sem senha nesta demonstração; os dados são fictícios.</p>
         {mutacao.erro && (
           <Alerta tom="erro" vivo>
             Não foi possível entrar. Tente novamente.

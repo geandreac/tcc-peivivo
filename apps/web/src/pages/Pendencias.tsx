@@ -53,9 +53,14 @@ export function Pendencias() {
                     {p.versao.numeroCiclo} <span className="meta">({formatarDataHora(p.versao.createdAt)})</span>
                   </td>
                   <td>
-                    <Badge tom={STATUS_VALIDACAO[p.versao.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[p.versao.statusValidacao].tom}>{STATUS_VALIDACAO[p.versao.statusValidacao].texto}</Badge>
+                    <Badge tom={STATUS_VALIDACAO[p.versao.statusValidacao].tom === "neutro" ? "neutro" : STATUS_VALIDACAO[p.versao.statusValidacao].tom}>
+                      {STATUS_VALIDACAO[p.versao.statusValidacao].texto}
+                    </Badge>
                   </td>
-                  <td>{p.diasEmAberto} {p.diasEmAberto === 1 ? "dia" : "dias"}{p.diasEmAberto >= 7 && " — prazo vencido"}</td>
+                  <td>
+                    {p.diasEmAberto} {p.diasEmAberto === 1 ? "dia" : "dias"}
+                    {p.diasEmAberto >= 7 && " — prazo vencido"}
+                  </td>
                   <td>
                     <LinkBotao to={`/estudantes/${p.estudante.id}/validar`} variante="secundario" pequeno>
                       Abrir validação

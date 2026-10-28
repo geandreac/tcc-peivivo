@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { textoDoAdaptado } from "@pei-vivo/motor-adaptacao";
 import { api, mensagemAmigavel, type Material } from "../services";
@@ -25,15 +25,15 @@ export function RevisarMaterial() {
   useTitulo(material.dados ? `Revisar: ${material.dados.titulo}` : "Revisar material", !material.carregando);
 
   const [editando, setEditando] = useState(false);
-  const [textoEditado, setTextoEditado] = useState("");
+  // null = ainda não editado: o campo mostra o texto vindo do material (estado derivado, sem efeito)
+  const [textoEditado, setTextoEditado] = useState<string | null>(null);
   const [modalDescartar, setModalDescartar] = useState(false);
 
-  useEffect(() => {
-    if (material.dados?.textoAdaptado) setTextoEditado(material.dados.textoRevisado ?? textoDoAdaptado(material.dados.textoAdaptado));
-  }, [material.dados]);
+  const textoInicial = material.dados?.textoAdaptado ? (material.dados.textoRevisado ?? textoDoAdaptado(material.dados.textoAdaptado)) : "";
+  const texto = textoEditado ?? textoInicial;
 
   const aprovar = useMutacao(async () => {
-    const m = await api.aprovarMaterial(id!, editando ? textoEditado : undefined);
+    const m = await api.aprovarMaterial(id!, editando ? texto : undefined);
     anunciar("Material aprovado. Agora família, profissional e coordenação também o veem.", "sucesso");
     navigate(`/materiais/${m.id}`);
   });
@@ -77,7 +77,11 @@ export function RevisarMaterial() {
 
   return (
     <>
-      <CabecalhoEstudante contexto={ctx.dados} titulo={`Revisar: ${m.titulo}`} descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar." />
+      <CabecalhoEstudante
+        contexto={ctx.dados}
+        titulo={`Revisar: ${m.titulo}`}
+        descricao="Compare o original com a versão adaptada. Edite se quiser. Nada chega ao estudante sem o seu toque em Aprovar."
+      />
 
       <div className="chips chips--secao">
         <Badge tom="aviso">{STATUS_APROVACAO.RASCUNHO.texto}</Badge>
@@ -87,7 +91,8 @@ export function RevisarMaterial() {
 
       {!m.iaAplicada && (
         <Alerta tom="info" titulo="A camada de IA não foi aplicada">
-          Você recebeu blocos, etapas e contraste conforme o perfil. Vocabulário e exemplos (âncora de interesse) só mudam com a IA ligada — que, ainda assim, nunca aprova nada.
+          Você recebeu blocos, etapas e contraste conforme o perfil. Vocabulário e exemplos (âncora de interesse) só mudam com a IA ligada — que, ainda assim,
+          nunca aprova nada.
         </Alerta>
       )}
 
@@ -105,7 +110,15 @@ export function RevisarMaterial() {
         <section className="comparacao__painel" aria-labelledby="titulo-adaptado">
           <h2 id="titulo-adaptado">Adaptado</h2>
           {editando ? (
-            <Campo tipo="area" id="texto-editado" rotulo="Texto adaptado (editável)" dica="Separe blocos com uma linha em branco. Etapas numeradas viram lista." rows={16} value={textoEditado} onChange={(e) => setTextoEditado(e.target.value)} />
+            <Campo
+              tipo="area"
+              id="texto-editado"
+              rotulo="Texto adaptado (editável)"
+              dica="Separe blocos com uma linha em branco. Etapas numeradas viram lista."
+              rows={16}
+              value={texto}
+              onChange={(e) => setTextoEditado(e.target.value)}
+            />
           ) : (
             m.textoAdaptado && <MaterialAdaptado adaptado={m.textoAdaptado} mostrarExcedentes />
           )}

@@ -44,7 +44,15 @@ export function Modal({ aberto, titulo, onFechar, children, acoes }: ModalProps)
   }, [onFechar]);
 
   return (
-    <dialog ref={ref} className="modal" aria-labelledby={idTitulo} onCancel={(e) => { e.preventDefault(); ref.current?.close(); }}>
+    <dialog
+      ref={ref}
+      className="modal"
+      aria-labelledby={idTitulo}
+      onCancel={(e) => {
+        e.preventDefault();
+        ref.current?.close();
+      }}
+    >
       <div className="modal__conteudo">
         <h2 id={idTitulo} tabIndex={-1}>
           {titulo}

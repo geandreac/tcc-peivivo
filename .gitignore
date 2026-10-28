@@ -32,3 +32,6 @@ docs/tcc/*respostas*
 docs/tcc/Relat*
 docs/tcc/Artigo Refer*.pdf
 docs/tcc/checklist.jpeg
+
+# backups de dados da nuvem (LGPD: dados de pessoas) — nunca versionar
+backups/

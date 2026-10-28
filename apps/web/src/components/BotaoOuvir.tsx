@@ -15,9 +15,12 @@ export function BotaoOuvir({ texto, trecho }: { texto: string; trecho: number })
   const [falando, setFalando] = useState(false);
   const voz = sintese();
 
-  useEffect(() => () => {
-    if (falando) sintese()?.cancel();
-  }, [falando]);
+  useEffect(
+    () => () => {
+      if (falando) sintese()?.cancel();
+    },
+    [falando],
+  );
 
   if (!voz) return null;
 

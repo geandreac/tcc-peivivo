@@ -83,7 +83,11 @@ describe("Guarda de rota no modo real", () => {
 describe("Verificação em duas etapas", () => {
   it("primeiro acesso: QR + o mesmo segredo em texto (alternativa acessível) e código de 6 dígitos", async () => {
     modoReal(SAUDE, "aal1", false);
-    vi.spyOn(api, "iniciarCadastroSegundoFator").mockResolvedValue({ fatorId: "f1", qrCode: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'/>", segredo: "JBSWY3DPEHPK3PXP" });
+    vi.spyOn(api, "iniciarCadastroSegundoFator").mockResolvedValue({
+      fatorId: "f1",
+      qrCode: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'/>",
+      segredo: "JBSWY3DPEHPK3PXP",
+    });
     const verificar = vi.spyOn(api, "verificarSegundoFator").mockResolvedValue();
     const { container } = await renderizarApp("/entrar/verificacao");
     await userEvent.click(await screen.findByRole("button", { name: "Começar" }));

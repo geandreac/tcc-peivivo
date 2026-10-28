@@ -83,7 +83,7 @@ Personas em `docs/validacao-da-ideia.md` §2.
 pei-vivo/
 ├── apps/web/                      # React + Vite — protótipo funcional
 │   ├── index.html · vite.config.ts · tsconfig.json
-│   ├── public/                    # favicon.svg, manifest.webmanifest, logo-pei-vivo.png
+│   ├── public/                    # favicon.svg, manifest.webmanifest, logo-pei-vivo.webp (arte-fonte em design/)
 │   └── src/
 │       ├── main.tsx               # providers (sessão, anúncios) + router
 │       ├── routes/                # mapa de rotas (= arquitetura da informação) e RotaProtegida
@@ -101,7 +101,7 @@ pei-vivo/
 ├── packages/politicas/            # 113 testes de RLS/RPC (+12 só no CI) (caminho negado primeiro) — PGlite local, Supabase no CI
 ├── packages/contratos/            # schemas Zod compartilhados app ↔ Edge Functions
 ├── packages/funcoes/              # casos de uso das Edge Functions (TS puro, 24 testes)
-├── supabase/                      # migrations 0001–0006, functions/ (gerar-material, fechar-ciclo), seed fictício, config
+├── supabase/                      # migrations 0001–0011, functions/ (gerar-material, fechar-ciclo, convidar), seed fictício, config
 ├── scripts/                       # validar-migrations.mjs (PGlite), contraste.mjs, criar-kanban.sh
 ├── docs/                          # documentação do projeto (ver §13)
 │   └── tcc/                       # fontes do TCC: pré-projeto, diagramas, orientação
@@ -143,18 +143,59 @@ Rosa → consentimento · Márcia → observar → fechar ciclo · Camila → va
 Márcia → gerar (texto de exemplo) → revisar → aprovar → desfecho · Coordenação → histórico.
 Em **Ajuda** há "Restaurar dados" e "Simular falha de rede".
 
+### 8.1 Variáveis de ambiente
+
+Só os nomes estão no repositório. Os valores do front ficam em `apps/web/.env.local` (ignorado pelo git; modelo em [`.env.example`](.env.example)), e os das Edge Functions ficam nos *secrets* do Supabase. Passo a passo em [`docs/reformulacao/IMPLANTACAO.md`](docs/reformulacao/IMPLANTACAO.md).
+
+| Variável | Onde | Finalidade | Pública? |
+|---|---|---|---|
+| `VITE_API` | front (build) | `supabase` liga o sistema real; qualquer outro valor (ou ausente) mantém a demonstração com dados fictícios | sim |
+| `VITE_SUPABASE_URL` | front (build) | URL do projeto Supabase | sim (vai no bundle) |
+| `VITE_SUPABASE_ANON_KEY` | front (build) | chave anônima; quem protege os dados é o RLS, não a chave | sim (vai no bundle) |
+| `VITE_IA_ATIVA` | front (build) | reservada para a Fase 5; **hoje nenhum código a lê**. Quem liga a IA é o servidor (`IA_HABILITADA`) | sim |
+| `ORIGEM_APP` | Edge Functions | origem aceita no CORS e base do link do convite | não é segredo |
+| `IA_HABILITADA` | Edge Functions | `true` liga a camada de IA (desligada por padrão, D-39) | não é segredo |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Edge Functions | injetadas pelo Supabase; a *service role* só existe no servidor | **service role é segredo** |
+| `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | testes (`packages/politicas`, CI) | quando presentes, os testes de política rodam contra Postgres/Supabase real | segredo no CI |
+| `SUPABASE_PING_ATIVO` (variável) e `SUPABASE_URL`/`SUPABASE_ANON_KEY` (secrets) | GitHub Actions | ping de keep-alive (`manter-supabase-ativo.yml`) | secrets |
+
+### 8.2 Edge Functions (API HTTP)
+
+As três funções recebem `POST` com `Authorization: Bearer <JWT do usuário>` e corpo JSON. O corpo é validado por schemas Zod em modo estrito, em [`packages/contratos`](packages/contratos/src/index.ts), e um campo a mais é recusado. Toda resposta traz o cabeçalho `x-request-id`. Os erros saem como `{ "erro": { "codigo", "mensagem" } }`.
+
+| Rota | Entrada | Saída (200) | Quem pode |
+|---|---|---|---|
+| `/functions/v1/gerar-material` | `{ estudanteId: uuid, titulo?: string ≤ 120, texto: string 1–20 000 }` | `{ materialId, emCache, origem: "REGRAS" \| "REGRAS_E_IA", avisos[], duracaoMs }` | docente vinculado, com consentimento de geração e perfil vigente |
+| `/functions/v1/fechar-ciclo` | `{ cicloId: uuid }` | `{ versaoId, statusValidacao: "PENDENTE" \| "VIGENTE", modoPedagogico, diff[] }` | docente vinculado, ciclo aberto com observação |
+| `/functions/v1/convidar` | `{ escolaId: uuid, email, nome?, papel: "DOCENTE" \| "RESPONSAVEL" \| "PROFISSIONAL_SAUDE", estudanteId?, registroConselho?, conferidoPresencialmente? }` | `{ emailEnviado, avisos[] }` | coordenação da escola com segundo fator (aal2) |
+
+| HTTP | `codigo` | Quando |
+|---|---|---|
+| 400 | `VALIDACAO` | corpo inválido, campo extra, JSON malformado, `22023`/`23514`/`22P02` do banco |
+| 401 | `NAO_AUTENTICADO` | sem `Bearer` (o gateway também recusa JWT expirado) |
+| 403 | `NEGADO` | o banco negou (`42501`): papel, vínculo, consentimento ou segundo fator |
+| 405 | `VALIDACAO` | método diferente de `POST` |
+| 409 | `CONFLITO` | estado mudou (`PT409`) ou duplicidade (`23505`) |
+| 500 / 502 | `INTERNO` | erro inesperado ou Auth indisponível, sem detalhe interno |
+
+O schema do banco está documentado em [`docs/tcc/class_diagram.svg`](docs/tcc/class_diagram.svg) (gerado das migrations por `npm run diagramas`) e nos `comment on table` das migrations.
+
 ## 9. Scripts disponíveis
 
 | Comando | O que faz |
 |---|---|
 | `npm run dev` | Vite dev server do app |
 | `npm run build` | Typecheck + build do app |
-| `npm test` | Todos os testes (motor + políticas + web) |
-| `npm run test:motor` | 42 testes do motor |
-| `npm run test:web` | 116 testes do app (inclui axe-core e autenticação por perfil) |
-| `npm test -w packages/politicas` | 71 testes das políticas RLS e RPCs (PGlite; `DATABASE_URL` aponta para Postgres real) |
+| `npm test` | Todos os testes (motor + funções + políticas + web) |
+| `npm run test:motor` | 44 testes do motor |
+| `npm test -w packages/funcoes` | 74 testes dos casos de uso e da camada HTTP das Edge Functions |
+| `npm run test:web` | 172 testes do app (inclui axe-core, autenticação por perfil e o contrato do `supabaseApi`) |
+| `npm test -w packages/politicas` | 133 testes das políticas RLS e RPCs no PGlite (+13 que só rodam com `DATABASE_URL`/Supabase real, no CI) |
+| `npm run test:e2e` | 20 testes ponta a ponta (Playwright, 390 e 1280 px, axe com contraste real) |
+| `npm run lint` | ESLint no monorepo (typescript-eslint, react-hooks, jsx-a11y) |
+| `npm run format` / `format:check` | Prettier (configurado; reformatação em massa ainda não aplicada) |
 | `node scripts/sondar-rls.mjs` | Evidência histórica: 31 ataques contra as policies de `0002` (25 passavam) |
-| `npm run test:coverage` | Cobertura de motor e web |
+| `npm run test:coverage` | Cobertura de motor, funções e web (limite de 70 %) |
 | `npm run typecheck` | `tsc --noEmit` em todos os workspaces |
 | `npm run contraste` | Verifica as razões de contraste dos tokens |
 | `npm run db:validar` | Migrations + seed num Postgres real (PGlite) |

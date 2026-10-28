@@ -22,10 +22,15 @@ export function useConsulta<T>(fn: () => Promise<T>, deps: unknown[] = []): Cons
   const [erro, setErro] = useState<Error | null>(null);
   const [versao, setVersao] = useState(0);
   const fnRef = useRef(fn);
-  fnRef.current = fn;
+  // declarado antes do efeito da busca: os efeitos rodam em ordem, então a busca vê a função atual
+  useEffect(() => {
+    fnRef.current = fn;
+  });
 
   useEffect(() => {
     let ativo = true;
+    // busca com efeito (sem biblioteca de cache): o estado precisa mostrar "carregando" assim que a consulta muda
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCarregando(true);
     setErro(null);
     fnRef
@@ -76,7 +81,7 @@ export function useMutacao<A extends unknown[], R>(fn: (...args: A) => Promise<R
         setOcupado(false);
       }
     },
-    [fn]
+    [fn],
   );
 
   return { executar, ocupado, erro, limparErro: () => setErro(null) };
