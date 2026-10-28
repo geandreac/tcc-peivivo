@@ -953,7 +953,9 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------- 9. permissões de execução
-revoke execute on all functions in schema privado from public, anon;
+-- Sem revoke geral em `privado`: no Supabase o service_role herda EXECUTE por PUBLIC e precisa dele
+-- nas funções usadas em CHECK (ex.: parametros_validos). O schema não é exposto ao anon; as funções
+-- novas só rodam dentro das RPCs security definer.
 grant execute on function privado.usuario_atual(), privado.usuario_logado(), privado.admin_geral(), privado.eh_admin(uuid),
   privado.teto(text), privado.usuario_pode(uuid, public.ferramenta, public.acao_ferramenta),
   privado.pode(public.ferramenta, public.acao_ferramenta), privado.pode_observar(uuid) to authenticated;

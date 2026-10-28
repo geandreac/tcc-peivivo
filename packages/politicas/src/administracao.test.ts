@@ -260,10 +260,10 @@ describe("painel · permitido", () => {
     expect(ok(await db.como("admin", listar("'docente2'"))).map((l) => l.id)).toEqual([usuarioId("docente2")]);
   });
   it("escolas: o admin vê todas; a coordenação, só a dela (só id e nome)", async () => {
-    expect(ok(await db.como("admin", "select * from fn_admin_listar_escolas()")).map((e) => e.nome)).toEqual([
-      "Escola fictícia 1 (teste)",
-      "Escola fictícia 2 (teste)",
-    ]);
+    // no Supabase do CI há outras escolas além da fixture
+    expect(ok(await db.como("admin", "select * from fn_admin_listar_escolas()")).map((e) => e.nome)).toEqual(
+      expect.arrayContaining(["Escola fictícia 1 (teste)", "Escola fictícia 2 (teste)"]),
+    );
     expect(ok(await db.como("coordenacao", "select * from fn_admin_listar_escolas()"))).toEqual([{ id: ID.escola1, nome: "Escola fictícia 1 (teste)" }]);
   });
   it("resumo: escopo, contagens e ferramentas disponíveis", async () => {
