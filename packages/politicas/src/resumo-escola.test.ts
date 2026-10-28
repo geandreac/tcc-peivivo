@@ -109,7 +109,8 @@ describe("fn_listar_auditoria paginada · permitido", () => {
 describe("prazos do banco = constantes de @pei-vivo/contratos (mock e app usam as mesmas)", () => {
   const definicao = async (assinatura: string) => String((await db.sistema(`select pg_get_functiondef('${assinatura}'::regprocedure) as d`)).rows[0]?.d);
   it("painel: validação atrasada e ciclo parado", async () => {
-    const d = await definicao("public.fn_resumo_escola(uuid)");
+    // D-50: a função da 0011 foi para `privado`, atrás do invólucro que confere a ferramenta PAINEL_ESCOLA
+    const d = await definicao("privado.fn_resumo_escola(uuid)");
     expect(d).toContain(`interval '${DIAS_VALIDACAO_ATRASADA} days'`);
     expect(d).toContain(`current_date - ${DIAS_CICLO_PARADO}`);
   });

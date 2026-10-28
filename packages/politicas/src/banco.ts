@@ -32,7 +32,7 @@ const raiz = fileURLToPath(new URL("../../..", import.meta.url));
 
 const STUB_SUPABASE = `
   create schema if not exists auth;
-  create table if not exists auth.users (id uuid primary key, aud text, role text, email text);
+  create table if not exists auth.users (id uuid primary key, aud text, role text, email text, last_sign_in_at timestamptz);
   create or replace function auth.jwt() returns jsonb language sql stable as $$
     select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
   $$;
@@ -93,6 +93,7 @@ export const PESSOAS = {
   estranho: 9,
   docenteSemVinculo: 10,
   profissionalNovo: 11,
+  admin: 12,
 } as const;
 export type Pessoa = keyof typeof PESSOAS;
 export const usuarioId = (p: Pessoa) => u(PESSOAS[p]);
@@ -164,6 +165,8 @@ const FIXTURE = `
   update materiais_adaptados set status_aprovacao = 'APROVADO' where id = '${ID.aprovadoDocente}';
   insert into notas_clinicas (id, estudante_id, profissional_id, conteudo) values
     ('${ID.notaSaude}','${ID.e1}','${u(5)}','Nota reservada fictícia');
+  -- D-50: Administrador Geral fictício (sem vínculo nem escola)
+  insert into administradores (usuario_id) values ('${u(12)}');
 `;
 
 // ------------------------------------------------------------------ API dos testes
@@ -187,7 +190,7 @@ export interface Banco {
   fechar(): Promise<void>;
 }
 
-const AAL2_PADRAO: Pessoa[] = ["saude", "saude2", "coordenacao", "coordOutraEscola", "profissionalNovo"];
+const AAL2_PADRAO: Pessoa[] = ["saude", "saude2", "coordenacao", "coordOutraEscola", "profissionalNovo", "admin"];
 
 function preparo(ator: Ator, aal?: "aal1" | "aal2"): string {
   if (ator === "sistema") return "reset role; select set_config('request.jwt.claims', '', true);";
