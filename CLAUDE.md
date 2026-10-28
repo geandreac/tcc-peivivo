@@ -132,7 +132,10 @@ gratuito: sem limite de sessão e sem modelo de e-mail em português (exige SMTP
 `IMPLANTACAO.md` §0.
 **R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v3 (N1: até a
 Metodologia) em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera `Artigo_PEI_Vivo_v3.docx`; a v2 fica
-preservada). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`
+preservada). **v4 (28/10)**, no modelo do artigo REWORK aprovado para a pré-banca (sem capa/resumo,
+notas de autoria no rodapé, Tabelas 1–3 para RF/RNF/RN, seções 4–5 para a N2): `docs/tcc/artigo/artigo_v4.md`
+→ `python scripts/artigo/gerar_docx.py docs/tcc/artigo/artigo_v4.md docs/tcc/artigo/Artigo_PEI_Vivo_v4.docx`
+(o modo pré-banca liga com `@autores-rodape`; as versões antigas saem idênticas). Resultados e discussões (N2) em `docs/tcc/artigo/n2-resultados-e-discussoes.md`; `npm run artigo:telas`
 recaptura as telas com o protótipo em `VITE_API=mock` na 5179. Diagramas UML gerados do código por
 `npm run diagramas`: completos em `docs/tcc/*_diagram.svg` e, para impressão, repartidos em
 `docs/tcc/artigo/figuras/` (`scripts/diagramas/impressao.mjs`). Marcadores `[PREENCHER]`/`[CONFERIR]` = dados

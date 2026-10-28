@@ -9,6 +9,11 @@ rosto, título com autores, resumo, abstract e seções numeradas. A4, margens
 referências em espaço simples. Código como listagem numerada (Código N);
 diagramas com .svg ao lado do .png entram como vetor. Figuras com {paisagem} vão para página deitada; com {pagina}, para página retrato inteira.
 Marcadores [PREENCHER: …] e [CONFERIR: …] saem destacados em amarelo.
+
+Com @autores-rodape no lugar de @autores, sai no modelo de pré-banca (o do artigo
+REWORK aprovado): sem capa, resumo nem número de página; título em duas linhas;
+autores à direita com as notas de autoria no rodapé da 1ª página; Tabela/Quadro com
+cabeçalho azul-claro e fonte em itálico à esquerda; referências e declaração em página nova.
 """
 import re
 import sys
@@ -77,13 +82,13 @@ def texto(p, s, tam=12, negrito=False, italico=False, mono=False):
     return p
 
 
-def paragrafo(doc, s, alinhar=WD_ALIGN_PARAGRAPH.JUSTIFY, recuo=True, simples=False, tam=12, negrito=False, depois=0, antes=0):
+def paragrafo(doc, s, alinhar=WD_ALIGN_PARAGRAPH.JUSTIFY, recuo=True, simples=False, tam=12, negrito=False, depois=0, antes=0, italico=False):
     p = doc.add_paragraph()
     p.alignment = alinhar
     espacamento(p, simples, antes, depois)
     if recuo:
         p.paragraph_format.first_line_indent = Cm(1.25)
-    return texto(p, s, tam=tam, negrito=negrito)
+    return texto(p, s, tam=tam, negrito=negrito, italico=italico)
 
 
 def centro(doc, s, negrito=True, tam=12, antes=0, depois=0):
@@ -174,10 +179,44 @@ def autores(doc):
         texto(q, nota, tam=10)
 
 
+def autores_rodape(doc):
+    """Nomes à direita, sobrescrito numerado; as notas vão no rodapé só da 1ª página."""
+    discentes, (orientadora, _) = AUTORIA[:-1], AUTORIA[-1]
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    espacamento(p, simples=True)
+    for i, (nome, _) in enumerate(discentes, 1):
+        texto(p, nome)
+        r = p.add_run(str(i))
+        r.font.superscript, r.font.name = True, FONTE
+        if i < len(discentes):
+            r.add_break()
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    espacamento(p, simples=True, antes=6, depois=24)
+    texto(p, orientadora)
+    r = p.add_run(str(len(AUTORIA)))
+    r.font.superscript, r.font.name = True, FONTE
+    secao = doc.sections[0]
+    secao.different_first_page_header_footer = True
+    rodape = secao.first_page_footer
+    linha = rodape.paragraphs[0]
+    espacamento(linha, simples=True)
+    texto(linha, "_" * 23, tam=9)
+    for i, (_, nota) in enumerate(AUTORIA, 1):
+        q = rodape.add_paragraph()
+        espacamento(q, simples=True)
+        r = q.add_run(str(i))
+        r.font.superscript, r.font.name, r.font.size = True, FONTE, Pt(9)
+        texto(q, f" {nota}", tam=9)
+
+
 def celula(c, s, cabecalho=False):
     c.paragraphs[0].text = ""
     p = c.paragraphs[0]
     espacamento(p, simples=True)
+    if cabecalho and PRE_BANCA:
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     texto(p, s, tam=10, negrito=cabecalho)
 
 
@@ -190,7 +229,7 @@ def tabela(doc, linhas):
         celula(c, s, cabecalho=True)
         sombra = OxmlElement("w:shd")
         sombra.set(qn("w:val"), "clear")
-        sombra.set(qn("w:fill"), "E7EDF2")
+        sombra.set(qn("w:fill"), "D9EAF7" if PRE_BANCA else "E7EDF2")
         c._tc.get_or_add_tcPr().append(sombra)
     for linha in corpo:
         for c, s in zip(t.add_row().cells, linha):
@@ -225,7 +264,10 @@ def legenda(doc, s):
 
 
 def fonte_do_elemento(doc, s):
-    paragrafo(doc, s, WD_ALIGN_PARAGRAPH.CENTER, recuo=False, simples=True, tam=10, antes=6, depois=12)
+    if PRE_BANCA:  # no modelo REWORK: itálico, à esquerda, colada ao elemento
+        paragrafo(doc, s, WD_ALIGN_PARAGRAPH.LEFT, recuo=False, simples=True, tam=10, antes=2, depois=12, italico=True)
+    else:
+        paragrafo(doc, s, WD_ALIGN_PARAGRAPH.CENTER, recuo=False, simples=True, tam=10, antes=6, depois=12)
 
 
 def figura(doc, titulo, caminho, modo, fonte_texto):
@@ -235,6 +277,7 @@ def figura(doc, titulo, caminho, modo, fonte_texto):
         larg_max, alt_max = LARGURA_RETRATO, Cm(22.3)
     elif paisagem:
         nova = doc.add_section(WD_SECTION.NEW_PAGE)
+        nova.different_first_page_header_footer = False  # as notas de autoria são só da 1ª página
         margens(nova, paisagem=True)
         larg_max, alt_max = Cm(24.7), Cm(13.5)
     else:  # {cm=11}: largura máxima própria (figura estreita não precisa ocupar 16 cm)
@@ -254,7 +297,9 @@ def figura(doc, titulo, caminho, modo, fonte_texto):
         vetor(doc, r, caminho.with_suffix(".svg"))
     fonte_do_elemento(doc, fonte_texto)
     if paisagem:
-        margens(doc.add_section(WD_SECTION.NEW_PAGE))
+        volta = doc.add_section(WD_SECTION.NEW_PAGE)
+        volta.different_first_page_header_footer = False
+        margens(volta)
 
 
 def vetor(doc, run, svg):
@@ -293,14 +338,16 @@ def celulas(linha):
 md = re.sub(r"<!--.*?-->", "", ORIGEM.read_text(encoding="utf-8"), flags=re.S)
 linhas = md.splitlines()
 TITULO = next(l[2:].strip() for l in linhas if l.startswith("# "))
+PRE_BANCA = "@autores-rodape" in linhas
 
 doc = Document()
 estilo = doc.styles["Normal"]
 estilo.font.name, estilo.font.size = FONTE, Pt(12)
 estilo.element.rPr.rFonts.set(qn("w:eastAsia"), FONTE)
 margens(doc.sections[0])
-numero_de_pagina(doc.sections[0])
-capa_e_rosto(doc)
+if not PRE_BANCA:
+    numero_de_pagina(doc.sections[0])
+    capa_e_rosto(doc)
 
 i, titulo_feito, referencias = 0, False, False
 while i < len(linhas):
@@ -309,8 +356,15 @@ while i < len(linhas):
         i += 1
         continue
     if l.startswith("# ") and not titulo_feito:
-        centro(doc, TITULO, depois=12)
+        if PRE_BANCA:  # nome do sistema numa linha, subtítulo na seguinte
+            nome, _, subtitulo = TITULO.partition(": ")
+            centro(doc, nome, depois=6)
+            centro(doc, subtitulo, depois=12)
+        else:
+            centro(doc, TITULO, depois=12)
         titulo_feito = True
+    elif l.strip() == "@autores-rodape":
+        autores_rodape(doc)
     elif l.strip() == "@autores":
         autores(doc)
     elif l.startswith("## ") and l[3:].strip() in ("RESUMO", "ABSTRACT"):
@@ -318,14 +372,19 @@ while i < len(linhas):
             quebra(doc)
         centro(doc, l[3:].strip(), antes=12, depois=6)
     elif l.startswith("# "):
+        depois_das_referencias = referencias
         referencias = l[2:].strip() == "REFERÊNCIAS"
-        quebra(doc) if l[2:].startswith("1.") or referencias else None
-        p = paragrafo(doc, l[2:].strip(), WD_ALIGN_PARAGRAPH.LEFT if l[2].isdigit() else WD_ALIGN_PARAGRAPH.CENTER, recuo=False, negrito=True, antes=12, depois=6)
+        if PRE_BANCA:  # referências e o que vem depois delas começam página nova
+            quebra(doc) if referencias or depois_das_referencias else None
+        else:
+            quebra(doc) if l[2:].startswith("1.") or referencias else None
+        alinhar = WD_ALIGN_PARAGRAPH.LEFT if l[2].isdigit() or PRE_BANCA else WD_ALIGN_PARAGRAPH.CENTER
+        p = paragrafo(doc, l[2:].strip(), alinhar, recuo=False, negrito=True, antes=18 if PRE_BANCA else 12, depois=6)
         p.paragraph_format.keep_with_next = True
     elif l.startswith("## ") or l.startswith("### "):
-        p = paragrafo(doc, l.lstrip("#").strip(), WD_ALIGN_PARAGRAPH.LEFT, recuo=False, negrito=l.startswith("## "), antes=6, depois=3)
+        p = paragrafo(doc, l.lstrip("#").strip(), WD_ALIGN_PARAGRAPH.LEFT, recuo=False, negrito=l.startswith("## ") or PRE_BANCA, antes=12 if PRE_BANCA else 6, depois=3)
         p.paragraph_format.keep_with_next = True
-    elif re.match(r"^(Quadro|Figura|Código) \d+ – ", l):
+    elif re.match(r"^(Tabela|Quadro|Figura|Código) \d+ – ", l):
         legenda(doc, l.strip())
     elif l.startswith("|"):
         bloco = []
@@ -356,14 +415,16 @@ while i < len(linhas):
     elif l.startswith("**Palavras-chave:**") or l.startswith("**Keywords:**"):
         paragrafo(doc, l, WD_ALIGN_PARAGRAPH.JUSTIFY, recuo=False, simples=True, antes=6, depois=6)
     elif referencias:
-        paragrafo(doc, l, WD_ALIGN_PARAGRAPH.LEFT, recuo=False, simples=True, depois=12)
+        paragrafo(doc, l, WD_ALIGN_PARAGRAPH.LEFT, recuo=False, simples=True, tam=11 if PRE_BANCA else 12, depois=10 if PRE_BANCA else 12)
     elif re.match(r"^[a-e]\) ", l):
         paragrafo(doc, l, recuo=True)
     else:
         resumo = any(h.strip() in ("## RESUMO", "## ABSTRACT") for h in linhas[max(0, i - 2) : i])
-        paragrafo(doc, l, recuo=not resumo, simples=resumo)
+        paragrafo(doc, l, recuo=not resumo, simples=resumo, depois=6 if PRE_BANCA else 0)
     i += 1
 
+doc.core_properties.title = TITULO
+doc.core_properties.author = "; ".join(nome for nome, _ in AUTORIA[:-1])
 doc.save(DESTINO)
 pendencias = len(MARCADOR.findall(md))
 print(f"OK {DESTINO.relative_to(RAIZ)}  ({pendencias} marcadores destacados em amarelo)")
