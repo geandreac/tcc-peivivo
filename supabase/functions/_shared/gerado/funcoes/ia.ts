@@ -149,7 +149,12 @@ export function provedorCompativelOpenAI(cfg: ConfigProvedor): ProvedorIA {
       const conteudo = corpo.choices?.[0]?.message?.content;
       if (typeof conteudo !== "string") throw new Error("resposta sem conteúdo");
       // alguns modelos gratuitos embrulham o JSON em bloco de código
-      return JSON.parse(conteudo.trim().replace(/^`{3}(?:json)?\s*/u, "").replace(/\s*`{3}$/u, "")) as unknown;
+      return JSON.parse(
+        conteudo
+          .trim()
+          .replace(/^`{3}(?:json)?\s*/u, "")
+          .replace(/\s*`{3}$/u, ""),
+      ) as unknown;
     },
   };
 }

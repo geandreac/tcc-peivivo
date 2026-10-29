@@ -105,7 +105,7 @@ export async function gerarMaterial(corpo: unknown, portas: PortasGerarMaterial)
     }
   }
 
-  const regras = adaptar(textoBase, parametros.data);
+  const regras = adaptar(textoBase, parametros.data, perguntas?.length ?? 0);
   // D-43: o glossário da IA só acrescenta termos ao das regras (curado).
   const comGlossario =
     regras.apoios && glossario ? { ...regras, apoios: { ...regras.apoios, glossario: juntarGlossarios(regras.apoios.glossario, glossario) } } : regras;

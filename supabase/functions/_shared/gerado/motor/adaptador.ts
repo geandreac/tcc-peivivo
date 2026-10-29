@@ -187,16 +187,17 @@ function paragrafos(texto: string): string[] {
     .filter(Boolean);
 }
 
-export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAdaptado {
+/** `perguntas`: quantas perguntas de compreensão a IA trouxe (D-53) — viram o último passo do roteiro. */
+export function adaptar(texto: string, parametros: ParametrosAdaptacao, perguntas = 0): TextoAdaptado {
   const p = { ...parametros };
   const maxLinhas = Math.max(1, Math.floor(p.maxLinhasPorBloco));
   const maxBlocos = Math.max(1, Math.floor(p.blocosPorMaterial));
 
   const blocos: Bloco[] = [];
   const enunciados: Enunciado[] = [];
-  // D-53: o que vai para o roteiro — se o bloco é leitura e quais comandos vieram de cada parágrafo
+  // D-53: o que o roteiro conta — se o bloco é leitura e quantas tarefas ele traz
   const deLeitura: boolean[] = [];
-  const comandos: string[][] = [];
+  const tarefas: number[] = [];
 
   for (const paragrafo of paragrafos(texto)) {
     if (p.formatoEnunciado === "ETAPA_UNICA" && ehEnunciadoComposto(paragrafo)) {
@@ -208,7 +209,7 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
           linhas: etapas.slice(i, i + maxLinhas).map((e, j) => `${i + j + 1}. ${e}`),
         });
         deLeitura.push(false);
-        comandos.push(i === 0 ? etapas : []);
+        tarefas.push(i === 0 ? etapas.length : 0);
       }
       continue;
     }
@@ -216,7 +217,7 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
     blocosDoParagrafo(paragrafo, maxLinhas).forEach((linhas, i) => {
       blocos.push({ linhas });
       deLeitura.push(!comando);
-      comandos.push(comando && i === 0 ? [comoPasso(paragrafo)] : []);
+      tarefas.push(comando && i === 0 ? 1 : 0);
     });
   }
 
@@ -226,24 +227,24 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
     enunciados,
     parametros: p,
     apoios: apoiosDeLeitura(texto, p),
-    roteiro: roteiroDaAtividade(deLeitura.slice(0, maxBlocos), comandos.slice(0, maxBlocos)),
+    roteiro: roteiroDaAtividade(deLeitura.slice(0, maxBlocos), tarefas.slice(0, maxBlocos), perguntas),
   };
 }
 
-/** Comando inteiro como um passo: sem a numeração do original, com ponto final. */
-function comoPasso(paragrafo: string): string {
-  const s = paragrafo.trim().replace(/^\d+[.)]\s*/u, "").replace(/[\s.;:]+$/u, "");
-  return s.charAt(0).toUpperCase() + s.slice(1) + ".";
-}
-
 /**
- * D-53 — previsibilidade: a ordem do que a atividade pede, só com o que está no material
- * (a leitura dos trechos e os comandos, na ordem do texto). Menos de dois passos não é
- * roteiro: devolve vazio. Não inventa passo, prazo nem recompensa.
+ * D-53 — previsibilidade: o que vem pela frente, contado do próprio material (quantos
+ * trechos de leitura, quantas tarefas). Resume, não repete os comandos, que já estão no
+ * texto — repetir dobraria a leitura. Menos de dois passos não é roteiro: devolve vazio.
+ * Não inventa passo, prazo nem recompensa. As perguntas (só com IA) são o último passo.
  */
-export function roteiroDaAtividade(deLeitura: boolean[], comandos: string[][]): string[] {
+export function roteiroDaAtividade(deLeitura: boolean[], tarefasPorBloco: number[], perguntas = 0): string[] {
   const trechos = deLeitura.filter(Boolean).length;
-  const passos = [...(trechos > 0 ? [`Leia o texto: ${trechos === 1 ? "1 trecho" : `${trechos} trechos`}.`] : []), ...comandos.flat()];
+  const tarefas = tarefasPorBloco.reduce((a, b) => a + b, 0);
+  const passos = [
+    ...(trechos > 0 ? [`Leia o texto: ${trechos === 1 ? "1 trecho" : `${trechos} trechos`}.`] : []),
+    ...(tarefas > 0 ? [`Faça ${tarefas === 1 ? "1 tarefa" : `${tarefas} tarefas`}.`] : []),
+    ...(perguntas > 0 ? [`Responda ${perguntas === 1 ? "a 1 pergunta" : `às ${perguntas} perguntas`} sobre o texto.`] : []),
+  ];
   return passos.length >= 2 ? passos : [];
 }
 

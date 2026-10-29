@@ -74,8 +74,8 @@ export interface TextoAdaptado {
    */
   apoios?: ApoiosLeitura;
   /**
-   * D-53 — roteiro da atividade, em ordem ("primeiro… depois… no fim"), feito só do que o
-   * texto já pede: leitura dos trechos e os comandos encontrados. Nada é acrescentado.
+   * D-53 — roteiro da atividade, em ordem ("primeiro… depois… no fim"), contado do próprio
+   * material: trechos de leitura, tarefas e, com IA, perguntas. Nada é acrescentado.
    * Opcional: materiais anteriores não têm. Vazio quando o texto não tem comando.
    */
   roteiro?: string[];
