@@ -849,6 +849,7 @@ dl.dados dd {
   display: grid;
   gap: var(--esp-3);
   grid-template-columns: 1fr;
+  margin-bottom: var(--esp-6); /* a grade fecha a seção: o cartão seguinte não encosta nela */
 }
 @media (min-width: 48em) {
   .perfis {
