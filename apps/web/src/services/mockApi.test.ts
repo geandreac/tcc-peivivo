@@ -7,6 +7,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { criarMockApi } from "./mockApi";
 import { ErroApi } from "./erros";
 import { ID } from "../mocks/dados";
+import { PARAMETROS_PADRAO } from "@pei-vivo/motor-adaptacao";
 
 const api = criarMockApi({ latenciaMs: 0, persistir: false });
 
@@ -113,11 +114,25 @@ describe("RF08/RF09 — gerar material (camada determinística, IA desligada)", 
     const b = await api.gerarMaterial(ID.estudanteA, "B", "Texto idêntico.");
     expect(b.id).toBe(a.id);
   });
-  it("sem versão vigente → CONFLITO", async () => {
+  // D-53 (= 0013): sem versão vigente, adaptação padrão — sem presumir nada do estudante
+  it("sem versão vigente e SEM consentimento → continua negado (RN01)", async () => {
+    await api.entrar(ID.docente);
+    await esperaNegado(api.gerarMaterial(ID.estudanteB, "t", "texto"));
+  });
+  it("sem versão vigente, quem não é docente vinculado continua negado", async () => {
+    await api.entrar(ID.responsavel);
+    await api.concederConsentimento(ID.estudanteB, ["geracao_material"]);
+    await api.entrar(ID.docente2);
+    await esperaNegado(api.gerarMaterial(ID.estudanteB, "t", "texto"));
+  });
+  it("sem versão vigente → rascunho com a adaptação padrão, versão nula e sem IA", async () => {
     await api.entrar(ID.responsavel);
     await api.concederConsentimento(ID.estudanteB, ["geracao_material"]);
     await api.entrar(ID.docente);
-    await esperaNegado(api.gerarMaterial(ID.estudanteB, "t", "texto"), "CONFLITO");
+    const m = await api.gerarMaterial(ID.estudanteB, "t", "Leia o texto e depois responda.");
+    expect(m).toMatchObject({ statusAprovacao: "RASCUNHO", versaoPerfilId: null, iaAplicada: false });
+    expect(m.textoAdaptado?.parametros).toEqual(PARAMETROS_PADRAO);
+    expect(m.textoAdaptado?.parametros.interesseAncora).toBeNull();
   });
   it("texto vazio → VALIDACAO", async () => {
     await api.entrar(ID.docente);

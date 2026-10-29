@@ -123,7 +123,8 @@ export interface VersaoPerfil {
 export interface Material {
   id: string;
   estudanteId: string;
-  versaoPerfilId: string;
+  /** Nulo = gerado com a adaptação padrão, antes do primeiro perfil vigente (D-53). */
+  versaoPerfilId: string | null;
   docenteId: string;
   titulo: string;
   textoOriginal: string;

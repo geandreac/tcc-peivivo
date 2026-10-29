@@ -25,6 +25,9 @@ export const LIMITE_OBSERVACAO_DESFECHO = 1_000;
 export const LIMITE_NOTA_CLINICA = 5_000;
 /** RNF08: a IA nunca segura a geração; passado o limite, vale só a camada de regras. */
 export const TIMEOUT_IA_MS = 30_000;
+/** D-53: perguntas de compreensão que a IA pode sugerir (2 a 5 pedidas; até 5 aceitas). */
+export const MAX_PERGUNTAS = 5;
+export const LIMITE_PERGUNTA = 160;
 
 // ------------------------------------------------------------------ prazos e padrões compartilhados
 export const MS_POR_DIA = 86_400_000;
@@ -88,6 +91,8 @@ export const SaidaIASchema = z
       .array(z.object({ termo: z.string().min(1).max(60), explicacao: z.string().min(1).max(300) }).strict())
       .max(50)
       .default([]),
+    /** D-53: perguntas de compreensão sobre o próprio texto, uma ideia por pergunta. */
+    perguntas: z.array(z.string().trim().min(5).max(LIMITE_PERGUNTA)).max(MAX_PERGUNTAS).default([]),
   })
   .strict();
 export type SaidaIA = z.infer<typeof SaidaIASchema>;

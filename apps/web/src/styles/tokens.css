@@ -50,7 +50,6 @@
   /* O material é a "folha" do estudante: fica claro em todos os temas (D-10), por isso
      estes valores NÃO são redefinidos no tema escuro. Usados também pelo QR do TOTP. */
   --material-claro: oklch(1 0 0);
-  --material-contorno: oklch(0 0 0); /* perfil com contraste 7:1 */
   --material-destaque: oklch(0.351 0.089 255.1); /* 11,29:1 sobre branco; 10,9:1 sobre o creme */
   --material-destaque-tint: oklch(0.949 0.014 254.61);
   --material-bloco: oklch(0.423 0.111 255.11 / 0.05); /* véu da primária sobre o creme */

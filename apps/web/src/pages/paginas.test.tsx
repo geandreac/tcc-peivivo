@@ -124,13 +124,15 @@ describe("Fluxo principal — gerar, revisar, aprovar, desfecho (HU-D.03–D.06)
     await semViolacoesAxe(container);
   });
 
-  it("estado vazio quando o estudante tem consentimento mas não tem perfil vigente", async () => {
+  it("sem perfil vigente: avisa que a adaptação é a padrão e deixa gerar (D-53)", async () => {
     const { container } = await renderizarApp(`/estudantes/${ID.estudanteB}/gerar`, ID.docente, async () => {
       await api.entrar(ID.responsavel);
       await api.concederConsentimento(ID.estudanteB, ["geracao_material"]);
     });
-    expect(await screen.findByText("Ainda não há perfil vigente")).toBeInTheDocument();
+    expect(await screen.findByText("Ainda não há perfil vigente: adaptação padrão")).toBeInTheDocument();
+    expect(screen.getByText(/sem personalização/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Registrar observação" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Adaptar para/ })).toBeInTheDocument();
     await semViolacoesAxe(container);
   });
 });

@@ -55,7 +55,7 @@ describe("P2.2 — derivarInteresseAncora (HU-S.02, D-03)", () => {
     expect(derivarInteresseAncora([], "dinossauros")).toBe("dinossauros");
   });
 
-  it("nunca volta a null se já houve valor (evidência vazia é ignorada)", () => {
+  it("evidência vazia não vira tema nem apaga o anterior", () => {
     const h = [obs(4, "INTERESSE_MANIFESTO", "AMPLIADA", "   ")];
     expect(derivarInteresseAncora(h, "dinossauros")).toBe("dinossauros");
   });
@@ -63,6 +63,27 @@ describe("P2.2 — derivarInteresseAncora (HU-S.02, D-03)", () => {
   it("usa a observação do ciclo mais recente", () => {
     const h = [obs(2, "INTERESSE_MANIFESTO", "AMPLIADA", "Carros"), obs(4, "INTERESSE_MANIFESTO", "AMPLIADA", "Espaço e planetas.")];
     expect(derivarInteresseAncora(h, null)).toBe("espaço e planetas");
+  });
+
+  // D-53: interesse muda; o material não insiste num tema que ninguém observa mais
+  it("menos interesse no ciclo mais recente, sem tema escrito → sem âncora", () => {
+    const h = [obs(2, "INTERESSE_MANIFESTO", "AMPLIADA", "Dinossauros"), obs(3, "INTERESSE_MANIFESTO", "REDUZIDA")];
+    expect(derivarInteresseAncora(h, "dinossauros")).toBeNull();
+  });
+
+  it("um tema novo escrito depois de 'menos interesse' volta a valer", () => {
+    const h = [obs(3, "INTERESSE_MANIFESTO", "REDUZIDA"), obs(4, "INTERESSE_MANIFESTO", "AMPLIADA", "Trens")];
+    expect(derivarInteresseAncora(h, null)).toBe("trens");
+  });
+
+  it("no mesmo ciclo, o tema escrito por alguém vale mais que 'menos interesse' sem tema", () => {
+    const h = [obs(4, "INTERESSE_MANIFESTO", "REDUZIDA"), obs(4, "INTERESSE_MANIFESTO", "AMPLIADA", "Música")];
+    expect(derivarInteresseAncora(h, "dinossauros")).toBe("música");
+  });
+
+  it("nunca presume tema: sem nada escrito, nada vira âncora", () => {
+    const h = [obs(1, "INTERESSE_MANIFESTO", "AMPLIADA"), obs(1, "ATENCAO_SUSTENTADA", "AMPLIADA", "Gosta de futebol")];
+    expect(derivarInteresseAncora(h, null)).toBeNull();
   });
 
   it("normalizarAncora devolve null para string só de pontuação", () => {

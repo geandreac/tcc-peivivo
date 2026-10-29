@@ -100,6 +100,69 @@ describe("gerar-material · fn_registrar_material (só service role)", () => {
 });
 
 // =============================================================================
+// D-53: sem versão VIGENTE, gera-se com os parâmetros padrão (não personalizados), nunca com IA.
+const semVigente = { ator: "sistema" as const, sql: `update versoes_perfil set status_validacao = 'SUBSTITUIDA' where id = '${ID.vigenteE1}'` };
+const PADRAO = {
+  maxLinhasPorBloco: 6,
+  nivelVocabulario: "INTERMEDIARIO",
+  interesseAncora: null,
+  formatoEnunciado: "MULTIPLAS_ETAPAS",
+  contrasteMinimo: 4.5,
+  blocosPorMaterial: 8,
+};
+const registrarPadrao = (ia = false, hash = "hp") =>
+  `select fn_registrar_material('${usuarioId("docente")}','${ID.e1}',null,'Título','Texto fictício','${ADAPTADO}','${hash}',${ia}) as r`;
+
+describe("gerar-material · material padrão sem perfil vigente (D-53)", () => {
+  it("RN01: sem perfil vigente, docente sem consentimento continua negado", async () => {
+    negado(await db.como("docente", `select fn_preparar_geracao('${ID.e2}')`));
+  });
+  it("com perfil vigente, gravar com os parâmetros padrão é conflito (usa-se a vigente)", async () => {
+    conflito(await db.como("servico", registrarPadrao()));
+  });
+  it("sem perfil vigente, material padrão nunca grava 'IA aplicada' (22023)", async () => {
+    const r = await db.fluxo([semVigente, { ator: "servico", sql: registrarPadrao(true) }]);
+    expect(r[1]?.ok).toBe(false);
+    expect(r[1]?.codigo, r[1]?.mensagem).toBe("22023");
+  });
+  it("sem perfil vigente, quem não é docente ativo continua negado; o docente não chama a gravação direto", async () => {
+    // o fluxo para no primeiro erro: um fluxo por tentativa
+    const tentativas = [
+      { ator: "servico" as const, sql: registrarPadrao().replace(usuarioId("docente"), usuarioId("responsavel")) },
+      { ator: "servico" as const, sql: registrarPadrao().replace(usuarioId("docente"), usuarioId("estranho")) },
+      { ator: "docente" as const, sql: registrarPadrao() },
+    ];
+    for (const passo of tentativas) negado((await db.fluxo([semVigente, passo]))[1]);
+  });
+  it("o INSERT direto com versão nula também passa pelo gatilho (com vigente → conflito)", async () => {
+    conflito(
+      await db.como(
+        "sistema",
+        `insert into materiais_adaptados (estudante_id, versao_perfil_id, docente_id, titulo, texto_original, texto_adaptado, hash_texto)
+         values ('${ID.e1}', null, '${usuarioId("docente")}', 't', 'x', '{}'::jsonb, 'hx')`,
+      ),
+    );
+  });
+  it("PERMITIDO: preparar devolve os parâmetros padrão, sem versão e sem IA, mesmo com profissional vinculado", async () => {
+    const r = await db.fluxo([semVigente, { ator: "docente", sql: `select fn_preparar_geracao('${ID.e1}') as p` }]);
+    const p = ok(r[1])[0]?.p as Record<string, unknown>;
+    expect(p).toMatchObject({ versaoId: null, perfilPadrao: true, iaPermitida: false });
+    expect(p.parametros).toEqual(PADRAO);
+  });
+  it("PERMITIDO: grava rascunho padrão; o mesmo texto devolve o mesmo material (cache)", async () => {
+    const r = await db.fluxo([semVigente, { ator: "servico", sql: registrarPadrao() }, { ator: "servico", sql: registrarPadrao() }]);
+    const a = ok(r[1])[0]?.r as { materialId: string; emCache: boolean };
+    const b = ok(r[2])[0]?.r as { materialId: string; emCache: boolean };
+    expect(a.emCache).toBe(false);
+    expect(b).toEqual({ materialId: a.materialId, emCache: true });
+  });
+  it("com vigente, preparar avisa que não é padrão", async () => {
+    const p = ok(await db.como("docente", `select fn_preparar_geracao('${ID.e1}') as p`))[0]?.p as Record<string, unknown>;
+    expect(p.perfilPadrao).toBe(false);
+  });
+});
+
+// =============================================================================
 describe("fechar-ciclo · fn_dados_fechamento (como o usuário)", () => {
   it("responsável e profissional não fecham ciclo", async () => {
     negado(await db.como("responsavel", `select fn_dados_fechamento('${ID.cicloE1}')`));
