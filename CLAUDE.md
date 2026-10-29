@@ -74,7 +74,7 @@ banco e políticas são validados no PGlite; o Supabase real roda só no job `db
 
 A tabela completa de RF/RNF e o mapeamento para código está em `README.md`.
 A análise de requisitos por perfil, as decisões de projeto (`D-nn`, hoje até
-D-46) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
+D-51) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
 de implementar qualquer feature; toda decisão nova ganha um `D-nn` lá. Para
 telas: `docs/ux-ui.md` (arquitetura, telas, design system),
 `docs/acessibilidade.md`, `docs/wcag-2.2.md`, `docs/avaliacao-heuristica.md`,

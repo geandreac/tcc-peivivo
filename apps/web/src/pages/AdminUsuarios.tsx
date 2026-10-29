@@ -175,12 +175,17 @@ export function AdminUsuarios() {
                     <td data-rotulo="Último login">{u.ultimoLogin ? formatarDataHora(u.ultimoLogin) : "Nunca entrou"}</td>
                     <td data-rotulo="Ações">
                       <div className="acoes-linha">
-                        <Link to={`/admin/usuarios/${u.id}`} aria-label={`Visualizar ${u.nome}`}>
+                        <Link to={`/admin/usuarios/${u.id}`} className="botao botao--discreto botao--pequeno" aria-label={`Visualizar ${u.nome}`}>
                           Visualizar
                         </Link>
                         {editavel(u) && (
                           <>
-                            <Link to={`/admin/usuarios/${u.id}`} state={{ editar: true }} aria-label={`Editar o acesso de ${u.nome}`}>
+                            <Link
+                              to={`/admin/usuarios/${u.id}`}
+                              state={{ editar: true }}
+                              className="botao botao--discreto botao--pequeno"
+                              aria-label={`Editar o acesso de ${u.nome}`}
+                            >
                               Editar
                             </Link>
                             {acoesDe(u).map((a) => (
