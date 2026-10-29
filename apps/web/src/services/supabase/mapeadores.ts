@@ -92,7 +92,7 @@ export const paraVersao = (r: Linha): VersaoPerfil => ({
 export const paraMaterial = (r: Linha, duracaoMs = 0): Material => ({
   id: String(r.id),
   estudanteId: String(r.estudante_id),
-  versaoPerfilId: String(r.versao_perfil_id),
+  versaoPerfilId: r.versao_perfil_id == null ? null : String(r.versao_perfil_id),
   docenteId: String(r.docente_id),
   titulo: String(r.titulo),
   textoOriginal: String(r.texto_original),

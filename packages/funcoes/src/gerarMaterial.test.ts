@@ -3,6 +3,8 @@ import type { ParametrosAdaptacao } from "@pei-vivo/motor-adaptacao";
 import { ErroFuncao } from "./erros";
 import {
   AVISO_IA_INDISPONIVEL,
+  AVISO_IA_QUALIDADE,
+  AVISO_PERFIL_PADRAO,
   AVISO_REVISAO,
   gerarMaterial,
   hashTexto,
@@ -158,7 +160,7 @@ describe("gerar-material · camada de IA (RN06, RNF08, prompt injection)", () =>
   });
   it("D-43: o glossário da IA entra nos apoios de leitura sem repetir termo", async () => {
     const ia = provedor(async () => ({
-      textoSimplificado: "O ciclo da água.",
+      textoSimplificado: "O ciclo da água é o caminho da água na Terra: ela vira nuvem e depois chuva.",
       glossario: [
         { termo: "Ciclo", explicacao: "da IA" },
         { termo: "nuvem", explicacao: "da IA" },
@@ -185,5 +187,57 @@ describe("gerar-material · camada de IA (RN06, RNF08, prompt injection)", () =>
     const { p } = portas({ ia: nunca, iaHabilitada: true, timeoutIaMs: 20 }, { iaPermitida: true });
     const r = await gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p);
     expect(r.avisos).toContain(AVISO_IA_INDISPONIVEL);
+  });
+});
+
+// =============================================================================
+// D-53: material padrão sem perfil validado; perguntas e conferência de qualidade da IA
+describe("D-53 · gerar sem perfil validado e com perguntas", () => {
+  const ia = (saida: unknown): ProvedorIA => ({ nome: "teste", simplificar: vi.fn(async () => saida) });
+  const BOA = {
+    textoSimplificado: "O ciclo da água é o caminho da água na Terra. A água sobe, vira nuvem e cai como chuva.",
+    glossario: [],
+    perguntas: ["O que é o ciclo da água?", "O que acontece com a água na nuvem?", "O que é o ciclo da água?"],
+  };
+
+  it("sem versão vigente: grava com versão nula, avisa e NÃO chama a IA, mesmo permitida e ligada", async () => {
+    const provedorIa = ia(BOA);
+    const { p, registrar } = portas({ ia: provedorIa, iaHabilitada: true }, { versaoId: null, perfilPadrao: true, iaPermitida: true });
+    const r = await gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p);
+    expect(provedorIa.simplificar).not.toHaveBeenCalled();
+    expect(r).toMatchObject({ origem: "REGRAS" });
+    expect(r.avisos).toEqual([AVISO_PERFIL_PADRAO]);
+    expect(registrar.mock.calls[0]![0]).toMatchObject({ versaoId: null, iaAplicada: false });
+    expect(registrar.mock.calls[0]![0].textoAdaptado.perguntas).toBeUndefined();
+  });
+
+  it("com IA aprovada pela conferência: perguntas entram no material, sem repetição", async () => {
+    const { p, registrar } = portas({ ia: ia(BOA), iaHabilitada: true }, { iaPermitida: true });
+    const r = await gerarMaterial({ estudanteId: ESTUDANTE, texto: TEXTO }, p);
+    expect(r.origem).toBe("REGRAS_E_IA");
+    expect(registrar.mock.calls[0]![0].textoAdaptado.perguntas).toEqual(["O que é o ciclo da água?", "O que acontece com a água na nuvem?"]);
+    expect(registrar.mock.calls[0]![0].textoAdaptado.roteiro?.at(-1)).toBe("Responda às 2 perguntas sobre o texto.");
+  });
+
+  it.each([
+    [
+      "some um número do original",
+      { ...BOA, textoSimplificado: "A água da Terra muda de forma. Ela sobe e cai como chuva muitas vezes." },
+      "A água faz 3 caminhos na Terra (texto fictício).",
+    ],
+    ["acrescenta um rótulo que o texto não tinha", { ...BOA, perguntas: ["Por que alunos com autismo gostam de água?"] }, TEXTO],
+    ["corta o conteúdo (menos de 30 % do original)", { ...BOA, textoSimplificado: "Água." }, TEXTO],
+  ])("conferência de qualidade: IA que %s → só regras, com aviso", async (_n, saida, texto) => {
+    const { p, registrar } = portas({ ia: ia(saida), iaHabilitada: true }, { iaPermitida: true });
+    const r = await gerarMaterial({ estudanteId: ESTUDANTE, texto }, p);
+    expect(r.origem).toBe("REGRAS");
+    expect(r.avisos).toContain(AVISO_IA_QUALIDADE);
+    expect(registrar.mock.calls[0]![0].iaAplicada).toBe(false);
+  });
+
+  it("sem IA, o roteiro sai das regras mesmo assim (previsibilidade não depende da IA)", async () => {
+    const { p, registrar } = portas();
+    await gerarMaterial({ estudanteId: ESTUDANTE, texto: `${TEXTO}\n\nLeia o texto e depois circule a palavra água.` }, p);
+    expect(registrar.mock.calls[0]![0].textoAdaptado.roteiro).toEqual(["Leia o texto: 1 trecho.", "Faça 2 tarefas."]);
   });
 });

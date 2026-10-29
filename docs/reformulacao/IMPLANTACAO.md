@@ -15,7 +15,7 @@ Em 14/10 toda a pilha (PRs #98–#108) foi integrada em `development` (`e79747d`
 | 4 Site URL / Redirect URLs | ✅ Site URL `https://tcc-peivivo.vercel.app`; redirect `https://tcc-peivivo.vercel.app/**` (cobre `/definir-senha` e `/redefinir-senha`) |
 | 4 Sessões 12 h / 8 h, senhas vazadas | ⚠️ só no plano Pro (o painel bloqueia) → limitação declarada; o app encerra saúde/coordenação em 30 min |
 | 4 SMTP próprio e modelo de convite em português | ⚠️ pendente: o painel só edita modelos com SMTP próprio; os e-mails saem em inglês |
-| 5 EFs `gerar-material`, `fechar-ciclo`, `convidar` + `ORIGEM_APP` | ✅ **republicadas em 14/10** (versão 2, com `--use-api`, cópia Deno em dia); sem token respondem 401 |
+| 5 EFs `gerar-material`, `fechar-ciclo`, `convidar` + `ORIGEM_APP` | ✅ **republicadas em 28/10** (versão 3, com `--use-api`, cópia Deno em dia); `ORIGEM_APP=https://tcc-peivivo.vercel.app`; sem token respondem 401 |
 | 6 Primeira escola | ✅ 14/10: escola **"Escola Piloto PEI Vivo"**, coordenação **"Coordenação Piloto"** (`geandre51@gmail.com`). O 1º convite saiu antes de corrigir a Site URL; foi reenviado como link de recuperação (ver §6) |
 | 7 App web | ✅ publicado na Vercel (`https://tcc-peivivo.vercel.app`, deploy automático de `main`); `apps/web/.env.local` local com a chave anon |
 
@@ -71,7 +71,7 @@ node scripts/sincronizar-funcoes.mjs --verificar      # a cópia Deno precisa es
 npx supabase secrets set ORIGEM_APP=https://SEU-APP   # CORS e link do convite
 npx supabase functions deploy --use-api               # gerar-material, fechar-ciclo, convidar
 ```
-`SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` são injetadas pelo Supabase nas funções; não as defina à mão. A IA continua desligada (sem `IA_HABILITADA`).
+`SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` são injetadas pelo Supabase nas funções; não as defina à mão. A IA continua desligada (sem `IA_HABILITADA`). Para ligar (D-53, só depois da apresentação): `npx supabase secrets set IA_HABILITADA=true IA_URL=<base /v1 do serviço> IA_MODELO=<modelo gratuito> IA_CHAVE=<chave> --project-ref <ref>`; detalhes e critérios em [`docs/geracao-de-material.md`](../geracao-de-material.md).
 
 ## 6. Primeira escola e primeiro coordenador
 Rode na máquina de vocês, com a chave só no comando (o PowerShell tem sintaxe diferente; abaixo, Git Bash):

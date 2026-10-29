@@ -34,8 +34,9 @@
   /* `a.botao`: sem isto, `a:hover` (base.css) pinta o texto com a cor do fundo e ele some. */
   color: var(--botao-texto);
 }
+/* retorno no toque, não só na soltura (Apple, "Designing Fluid Interfaces") */
 .botao:active {
-  transform: translateY(1px);
+  transform: scale(0.97);
 }
 .botao--secundario {
   --botao-fundo: var(--cor-superficie);
@@ -603,10 +604,12 @@ legend {
   padding: var(--esp-5);
   max-width: var(--largura-leitura);
 }
+/* D-52 — perfil 7 vem de "luz, contraste ou telas incomodam mais" (SENSIBILIDADE_VISUAL).
+   O texto continua acima de 7:1 (tinta quase preta sobre o creme, ~16:1); o que sai é o
+   excesso de estímulo: nada de branco puro, preto puro, contornos grossos nem faixas de cor.
+   Os blocos se separam por espaço, não por linha. */
 .material[data-contraste="7"] {
-  --material-fundo: var(--material-claro);
-  --material-texto: var(--material-contorno);
-  border: 2px solid var(--material-contorno);
+  --material-bloco: transparent;
 }
 .material__bloco {
   padding: var(--esp-4);
@@ -616,9 +619,9 @@ legend {
   border-left: 5px solid var(--cor-primaria);
 }
 .material[data-contraste="7"] .material__bloco {
-  background: var(--material-claro);
-  border: 2px solid var(--material-contorno);
-  border-left-width: 8px;
+  border-left: 0;
+  padding-inline: 0;
+  margin-bottom: var(--esp-5);
 }
 .material__bloco p {
   margin: 0;
@@ -657,10 +660,34 @@ legend {
   border: 2px solid currentColor;
 }
 .material[data-contraste="7"] .pictograma {
-  color: var(--material-contorno);
+  color: var(--material-destaque); /* 10,9:1 sobre o creme */
+  border-width: 1px;
 }
 .material__ouvir {
   margin-top: var(--esp-3);
+}
+/* D-53: roteiro (antes do texto) e perguntas (depois): mesma caixa calma do glossário */
+.material__roteiro,
+.material__perguntas {
+  margin-block: var(--esp-4) var(--esp-5);
+  padding: var(--esp-4);
+  border-radius: var(--raio-md);
+  border: 1px solid var(--cor-borda-suave);
+  background: var(--material-fundo);
+}
+.material__roteiro > :is(h2, h3),
+.material__perguntas > :is(h2, h3) {
+  margin: 0 0 var(--esp-3);
+  font-size: var(--tamanho-lg);
+}
+.material__roteiro ol,
+.material__perguntas ol {
+  margin: 0;
+  padding-left: 1.5em;
+}
+.material__roteiro li + li,
+.material__perguntas li + li {
+  margin-top: var(--esp-2);
 }
 .material__glossario {
   margin-top: var(--esp-5);
@@ -670,8 +697,8 @@ legend {
   background: var(--cor-superficie);
 }
 .material[data-contraste="7"] .material__glossario {
-  background: var(--material-claro);
-  border-color: var(--material-contorno);
+  background: var(--material-fundo);
+  border-width: 1px;
 }
 .material__glossario > :is(h2, h3) {
   margin: 0 0 var(--esp-3);
@@ -848,6 +875,7 @@ dl.dados dd {
   display: grid;
   gap: var(--esp-3);
   grid-template-columns: 1fr;
+  margin-bottom: var(--esp-6); /* a grade fecha a seção: o cartão seguinte não encosta nela */
 }
 @media (min-width: 48em) {
   .perfis {

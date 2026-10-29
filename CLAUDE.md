@@ -23,7 +23,7 @@ Nunca implemente uma tela antes da política RLS que protege o dado que ela most
 ## Comandos
 
 ```bash
-npm test                                    # motor (44) + funções (77) + políticas RLS (166, PGlite) + web (216, axe) — 100%
+npm test                                    # motor (54) + funções (95) + políticas RLS (174, PGlite) + web (218, axe) — 100%
 npm run dev                                 # protótipo em http://localhost:5173 (5173 ocupada nesta máquina → `npx vite --port 5179`)
 npm run contraste                           # lê tokens.css: 78 pares ≥ 4,5:1 / 3:1, temas escuros iguais, papel ≠ aviso/erro
 npm run db:validar                          # migrations + seed no PGlite (sem Docker)
@@ -74,7 +74,7 @@ banco e políticas são validados no PGlite; o Supabase real roda só no job `db
 
 A tabela completa de RF/RNF e o mapeamento para código está em `README.md`.
 A análise de requisitos por perfil, as decisões de projeto (`D-nn`, hoje até
-D-46) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
+D-53) e a priorização MoSCoW (§11) estão em `docs/requisitos.md` — leia antes
 de implementar qualquer feature; toda decisão nova ganha um `D-nn` lá. Para
 telas: `docs/ux-ui.md` (arquitetura, telas, design system),
 `docs/acessibilidade.md`, `docs/wcag-2.2.md`, `docs/avaliacao-heuristica.md`,
@@ -135,7 +135,9 @@ gratuito: sem limite de sessão e sem modelo de e-mail em português (exige SMTP
 fixo em `catalogo_permissoes`; ferramentas que ligam/desligam módulos via `privado.pode`; suspensão/validade/aprovação
 bloqueiam tudo em `privado.usuario_atual()`), telas `/admin/*` (Administrador Geral sempre; coordenação = admin limitado da
 própria escola) e `e2e/admin.spec.ts`. Teto do contrato (`TETO` em `@pei-vivo/contratos`) = semente do banco (teste).
-Na nuvem desde 28/10 (0010–0012 + EF `convidar` republicada); ainda sem Administrador Geral criado (`implantar-escola.mjs --admin`).
+Na nuvem desde 28/10: 0010–0012, as 3 EFs republicadas (v3) e `ORIGEM_APP=https://tcc-peivivo.vercel.app` (CORS e link do convite).
+**Cenário de demonstração na nuvem** (`scripts/cenario-nuvem.mjs`, 100 % fictício): escola "Escola Municipal Aurora (fictícia)", os 5 perfis
+(`*.demo@example.com`) e o estudante "Miguel (fictício)"; senhas e chaves TOTP em `.env.demo-nuvem` (ignorado pelo git).
 **R5 parcial:** E2E, axe real, STRIDE e Lighthouse público feitos; NVDA e CSP pendentes. **Artigo (13/10):** texto v3 (N1: até a
 Metodologia) em `docs/tcc/artigo/artigo.md` (fonte; `npm run artigo` gera `Artigo_PEI_Vivo_v3.docx`; a v2 fica
 preservada). **v4 (28/10)**, no modelo do artigo REWORK aprovado para a pré-banca (sem capa/resumo,

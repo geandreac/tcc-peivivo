@@ -34,9 +34,35 @@ const resolver = (tema, nome, visitados = new Set()) => {
   return resolver(tema, ref[1], visitados.add(nome));
 };
 
-const lum = (hex) => {
-  const c = hex.replace("#", "");
-  const [r, g, b] = [0, 2, 4].map((i) => parseInt(c.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+/** Cor do token em sRGB 0–255. Aceita `#rrggbb` e `oklch(L C H)` (D-51), convertido pelas matrizes
+ *  OKLab de Björn Ottosson e arredondado a 8 bits, como o navegador pinta na tela. */
+function rgb(cor) {
+  if (/^#[0-9a-f]{6}$/i.test(cor)) return [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16));
+  const ok = cor.match(/^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\)$/);
+  if (!ok) throw new Error(`cor não suportada em par de contraste: ${cor}`);
+  const [L, C, H] = ok.slice(1).map(Number);
+  const a = C * Math.cos((H * Math.PI) / 180);
+  const b = C * Math.sin((H * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  const linear = [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+  ];
+  // fora da gama sRGB o navegador corta o canal; aqui também
+  return linear.map((v) => Math.round(Math.min(1, Math.max(0, v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055)) * 255));
+}
+const hex = (cor) =>
+  `#${rgb(cor)
+    .map((v) => v.toString(16).padStart(2, "0"))
+    .join("")}`;
+
+const lum = (cor) => {
+  const [r, g, b] = rgb(cor)
+    .map((v) => v / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
 const razao = (a, b) => {
@@ -68,7 +94,7 @@ const PARES = [
   ["claro", "material: destaque / branco", "material-destaque", "material-claro", 4.5],
   ["claro", "material: branco / destaque (avatar)", "material-claro", "material-destaque", 4.5],
   ["claro", "material: destaque / tint (selos)", "material-destaque", "material-destaque-tint", 4.5],
-  ["claro", "material: contorno / branco (7:1)", "material-contorno", "material-claro", 7],
+  ["claro", "material (perfil 7): pictograma / creme", "material-destaque", "material-fundo", 7],
   ["claro", "borda de campo / superfície", "cor-borda", "cor-superficie", 3],
   ["claro", "borda de campo / fundo", "cor-borda", "cor-fundo", 3],
   ["claro", "anel de foco / superfície", "cor-foco", "cor-superficie", 3],
@@ -147,7 +173,7 @@ const ESTADOS = ["cor-aviso", "cor-erro"]; // estados que pedem atenção; escol
 for (const [tema, valores] of Object.entries(TEMAS)) {
   for (const papel of Object.keys(valores).filter((n) => /^papel-[a-z]+$/.test(n))) {
     for (const estado of ESTADOS.filter((e) => e in valores)) {
-      if (resolver(valores, papel).toLowerCase() === resolver(valores, estado).toLowerCase()) {
+      if (hex(resolver(valores, papel)) === hex(resolver(valores, estado))) {
         falhas++;
         console.log(`✗ ${tema}: --${papel} igual a --${estado} (mesma cor com dois significados)`);
       }
@@ -163,7 +189,7 @@ for (const [tema, nome, frente, fundo, minimo] of PARES) {
   if (!ok) falhas++;
   const rotulo = `${tema === "claro" ? "" : `${tema}: `}${nome}`;
   console.log(
-    `${ok ? "✓" : "✗"} ${rotulo.padEnd(46)} ${a.toUpperCase()} sobre ${b.toUpperCase()}  ${r.toFixed(2).replace(".", ",")}:1${minimo ? `  (mín. ${minimo})` : ""}`,
+    `${ok ? "✓" : "✗"} ${rotulo.padEnd(46)} ${hex(a).toUpperCase()} sobre ${hex(b).toUpperCase()}  ${r.toFixed(2).replace(".", ",")}:1${minimo ? `  (mín. ${minimo})` : ""}`,
   );
 }
 if (falhas > 0) {

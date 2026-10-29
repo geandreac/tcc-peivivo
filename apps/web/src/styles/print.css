@@ -34,7 +34,9 @@
   .pictograma {
     color: #000 !important;
   }
-  .material__glossario {
+  .material__glossario,
+  .material__roteiro,
+  .material__perguntas {
     background: #fff;
     border: 1px solid #000;
     break-inside: avoid;

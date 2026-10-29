@@ -7,55 +7,55 @@
   color-scheme: light;
 
   /* --- cores de marca --- */
-  --cor-primaria: #1d4e89; /* 8,39:1 sobre branco */
-  --cor-primaria-escura: #163b68; /* 11,29:1 */
-  --cor-primaria-tint: #e8eff8; /* fundo suave; texto primário 7,24:1 */
-  --cor-secundaria: #0f6e56; /* 6,20:1 */
-  --cor-sobre-primaria: #ffffff; /* texto sobre fundo primário */
-  --cor-sobre-erro: #ffffff; /* texto sobre botão de perigo (6,57:1) */
-  --cor-erro-forte: #8b1a10; /* hover do botão de perigo */
+  --cor-primaria: oklch(0.423 0.111 255.11); /* 8,39:1 sobre branco */
+  --cor-primaria-escura: oklch(0.351 0.089 255.1); /* 11,29:1 */
+  --cor-primaria-tint: oklch(0.949 0.014 254.61); /* fundo suave; texto primário 7,24:1 */
+  --cor-secundaria: oklch(0.4809 0.0908 170.107); /* 6,20:1 */
+  --cor-sobre-primaria: oklch(1 0 0); /* texto sobre fundo primário */
+  --cor-sobre-erro: oklch(1 0 0); /* texto sobre botão de perigo (6,57:1) */
+  --cor-erro-forte: oklch(0.415 0.15 29.84); /* hover do botão de perigo */
+  --cor-marca-ponto: oklch(0.816 0.074 182.8); /* ponto verde-água do logo (decorativo) */
 
   /* --- neutros --- */
-  --cor-texto: #1b1b1b; /* 17,2:1 */
-  --cor-texto-secundario: #4d4d4d; /* 8,45:1 */
-  --cor-fundo: #f6f8fb;
-  --cor-superficie: #ffffff;
-  --cor-superficie-2: #edeff2;
+  --cor-texto: oklch(0.222 0 0); /* 17,2:1 */
+  --cor-texto-secundario: oklch(0.42 0 0); /* 8,45:1 */
+  --cor-fundo: oklch(0.978 0.005 258.32);
+  --cor-superficie: oklch(1 0 0);
+  --cor-superficie-2: oklch(0.951 0.005 258.32);
   /* cartão em destaque (hover/foco). No claro a sombra basta; no escuro a sombra some,
      então a elevação vem do tom, como no Material 3. */
   --cor-superficie-destaque: var(--cor-superficie);
-  --cor-borda: #767676; /* 4,54:1 — bordas de campos (1.4.11) */
-  --cor-borda-suave: #d5d9e0; /* decorativa (cards) */
-  --cor-desabilitado-texto: #6b6b6b;
-  --cor-desabilitado-fundo: #e9e9e9;
+  --cor-borda: oklch(0.566 0 0); /* 4,54:1 — bordas de campos (1.4.11) */
+  --cor-borda-suave: oklch(0.884 0.011 261.79); /* decorativa (cards) */
+  --cor-desabilitado-texto: oklch(0.528 0 0);
+  --cor-desabilitado-fundo: oklch(0.934 0 0);
 
   /* --- semânticas --- */
-  --cor-sucesso: #1e6b3a; /* 6,52:1 */
-  --cor-sucesso-fundo: #e3f3e8;
-  --cor-aviso: #8a5300; /* 6,33:1 */
-  --cor-aviso-fundo: #fff3d6;
-  --cor-erro: #b42318; /* 6,57:1 */
-  --cor-erro-fundo: #fde8e6;
-  --cor-info: #1d4e89;
-  --cor-info-fundo: #e8eff8;
+  --cor-sucesso: oklch(0.469 0.108 151.53); /* 6,52:1 */
+  --cor-sucesso-fundo: oklch(0.949 0.022 155.92);
+  --cor-aviso: oklch(0.494 0.1093 66.906); /* 6,33:1 */
+  --cor-aviso-fundo: oklch(0.966 0.04 88.2);
+  --cor-erro: oklch(0.5 0.182 29.51); /* 6,57:1 */
+  --cor-erro-fundo: oklch(0.947 0.023 24.13);
+  --cor-info: oklch(0.423 0.111 255.11);
+  --cor-info-fundo: oklch(0.949 0.014 254.61);
 
   /* --- foco (2.4.7 / 2.4.11) --- */
-  --cor-foco: #1d4e89;
+  --cor-foco: oklch(0.423 0.111 255.11);
   --anel-foco: 0 0 0 2px var(--cor-superficie), 0 0 0 5px var(--cor-foco);
 
   /* --- material adaptado (D-10: CSS a partir de parametros) --- */
-  --material-fundo: #fffdf5;
-  --material-texto: #1b1b1b;
+  --material-fundo: oklch(0.993 0.011 95.16);
+  --material-texto: oklch(0.222 0 0);
   /* O material é a "folha" do estudante: fica claro em todos os temas (D-10), por isso
      estes valores NÃO são redefinidos no tema escuro. Usados também pelo QR do TOTP. */
-  --material-claro: #ffffff;
-  --material-contorno: #000000; /* perfil com contraste 7:1 */
-  --material-destaque: #163b68; /* 11,29:1 sobre branco; 10,9:1 sobre o creme */
-  --material-destaque-tint: #e8eff8;
-  --material-bloco: rgba(29, 78, 137, 0.05); /* véu da primária sobre o creme */
+  --material-claro: oklch(1 0 0);
+  --material-destaque: oklch(0.351 0.089 255.1); /* 11,29:1 sobre branco; 10,9:1 sobre o creme */
+  --material-destaque-tint: oklch(0.949 0.014 254.61);
+  --material-bloco: oklch(0.423 0.111 255.11 / 0.05); /* véu da primária sobre o creme */
 
   /* --- sobreposição de diálogo --- */
-  --cor-sobreposicao: rgba(27, 27, 27, 0.6);
+  --cor-sobreposicao: oklch(0.222 0 0 / 0.6);
 
   /* --- tipografia --- */
   /* D-40: Atkinson Hyperlegible Next (Braille Institute, feita para baixa visão), hospedada no
@@ -103,20 +103,20 @@
   --raio-xl: 28px;
   --raio-pill: 999px;
   /* sombras em camadas, frias (puxadas para o azul da marca) */
-  --sombra-1: 0 1px 2px rgba(16, 38, 66, 0.06), 0 2px 8px rgba(16, 38, 66, 0.05);
-  --sombra-2: 0 2px 4px rgba(16, 38, 66, 0.05), 0 12px 32px rgba(16, 38, 66, 0.1);
-  --sombra-3: 0 4px 8px rgba(16, 38, 66, 0.06), 0 24px 64px rgba(16, 38, 66, 0.16);
+  --sombra-1: 0 1px 2px oklch(0.267 0.06 255.46 / 0.06), 0 2px 8px oklch(0.267 0.06 255.46 / 0.05);
+  --sombra-2: 0 2px 4px oklch(0.267 0.06 255.46 / 0.05), 0 12px 32px oklch(0.267 0.06 255.46 / 0.1);
+  --sombra-3: 0 4px 8px oklch(0.267 0.06 255.46 / 0.06), 0 24px 64px oklch(0.267 0.06 255.46 / 0.16);
 
   /* --- cores por papel (das mãos do logo) — identidade, nunca semântica de estado --- */
-  --papel-escola: #1d4e89; /* 8,39:1 */
-  --papel-escola-tint: #e8eff8;
-  --papel-familia: #146c43; /* 6,4:1 */
-  --papel-familia-tint: #e3f2ea;
-  --papel-saude: #a52a5c; /* 6,6:1 */
-  --papel-saude-tint: #f8e7ee;
-  --papel-coordenacao: #6a3d9a; /* 7,6:1 — violeta do laço; âmbar fica só para aviso */
-  --papel-coordenacao-tint: #efeafa;
-  --vidro: rgba(255, 255, 255, 0.78); /* cabeçalho translúcido */
+  --papel-escola: oklch(0.423 0.111 255.11); /* 8,39:1 */
+  --papel-escola-tint: oklch(0.949 0.014 254.61);
+  --papel-familia: oklch(0.471 0.104 157.23); /* 6,4:1 */
+  --papel-familia-tint: oklch(0.948 0.019 162.93);
+  --papel-saude: oklch(0.492 0.163 0.67); /* 6,6:1 */
+  --papel-saude-tint: oklch(0.943 0.021 350.55);
+  --papel-coordenacao: oklch(0.46 0.148 303.39); /* 7,6:1 — violeta do laço; âmbar fica só para aviso */
+  --papel-coordenacao-tint: oklch(0.946 0.022 300.2);
+  --vidro: oklch(1 0 0 / 0.78); /* cabeçalho translúcido */
 
   /* --- alvos de toque (2.5.8 exige 24px; adotamos 44px) --- */
   --alvo-minimo: 2.75rem;
@@ -144,36 +144,36 @@
 /* Tema de alto contraste (P4.1: contrasteMinimo 7). Ativado por preferência
    do usuário (data-contraste="alto") — todos os pares ≥ 9:1. */
 :root[data-contraste="alto"] {
-  --cor-primaria: #0b2a50;
-  --cor-primaria-escura: #061a33;
-  --cor-primaria-tint: #ffffff;
-  --cor-secundaria: #0a4a3a;
-  --cor-texto: #000000;
-  --cor-texto-secundario: #333333;
-  --cor-fundo: #ffffff;
-  --cor-superficie: #ffffff;
-  --cor-superficie-2: #f2f2f2;
-  --cor-borda: #000000;
-  --cor-borda-suave: #000000;
-  --cor-sucesso: #0f4a24;
-  --cor-sucesso-fundo: #ffffff;
-  --cor-aviso: #5c3600;
-  --cor-aviso-fundo: #ffffff;
-  --cor-erro: #8b1a10;
-  --cor-erro-fundo: #ffffff;
-  --cor-info: #0b2a50;
-  --cor-info-fundo: #ffffff;
-  --cor-foco: #000000;
-  --material-fundo: #ffffff;
-  --material-texto: #000000;
+  --cor-primaria: oklch(0.286 0.078 255.6);
+  --cor-primaria-escura: oklch(0.217 0.056 255.12);
+  --cor-primaria-tint: oklch(1 0 0);
+  --cor-secundaria: oklch(0.366 0.067 171.03);
+  --cor-texto: oklch(0 0 0);
+  --cor-texto-secundario: oklch(0.321 0 0);
+  --cor-fundo: oklch(1 0 0);
+  --cor-superficie: oklch(1 0 0);
+  --cor-superficie-2: oklch(0.961 0 0);
+  --cor-borda: oklch(0 0 0);
+  --cor-borda-suave: oklch(0 0 0);
+  --cor-sucesso: oklch(0.3619 0.0875 150.764);
+  --cor-sucesso-fundo: oklch(1 0 0);
+  --cor-aviso: oklch(0.371 0.082 67.37);
+  --cor-aviso-fundo: oklch(1 0 0);
+  --cor-erro: oklch(0.415 0.15 29.84);
+  --cor-erro-fundo: oklch(1 0 0);
+  --cor-info: oklch(0.286 0.078 255.6);
+  --cor-info-fundo: oklch(1 0 0);
+  --cor-foco: oklch(0 0 0);
+  --material-fundo: oklch(1 0 0);
+  --material-texto: oklch(0 0 0);
   --sombra-1: none;
   --sombra-2: none;
   --sombra-3: none;
-  --papel-escola: #0b2a50;
-  --papel-familia: #0f4a24;
-  --papel-saude: #6b1238;
-  --papel-coordenacao: #3f1f66;
-  --vidro: #ffffff;
+  --papel-escola: oklch(0.286 0.078 255.6);
+  --papel-familia: oklch(0.3619 0.0875 150.764);
+  --papel-saude: oklch(0.354 0.125 0.66);
+  --papel-coordenacao: oklch(0.324 0.119 300.56);
+  --vidro: oklch(1 0 0);
 }
 
 /* Tema escuro (R4.6): segue o sistema, a menos que a pessoa escolha "claro"
@@ -182,86 +182,86 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]):not([data-contraste="alto"]) {
     color-scheme: dark;
-    --cor-primaria: #9ec5ff;
-    --cor-primaria-escura: #c4dcff;
-    --cor-primaria-tint: #1c2a3d;
-    --cor-sobre-primaria: #0b1a2e;
-    --cor-secundaria: #6fd3b6;
-    --cor-texto: #eceff3;
-    --cor-texto-secundario: #b8c0cc;
-    --cor-fundo: #111418;
-    --cor-superficie: #1a1e24;
-    --cor-superficie-2: #252b34;
-    --cor-superficie-destaque: #252b34;
-    --cor-borda: #8a94a3;
-    --cor-borda-suave: #343b46;
-    --cor-desabilitado-texto: #9aa3ae;
-    --cor-desabilitado-fundo: #2a2f37;
-    --cor-sucesso: #7fd69a;
-    --cor-sucesso-fundo: #13261b;
-    --cor-aviso: #f2c46b;
-    --cor-aviso-fundo: #2b2210;
-    --cor-erro: #ff9b8f;
-    --cor-erro-fundo: #2d1614;
-    --cor-sobre-erro: #2d0b07;
-    --cor-erro-forte: #ffc2ba;
-    --cor-info: #9ec5ff;
-    --cor-info-fundo: #1c2a3d;
-    --cor-foco: #9ec5ff;
-    --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-    --sombra-2: 0 4px 12px rgba(0, 0, 0, 0.6);
-    --sombra-3: 0 24px 64px rgba(0, 0, 0, 0.6);
-    --papel-escola: #9ec5ff;
-    --papel-escola-tint: #1c2a3d;
-    --papel-familia: #7fd69a;
-    --papel-familia-tint: #13261b;
-    --papel-saude: #f4a3c3;
-    --papel-saude-tint: #33161f;
-    --papel-coordenacao: #c9b3f5;
-    --papel-coordenacao-tint: #241b33;
-    --vidro: rgba(26, 30, 36, 0.78);
+    --cor-primaria: oklch(0.816 0.092 258.14);
+    --cor-primaria-escura: oklch(0.888 0.055 257.74);
+    --cor-primaria-tint: oklch(0.282 0.04 256.24);
+    --cor-sobre-primaria: oklch(0.216 0.045 256.16);
+    --cor-secundaria: oklch(0.798 0.104 172.49);
+    --cor-texto: oklch(0.951 0.006 255.48);
+    --cor-texto-secundario: oklch(0.805 0.019 258.36);
+    --cor-fundo: oklch(0.19 0.009 255.63);
+    --cor-superficie: oklch(0.234 0.013 258.37);
+    --cor-superficie-2: oklch(0.287 0.019 258.37);
+    --cor-superficie-destaque: oklch(0.287 0.019 258.37);
+    --cor-borda: oklch(0.663 0.025 258.37);
+    --cor-borda-suave: oklch(0.35 0.021 259.39);
+    --cor-desabilitado-texto: oklch(0.712 0.019 253.39);
+    --cor-desabilitado-fundo: oklch(0.304 0.016 259.8);
+    --cor-sucesso: oklch(0.805 0.12 152.88);
+    --cor-sucesso-fundo: oklch(0.248 0.033 157.52);
+    --cor-aviso: oklch(0.843 0.1195 82.397);
+    --cor-aviso-fundo: oklch(0.257 0.033 83.59);
+    --cor-erro: oklch(0.789 0.122 27.48);
+    --cor-erro-fundo: oklch(0.232 0.038 25.67);
+    --cor-sobre-erro: oklch(0.208 0.057 29.93);
+    --cor-erro-forte: oklch(0.867 0.071 27.15);
+    --cor-info: oklch(0.816 0.092 258.14);
+    --cor-info-fundo: oklch(0.282 0.04 256.24);
+    --cor-foco: oklch(0.816 0.092 258.14);
+    --sombra-1: 0 1px 2px oklch(0 0 0 / 0.5);
+    --sombra-2: 0 4px 12px oklch(0 0 0 / 0.6);
+    --sombra-3: 0 24px 64px oklch(0 0 0 / 0.6);
+    --papel-escola: oklch(0.816 0.092 258.14);
+    --papel-escola-tint: oklch(0.282 0.04 256.24);
+    --papel-familia: oklch(0.805 0.12 152.88);
+    --papel-familia-tint: oklch(0.248 0.033 157.52);
+    --papel-saude: oklch(0.804 0.103 354.33);
+    --papel-saude-tint: oklch(0.246 0.048 1.49);
+    --papel-coordenacao: oklch(0.808 0.094 299.58);
+    --papel-coordenacao-tint: oklch(0.245 0.046 300.32);
+    --vidro: oklch(0.234 0.013 258.37 / 0.78);
   }
 }
 :root[data-tema="escuro"]:not([data-contraste="alto"]) {
   color-scheme: dark;
-  --cor-primaria: #9ec5ff;
-  --cor-primaria-escura: #c4dcff;
-  --cor-primaria-tint: #1c2a3d;
-  --cor-sobre-primaria: #0b1a2e;
-  --cor-secundaria: #6fd3b6;
-  --cor-texto: #eceff3;
-  --cor-texto-secundario: #b8c0cc;
-  --cor-fundo: #111418;
-  --cor-superficie: #1a1e24;
-  --cor-superficie-2: #252b34;
-  --cor-superficie-destaque: #252b34;
-  --cor-borda: #8a94a3;
-  --cor-borda-suave: #343b46;
-  --cor-desabilitado-texto: #9aa3ae;
-  --cor-desabilitado-fundo: #2a2f37;
-  --cor-sucesso: #7fd69a;
-  --cor-sucesso-fundo: #13261b;
-  --cor-aviso: #f2c46b;
-  --cor-aviso-fundo: #2b2210;
-  --cor-erro: #ff9b8f;
-  --cor-erro-fundo: #2d1614;
-  --cor-sobre-erro: #2d0b07;
-  --cor-erro-forte: #ffc2ba;
-  --cor-info: #9ec5ff;
-  --cor-info-fundo: #1c2a3d;
-  --cor-foco: #9ec5ff;
-  --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --sombra-2: 0 4px 12px rgba(0, 0, 0, 0.6);
-  --sombra-3: 0 24px 64px rgba(0, 0, 0, 0.6);
-  --papel-escola: #9ec5ff;
-  --papel-escola-tint: #1c2a3d;
-  --papel-familia: #7fd69a;
-  --papel-familia-tint: #13261b;
-  --papel-saude: #f4a3c3;
-  --papel-saude-tint: #33161f;
-  --papel-coordenacao: #c9b3f5;
-  --papel-coordenacao-tint: #241b33;
-  --vidro: rgba(26, 30, 36, 0.78);
+  --cor-primaria: oklch(0.816 0.092 258.14);
+  --cor-primaria-escura: oklch(0.888 0.055 257.74);
+  --cor-primaria-tint: oklch(0.282 0.04 256.24);
+  --cor-sobre-primaria: oklch(0.216 0.045 256.16);
+  --cor-secundaria: oklch(0.798 0.104 172.49);
+  --cor-texto: oklch(0.951 0.006 255.48);
+  --cor-texto-secundario: oklch(0.805 0.019 258.36);
+  --cor-fundo: oklch(0.19 0.009 255.63);
+  --cor-superficie: oklch(0.234 0.013 258.37);
+  --cor-superficie-2: oklch(0.287 0.019 258.37);
+  --cor-superficie-destaque: oklch(0.287 0.019 258.37);
+  --cor-borda: oklch(0.663 0.025 258.37);
+  --cor-borda-suave: oklch(0.35 0.021 259.39);
+  --cor-desabilitado-texto: oklch(0.712 0.019 253.39);
+  --cor-desabilitado-fundo: oklch(0.304 0.016 259.8);
+  --cor-sucesso: oklch(0.805 0.12 152.88);
+  --cor-sucesso-fundo: oklch(0.248 0.033 157.52);
+  --cor-aviso: oklch(0.843 0.1195 82.397);
+  --cor-aviso-fundo: oklch(0.257 0.033 83.59);
+  --cor-erro: oklch(0.789 0.122 27.48);
+  --cor-erro-fundo: oklch(0.232 0.038 25.67);
+  --cor-sobre-erro: oklch(0.208 0.057 29.93);
+  --cor-erro-forte: oklch(0.867 0.071 27.15);
+  --cor-info: oklch(0.816 0.092 258.14);
+  --cor-info-fundo: oklch(0.282 0.04 256.24);
+  --cor-foco: oklch(0.816 0.092 258.14);
+  --sombra-1: 0 1px 2px oklch(0 0 0 / 0.5);
+  --sombra-2: 0 4px 12px oklch(0 0 0 / 0.6);
+  --sombra-3: 0 24px 64px oklch(0 0 0 / 0.6);
+  --papel-escola: oklch(0.816 0.092 258.14);
+  --papel-escola-tint: oklch(0.282 0.04 256.24);
+  --papel-familia: oklch(0.805 0.12 152.88);
+  --papel-familia-tint: oklch(0.248 0.033 157.52);
+  --papel-saude: oklch(0.804 0.103 354.33);
+  --papel-saude-tint: oklch(0.246 0.048 1.49);
+  --papel-coordenacao: oklch(0.808 0.094 299.58);
+  --papel-coordenacao-tint: oklch(0.245 0.046 300.32);
+  --vidro: oklch(0.234 0.013 258.37 / 0.78);
 }
 
 /* Leitura facilitada (R4.6, prompt §7.1.3): fonte de alta legibilidade

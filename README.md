@@ -180,6 +180,47 @@ As três funções recebem `POST` com `Authorization: Bearer <JWT do usuário>` 
 
 O schema do banco está documentado em [`docs/tcc/class_diagram.svg`](docs/tcc/class_diagram.svg) (gerado das migrations por `npm run diagramas`) e nos `comment on table` das migrations.
 
+### 8.3 Contas fictícias para a apresentação
+
+Todas as pessoas, a escola e os estudantes abaixo são **fictícios** (nenhum dado real, nem em teste). Os e-mails usam domínios reservados (`example.com`, `example.test`) e não recebem mensagens.
+
+#### Sistema real — https://tcc-peivivo.vercel.app/entrar
+
+Contas criadas por [`scripts/cenario-nuvem.mjs`](scripts/cenario-nuvem.mjs) no Supabase de produção, na escola "Escola Municipal Aurora (fictícia)", com o estudante "Miguel (fictício)".
+
+| Perfil | Nome | E-mail | Segundo fator (TOTP) | O que mostrar |
+|---|---|---|---|---|
+| Administração geral | Administração Geral (fictícia) | `admin.demo@example.com` | sim | painel `/admin`: usuários e acessos, criar acesso, perfis e permissões, ferramentas, auditoria, configurações; nunca abre dado de estudante |
+| Coordenação pedagógica | Coordenação (fictícia) | `coordenacao.demo@example.com` | sim | painel da escola (só contagens), vínculos, convites, histórico do PEI, administração limitada à própria escola |
+| Docente regente | Márcia (fictícia) | `docente.demo@example.com` | não | observar, fechar ciclo, gerar, revisar e aprovar material, desfecho |
+| Responsável legal | Rosa (fictícia) | `responsavel.demo@example.com` | não | consentimento, privacidade (quem vê o quê), exportar dados |
+| Profissional de saúde | Camila (fictícia) | `saude.demo@example.com` | sim | validar parâmetros do ciclo, notas clínicas reservadas |
+
+**Senhas e chaves TOTP não ficam no repositório**, porque ele é público e essas contas entram no sistema real. Elas estão no arquivo local `.env.demo-nuvem` (ignorado pelo git), gerado pelo script. Para cadastrar o segundo fator, use "inserir chave" no app autenticador com o valor `DEMO_*_TOTP`. Rodar o script de novo recria as senhas e mantém o cenário.
+
+#### Demonstração (sem senha) — `npm run dev` ou previews da Vercel
+
+Em **Entrar**, escolha a porta do perfil e depois a pessoa. Os dados vivem no navegador; **Ajuda → Restaurar dados** volta ao estado inicial.
+
+| Porta | Nome | E-mail | Para que serve |
+|---|---|---|---|
+| Família | Rosa (fictícia) | `responsavel.dev@example.test` | responsável do Miguel (consentimento ativo) e do Estudante fictício B (aguardando consentimento) |
+| Professores | Márcia (fictícia) | `docente.dev@example.test` | docente do Miguel: perfil vigente, ciclo aberto e material para revisar |
+| Professores | Paulo (fictício) | `docente2.dev@example.test` | docente sem vínculo: painel vazio e acesso negado ao Miguel |
+| Equipe de saúde | Camila (fictícia) | `profissional.dev@example.test` | profissional do Miguel: valida parâmetros e escreve notas clínicas |
+| Equipe de saúde | Beatriz (fictícia) | `fono.dev@example.test` | profissional sem papel ativo |
+| Coordenação | Coordenação (fictícia) | `coordenacao.dev@example.test` | cadastra estudantes, vincula pessoas, painel da escola |
+| Administração geral | Administração Geral (fictícia) | `admin.dev@example.test` | painel administrativo completo |
+
+Contas que só aparecem no painel administrativo, para mostrar os estados de acesso:
+
+| Nome | E-mail | Situação |
+|---|---|---|
+| Lúcia (fictícia) | `docente3.dev@example.test` | suspensa |
+| Ricardo (fictício) | `terapeuta.dev@example.test` | acesso expirado |
+| Henrique (fictício) | `externo.dev@example.test` | aguardando aprovação (Centro Terapêutico Horizonte, fictício) |
+| Joana (fictícia) | `convidada.dev@example.test` | convite pendente |
+
 ## 9. Scripts disponíveis
 
 | Comando | O que faz |

@@ -17,10 +17,17 @@ interface Props {
  * "roda no cliente" e o que a versão impressa (RF12) reaproveita.
  * D-43: apoios de leitura — pictograma por etapa, "Ouvir" por trecho e
  * "Palavras para saber" (só aparecem se o material os trouxer).
+ * D-53: roteiro da atividade (previsibilidade: primeiro, depois, no fim) e perguntas de
+ * compreensão — também só quando o material os trouxer.
  */
 export function MaterialAdaptado({ adaptado, titulo, textoRevisado, mostrarExcedentes }: Props) {
   const { parametros, apoios } = adaptado;
   const idGlossario = useId();
+  const idRoteiro = useId();
+  const idPerguntas = useId();
+  // o roteiro cita os comandos do texto gerado; se a docente reescreveu, ele deixaria de bater
+  const roteiro = textoRevisado ? [] : (adaptado.roteiro ?? []);
+  const perguntas = adaptado.perguntas ?? [];
   const estilo = { "--material-linhas": parametros.maxLinhasPorBloco } as CSSProperties;
   const blocos = textoRevisado
     ? textoRevisado.split(/\n\s*\n/u).map((b) => ({ linhas: b.split("\n") }))
@@ -32,6 +39,18 @@ export function MaterialAdaptado({ adaptado, titulo, textoRevisado, mostrarExced
   return (
     <article className="material" data-contraste={String(parametros.contrasteMinimo)} style={estilo} lang="pt-BR">
       {titulo && <h2>{titulo}</h2>}
+      {roteiro.length > 0 && (
+        <section className="material__roteiro" aria-labelledby={idRoteiro}>
+          <NivelTitulo id={idRoteiro}>O que vamos fazer</NivelTitulo>
+          <ol>
+            {roteiro.map((passo, i) => (
+              <li key={i}>
+                <strong>{i === 0 ? "Primeiro" : i === roteiro.length - 1 ? "No fim" : "Depois"}:</strong> {passo}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
       {blocos.map((bloco, i) => {
         const ehEtapas = bloco.linhas.every((l) => /^\d+\.\s/u.test(l));
         const etapas = bloco.linhas.map((l) => l.replace(/^\d+\.\s/u, ""));
@@ -74,6 +93,16 @@ export function MaterialAdaptado({ adaptado, titulo, textoRevisado, mostrarExced
               </div>
             ))}
           </dl>
+        </section>
+      )}
+      {perguntas.length > 0 && (
+        <section className="material__perguntas" aria-labelledby={idPerguntas}>
+          <NivelTitulo id={idPerguntas}>Para pensar sobre o texto</NivelTitulo>
+          <ol>
+            {perguntas.map((q, i) => (
+              <li key={i}>{q}</li>
+            ))}
+          </ol>
         </section>
       )}
       {parametros.interesseAncora && (

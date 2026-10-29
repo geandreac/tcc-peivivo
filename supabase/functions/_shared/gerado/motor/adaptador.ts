@@ -187,13 +187,17 @@ function paragrafos(texto: string): string[] {
     .filter(Boolean);
 }
 
-export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAdaptado {
+/** `perguntas`: quantas perguntas de compreensão a IA trouxe (D-53) — viram o último passo do roteiro. */
+export function adaptar(texto: string, parametros: ParametrosAdaptacao, perguntas = 0): TextoAdaptado {
   const p = { ...parametros };
   const maxLinhas = Math.max(1, Math.floor(p.maxLinhasPorBloco));
   const maxBlocos = Math.max(1, Math.floor(p.blocosPorMaterial));
 
   const blocos: Bloco[] = [];
   const enunciados: Enunciado[] = [];
+  // D-53: o que o roteiro conta — se o bloco é leitura e quantas tarefas ele traz
+  const deLeitura: boolean[] = [];
+  const tarefas: number[] = [];
 
   for (const paragrafo of paragrafos(texto)) {
     if (p.formatoEnunciado === "ETAPA_UNICA" && ehEnunciadoComposto(paragrafo)) {
@@ -204,10 +208,17 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
         blocos.push({
           linhas: etapas.slice(i, i + maxLinhas).map((e, j) => `${i + j + 1}. ${e}`),
         });
+        deLeitura.push(false);
+        tarefas.push(i === 0 ? etapas.length : 0);
       }
       continue;
     }
-    for (const linhas of blocosDoParagrafo(paragrafo, maxLinhas)) blocos.push({ linhas });
+    const comando = ehEnunciado(paragrafo);
+    blocosDoParagrafo(paragrafo, maxLinhas).forEach((linhas, i) => {
+      blocos.push({ linhas });
+      deLeitura.push(!comando);
+      tarefas.push(comando && i === 0 ? 1 : 0);
+    });
   }
 
   return {
@@ -216,7 +227,25 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
     enunciados,
     parametros: p,
     apoios: apoiosDeLeitura(texto, p),
+    roteiro: roteiroDaAtividade(deLeitura.slice(0, maxBlocos), tarefas.slice(0, maxBlocos), perguntas),
   };
+}
+
+/**
+ * D-53 — previsibilidade: o que vem pela frente, contado do próprio material (quantos
+ * trechos de leitura, quantas tarefas). Resume, não repete os comandos, que já estão no
+ * texto — repetir dobraria a leitura. Menos de dois passos não é roteiro: devolve vazio.
+ * Não inventa passo, prazo nem recompensa. As perguntas (só com IA) são o último passo.
+ */
+export function roteiroDaAtividade(deLeitura: boolean[], tarefasPorBloco: number[], perguntas = 0): string[] {
+  const trechos = deLeitura.filter(Boolean).length;
+  const tarefas = tarefasPorBloco.reduce((a, b) => a + b, 0);
+  const passos = [
+    ...(trechos > 0 ? [`Leia o texto: ${trechos === 1 ? "1 trecho" : `${trechos} trechos`}.`] : []),
+    ...(tarefas > 0 ? [`Faça ${tarefas === 1 ? "1 tarefa" : `${tarefas} tarefas`}.`] : []),
+    ...(perguntas > 0 ? [`Responda ${perguntas === 1 ? "a 1 pergunta" : `às ${perguntas} perguntas`} sobre o texto.`] : []),
+  ];
+  return passos.length >= 2 ? passos : [];
 }
 
 /** Reconstrói o texto (útil para o teste "nada se perde" e para impressão). */
