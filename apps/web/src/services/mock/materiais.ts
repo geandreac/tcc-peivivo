@@ -3,7 +3,7 @@ import type { PeiVivoApi } from "../api";
 import { ErroApi } from "../erros";
 import type { Desfecho, Material } from "../tipos";
 import { LIMITE_OBSERVACAO_DESFECHO } from "@pei-vivo/contratos";
-import { adaptar } from "@pei-vivo/motor-adaptacao";
+import { adaptar, PARAMETROS_PADRAO } from "@pei-vivo/motor-adaptacao";
 import { uuid, hash, type ContextoMock } from "./contexto";
 
 export function materiais(ctx: ContextoMock) {
@@ -33,19 +33,20 @@ export function materiais(ctx: ContextoMock) {
         ctx.exigirFerramenta("GERACAO_MATERIAL", "EDITAR", "A geração de material não está liberada para este acesso.");
         const t = texto.trim();
         if (t.length < 1 || t.length > 20_000) throw new ErroApi("VALIDACAO", "O texto precisa ter entre 1 e 20.000 caracteres.");
+        // D-53 (= 0013): sem versão vigente, parâmetros padrão e versão nula — nada é presumido
         const vigente = ctx.versaoVigente(estudanteId);
-        if (!vigente) throw new ErroApi("CONFLITO", "Este estudante ainda não tem um perfil vigente. Feche um ciclo de observação primeiro.");
+        const versaoId = vigente?.id ?? null;
         const h = hash(t);
         const emCache = ctx.estado.materiais.find(
-          (m) => m.estudanteId === estudanteId && m.hashTexto === h && m.versaoPerfilId === vigente.id && m.statusAprovacao !== "DESCARTADO",
+          (m) => m.estudanteId === estudanteId && m.hashTexto === h && m.versaoPerfilId === versaoId && m.statusAprovacao !== "DESCARTADO",
         );
         if (emCache) return emCache; // P3.5: texto idêntico + mesma versão → não regera
         const inicio = performance.now();
-        const adaptado = adaptar(t, vigente.parametros);
+        const adaptado = adaptar(t, vigente?.parametros ?? PARAMETROS_PADRAO);
         const m: Material = {
           id: uuid(),
           estudanteId,
-          versaoPerfilId: vigente.id,
+          versaoPerfilId: versaoId,
           docenteId: ctx.eu().id,
           titulo: titulo.trim() || "Material sem título",
           textoOriginal: t,

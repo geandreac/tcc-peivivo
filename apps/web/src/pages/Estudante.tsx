@@ -238,7 +238,7 @@ export function Estudante() {
           {dados.erro && <ErroCarregamento erro={dados.erro} tentarNovamente={dados.recarregar} />}
           {dados.dados && !dados.dados.vigente && (
             <EstadoVazio titulo="Ainda não há perfil vigente">
-              <p>O perfil nasce quando a docente fecha o primeiro ciclo de observação. Até lá, não é possível gerar material.</p>
+              <p>O perfil nasce quando a docente fecha o primeiro ciclo de observação. Até lá, o material sai com a adaptação padrão, sem personalização.</p>
             </EstadoVazio>
           )}
           {dados.dados?.vigente && (

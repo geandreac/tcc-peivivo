@@ -73,6 +73,17 @@ export interface TextoAdaptado {
    * Opcional: materiais gravados antes do D-43 não têm.
    */
   apoios?: ApoiosLeitura;
+  /**
+   * D-53 — roteiro da atividade, em ordem ("primeiro… depois… no fim"), feito só do que o
+   * texto já pede: leitura dos trechos e os comandos encontrados. Nada é acrescentado.
+   * Opcional: materiais anteriores não têm. Vazio quando o texto não tem comando.
+   */
+  roteiro?: string[];
+  /**
+   * D-53 — perguntas de compreensão sugeridas pela IA (só com perfil validado, RN06), sobre
+   * o próprio texto. A docente revisa antes de aprovar (RN04). Sem IA: ausente.
+   */
+  perguntas?: string[];
 }
 
 /** Mesmo formato do glossário da camada de IA (`SaidaIASchema`). */

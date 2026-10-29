@@ -21,16 +21,18 @@ import { aplicarIA, iaDesligada, type ProvedorIA } from "./ia.ts";
 export interface Preparo {
   docenteId: string;
   estudanteId: string;
-  versaoId: string;
+  /** Nulo = estudante ainda sem versão VIGENTE: parâmetros padrão, não personalizados (D-53). */
+  versaoId: string | null;
   parametros: ParametrosAdaptacao;
   iaPermitida: boolean;
   revisaoEmAndamento: boolean;
+  perfilPadrao?: boolean;
 }
 
 export interface MaterialParaRegistrar {
   docenteId: string;
   estudanteId: string;
-  versaoId: string;
+  versaoId: string | null;
   titulo: string;
   textoOriginal: string;
   textoAdaptado: TextoAdaptado & { glossario?: SaidaIA["glossario"] };
@@ -52,6 +54,9 @@ export interface PortasGerarMaterial {
 
 export const AVISO_IA_INDISPONIVEL = "A assistência de IA não respondeu agora; o material foi adaptado só pelas regras.";
 export const AVISO_REVISAO = "Há uma revisão do perfil em andamento; usamos o perfil vigente.";
+export const AVISO_PERFIL_PADRAO =
+  "Este estudante ainda não tem perfil validado. O material saiu com a adaptação padrão, sem personalização; revise antes de aprovar.";
+export const AVISO_IA_QUALIDADE = "A sugestão da IA não passou na conferência de qualidade; o material foi adaptado só pelas regras.";
 
 /** SHA-256 em hex (Web Crypto: existe no Node 20+ e no Deno). Chave do cache. */
 export async function hashTexto(texto: string): Promise<string> {
@@ -78,27 +83,33 @@ export async function gerarMaterial(corpo: unknown, portas: PortasGerarMaterial)
   if (!parametros.success) throw new ErroFuncao(500, "INTERNO", "O perfil vigente está fora do contrato.");
 
   const avisos: string[] = [];
-  if (preparo.revisaoEmAndamento) avisos.push(AVISO_REVISAO);
+  const padrao = preparo.versaoId === null;
+  if (padrao) avisos.push(AVISO_PERFIL_PADRAO);
+  else if (preparo.revisaoEmAndamento) avisos.push(AVISO_REVISAO);
 
   // RN06: IA só com profissional ativo e autorizado E com a chave global ligada.
+  // D-53: e nunca sem perfil validado — o padrão não é personalizado, nem pela IA.
   let textoBase = texto;
   let glossario: SaidaIA["glossario"] | undefined;
+  let perguntas: string[] | undefined;
   let origem: OrigemMaterial = "REGRAS";
-  if (preparo.iaPermitida && portas.iaHabilitada) {
+  if (!padrao && preparo.iaPermitida && portas.iaHabilitada) {
     const r = await aplicarIA(portas.ia ?? iaDesligada, { texto, parametros: parametros.data }, portas.timeoutIaMs ?? TIMEOUT_IA_MS);
     if (r.ok) {
       textoBase = r.saida.textoSimplificado;
       glossario = r.saida.glossario;
+      perguntas = r.saida.perguntas.length > 0 ? r.saida.perguntas : undefined;
       origem = "REGRAS_E_IA";
     } else {
-      avisos.push(AVISO_IA_INDISPONIVEL);
+      avisos.push(r.motivo === "QUALIDADE" ? AVISO_IA_QUALIDADE : AVISO_IA_INDISPONIVEL);
     }
   }
 
   const regras = adaptar(textoBase, parametros.data);
   // D-43: o glossário da IA só acrescenta termos ao das regras (curado).
-  const adaptado =
+  const comGlossario =
     regras.apoios && glossario ? { ...regras, apoios: { ...regras.apoios, glossario: juntarGlossarios(regras.apoios.glossario, glossario) } } : regras;
+  const adaptado = perguntas ? { ...comGlossario, perguntas } : comGlossario;
   try {
     const { materialId, emCache } = await portas.registrar({
       docenteId: preparo.docenteId, // do banco (auth.uid()), nunca do corpo

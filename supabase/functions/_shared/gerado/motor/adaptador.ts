@@ -194,6 +194,9 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
 
   const blocos: Bloco[] = [];
   const enunciados: Enunciado[] = [];
+  // D-53: o que vai para o roteiro — se o bloco é leitura e quais comandos vieram de cada parágrafo
+  const deLeitura: boolean[] = [];
+  const comandos: string[][] = [];
 
   for (const paragrafo of paragrafos(texto)) {
     if (p.formatoEnunciado === "ETAPA_UNICA" && ehEnunciadoComposto(paragrafo)) {
@@ -204,10 +207,17 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
         blocos.push({
           linhas: etapas.slice(i, i + maxLinhas).map((e, j) => `${i + j + 1}. ${e}`),
         });
+        deLeitura.push(false);
+        comandos.push(i === 0 ? etapas : []);
       }
       continue;
     }
-    for (const linhas of blocosDoParagrafo(paragrafo, maxLinhas)) blocos.push({ linhas });
+    const comando = ehEnunciado(paragrafo);
+    blocosDoParagrafo(paragrafo, maxLinhas).forEach((linhas, i) => {
+      blocos.push({ linhas });
+      deLeitura.push(!comando);
+      comandos.push(comando && i === 0 ? [comoPasso(paragrafo)] : []);
+    });
   }
 
   return {
@@ -216,7 +226,25 @@ export function adaptar(texto: string, parametros: ParametrosAdaptacao): TextoAd
     enunciados,
     parametros: p,
     apoios: apoiosDeLeitura(texto, p),
+    roteiro: roteiroDaAtividade(deLeitura.slice(0, maxBlocos), comandos.slice(0, maxBlocos)),
   };
+}
+
+/** Comando inteiro como um passo: sem a numeração do original, com ponto final. */
+function comoPasso(paragrafo: string): string {
+  const s = paragrafo.trim().replace(/^\d+[.)]\s*/u, "").replace(/[\s.;:]+$/u, "");
+  return s.charAt(0).toUpperCase() + s.slice(1) + ".";
+}
+
+/**
+ * D-53 — previsibilidade: a ordem do que a atividade pede, só com o que está no material
+ * (a leitura dos trechos e os comandos, na ordem do texto). Menos de dois passos não é
+ * roteiro: devolve vazio. Não inventa passo, prazo nem recompensa.
+ */
+export function roteiroDaAtividade(deLeitura: boolean[], comandos: string[][]): string[] {
+  const trechos = deLeitura.filter(Boolean).length;
+  const passos = [...(trechos > 0 ? [`Leia o texto: ${trechos === 1 ? "1 trecho" : `${trechos} trechos`}.`] : []), ...comandos.flat()];
+  return passos.length >= 2 ? passos : [];
 }
 
 /** Reconstrói o texto (útil para o teste "nada se perde" e para impressão). */

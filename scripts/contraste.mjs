@@ -94,7 +94,7 @@ const PARES = [
   ["claro", "material: destaque / branco", "material-destaque", "material-claro", 4.5],
   ["claro", "material: branco / destaque (avatar)", "material-claro", "material-destaque", 4.5],
   ["claro", "material: destaque / tint (selos)", "material-destaque", "material-destaque-tint", 4.5],
-  ["claro", "material: contorno / branco (7:1)", "material-contorno", "material-claro", 7],
+  ["claro", "material (perfil 7): pictograma / creme", "material-destaque", "material-fundo", 7],
   ["claro", "borda de campo / superfície", "cor-borda", "cor-superficie", 3],
   ["claro", "borda de campo / fundo", "cor-borda", "cor-fundo", 3],
   ["claro", "anel de foco / superfície", "cor-foco", "cor-superficie", 3],
