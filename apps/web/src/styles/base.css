@@ -204,6 +204,13 @@ main > .container {
   height: 2rem;
   flex: none;
 }
+/* o "P" segue o par do botão primário: claro sobre azul no tema claro, escuro sobre azul claro no escuro */
+.marca__logo-letra {
+  fill: var(--cor-sobre-primaria);
+}
+.marca__logo-ponto {
+  fill: var(--cor-marca-ponto);
+}
 
 /* navegação pública (sem sessão): no cabeçalho */
 .nav-publica ul {
@@ -519,9 +526,24 @@ hr {
 }
 
 /* telas de autenticação e leitura (R2.2) */
+/* telas de conta (recuperar senha, convite, criar conta, 2FA): o mesmo cartão do login (D-49) */
 .pagina-estreita {
-  max-width: 28rem;
-  margin-inline: auto;
+  max-width: 27rem;
+  margin: var(--esp-6) auto;
+  padding: var(--esp-5) var(--esp-6);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-suave);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-2);
+}
+.pagina-estreita > h1:first-child {
+  margin-top: 0;
+}
+@media (max-width: 30rem) {
+  .pagina-estreita {
+    margin-block: var(--esp-4);
+    padding-inline: var(--esp-4);
+  }
 }
 .pagina-leitura {
   max-width: var(--largura-leitura);

@@ -129,7 +129,7 @@ export function FecharCiclo() {
       {previa.carregando && <Carregando texto="Calculando a proposta…" />}
       {previa.erro && <ErroCarregamento erro={previa.erro} tentarNovamente={previa.recarregar} />}
 
-      {previa.dados && !previa.dados.ciclo && (
+      {!previa.carregando && previa.dados && !previa.dados.ciclo && (
         <EstadoVazio titulo="Nenhum ciclo aberto" acao={<LinkBotao to={`/estudantes/${id}/observar`}>Abrir ciclo e observar</LinkBotao>}>
           <p>Abra um ciclo e registre observações antes de fechar.</p>
         </EstadoVazio>

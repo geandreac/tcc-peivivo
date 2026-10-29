@@ -34,8 +34,9 @@
   /* `a.botao`: sem isto, `a:hover` (base.css) pinta o texto com a cor do fundo e ele some. */
   color: var(--botao-texto);
 }
+/* retorno no toque, não só na soltura (Apple, "Designing Fluid Interfaces") */
 .botao:active {
-  transform: translateY(1px);
+  transform: scale(0.97);
 }
 .botao--secundario {
   --botao-fundo: var(--cor-superficie);

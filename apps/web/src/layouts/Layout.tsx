@@ -24,13 +24,14 @@ import { api } from "../services";
 import { useConsulta } from "../hooks/useConsulta";
 
 /** D-50: barra lateral do painel administrativo (Administrador Geral sempre; coordenação dentro de /admin). */
-const ITENS_ADMIN: { rota: string; rotulo: string; Icone: LucideIcon; fim?: boolean }[] = [
-  { rota: "/admin", rotulo: "Visão geral", Icone: LayoutDashboard, fim: true },
-  { rota: "/admin/usuarios", rotulo: "Usuários e acessos", Icone: UserCog },
-  { rota: "/admin/perfis", rotulo: "Perfis e permissões", Icone: ShieldCheck },
-  { rota: "/admin/ferramentas", rotulo: "Ferramentas", Icone: Wrench },
-  { rota: "/admin/auditoria", rotulo: "Atividades e auditoria", Icone: History },
-  { rota: "/admin/configuracoes", rotulo: "Configurações", Icone: Settings },
+// `curto` é o rótulo da barra do celular; começa o nome completo, que fica no aria-label (2.5.3)
+const ITENS_ADMIN: { rota: string; rotulo: string; curto: string; Icone: LucideIcon; fim?: boolean }[] = [
+  { rota: "/admin", rotulo: "Visão geral", curto: "Visão geral", Icone: LayoutDashboard, fim: true },
+  { rota: "/admin/usuarios", rotulo: "Usuários e acessos", curto: "Usuários", Icone: UserCog },
+  { rota: "/admin/perfis", rotulo: "Perfis e permissões", curto: "Perfis", Icone: ShieldCheck },
+  { rota: "/admin/ferramentas", rotulo: "Ferramentas", curto: "Ferramentas", Icone: Wrench },
+  { rota: "/admin/auditoria", rotulo: "Atividades e auditoria", curto: "Atividades", Icone: History },
+  { rota: "/admin/configuracoes", rotulo: "Configurações", curto: "Configurações", Icone: Settings },
 ];
 
 const ITENS_NAV: { rota: string; rotulo: string; Icone: LucideIcon; soQuemValida?: boolean }[] = [
@@ -44,8 +45,11 @@ function Logo() {
   return (
     <svg className="marca__logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
       <rect width="64" height="64" rx="14" fill="currentColor" />
-      <path d="M18 44V20h11.5c6 0 9.5 3.4 9.5 8.3S35.5 36.5 29.5 36.5H24V44h-6zm6-12.5h5c2.7 0 4.2-1.3 4.2-3.3s-1.5-3.2-4.2-3.2h-5v6.5z" fill="#fff" />
-      <circle cx="46" cy="40" r="5" fill="#8BD3C7" />
+      <path
+        d="M18 44V20h11.5c6 0 9.5 3.4 9.5 8.3S35.5 36.5 29.5 36.5H24V44h-6zm6-12.5h5c2.7 0 4.2-1.3 4.2-3.3s-1.5-3.2-4.2-3.2h-5v6.5z"
+        className="marca__logo-letra"
+      />
+      <circle cx="46" cy="40" r="5" className="marca__logo-ponto" />
     </svg>
   );
 }
@@ -164,11 +168,12 @@ export function Layout() {
           <nav className={areaAdmin ? "nav-app nav-app--admin" : "nav-app"} aria-label={areaAdmin ? "Administração" : "Principal"}>
             <ul>
               {areaAdmin
-                ? ITENS_ADMIN.map(({ rota, rotulo, Icone, fim }) => (
+                ? ITENS_ADMIN.map(({ rota, rotulo, curto, Icone, fim }) => (
                     <li key={rota}>
-                      <NavLink to={rota} end={fim}>
+                      <NavLink to={rota} end={fim} aria-label={rotulo}>
                         <Icone aria-hidden="true" size={22} strokeWidth={2} />
-                        <span>{rotulo}</span>
+                        <span className="nav-app__completo">{rotulo}</span>
+                        <span className="nav-app__curto">{curto}</span>
                       </NavLink>
                     </li>
                   ))

@@ -212,8 +212,6 @@ main > .container > .lista-simples li {
   color: var(--cor-texto-secundario);
   font-size: var(--texto-meta);
   font-weight: var(--peso-medio);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .cabecalho-admin__acoes {
   display: flex;
@@ -370,12 +368,46 @@ main > .container > .lista-simples li {
   }
 }
 
-/* seis itens na barra inferior do celular: duas linhas de três */
+/* seis itens na barra inferior do celular: duas linhas baixas de três, ícone ao lado do
+   rótulo curto (o nome completo segue no aria-label e começa pelo rótulo visível, 2.5.3) */
+.nav-app__curto {
+  display: none;
+}
 @media (max-width: 47.99em) {
   .nav-app--admin ul {
     grid-template-columns: repeat(3, 1fr);
   }
+  .nav-app--admin a {
+    flex-direction: row;
+    gap: var(--esp-1);
+    min-height: var(--alvo-minimo);
+  }
+  .nav-app--admin .nav-app__completo {
+    display: none;
+  }
+  .nav-app--admin .nav-app__curto {
+    display: inline;
+  }
   .app--com-nav:has(.nav-app--admin) main > .container {
-    padding-bottom: calc(var(--esp-8) + 7rem);
+    padding-bottom: calc(var(--esp-8) + 4rem);
+  }
+  /* no celular, a descrição vem logo abaixo do título e a busca depois */
+  .cabecalho-admin {
+    display: flex;
+    flex-direction: column;
+  }
+  .cabecalho-admin__linha {
+    display: contents;
+  }
+  .busca-admin {
+    flex: none; /* na coluna, a base de 18rem viraria altura */
+    order: 3;
+    margin-top: var(--esp-3);
+  }
+  .cabecalho-admin > .texto-apoio {
+    order: 2;
+  }
+  .cabecalho-admin__acoes {
+    order: 4;
   }
 }
