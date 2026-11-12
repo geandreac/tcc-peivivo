@@ -349,3 +349,12 @@ Plano completo: `docs/plano-desenvolvimento.md`. Rastreabilidade: `docs/rastreab
 | `docs/checklist-final-tcc.md` | Evidências por pilar para a banca |
 | `docs/relatorio-de-conformidade.md` | Relatório final da auditoria + plano de ação |
 | `docs/tcc/` | Pré-projeto, slides, diagramas, orientação da disciplina |
+
+## Como clonar
+
+```bash
+git clone https://github.com/geandreac/tcc-peivivo.git
+cd tcc-peivivo
+npm install
+npm run dev      # monorepo; veja os scripts db:* no package.json para o banco (Supabase)
+```
