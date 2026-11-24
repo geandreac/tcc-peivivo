@@ -5,6 +5,7 @@ import { useEstudante } from "../hooks/useEstudante";
 import { useConsulta } from "../hooks/useConsulta";
 import { useTitulo } from "../hooks/useTitulo";
 import { Alerta, Badge, Card, Carregando, ErroCarregamento, Esqueleto, EstadoVazio } from "../components/Feedback";
+import { AvisoAjuste } from "../components/AvisoAjuste";
 import { Botao, LinkBotao } from "../components/Botao";
 import { EXPLICA_RITMO_PERFIL, PARAMETRO, STATUS_APROVACAO, STATUS_VALIDACAO, descreverPerfil } from "../utils/rotulos";
 import { formatarData, formatarDataHora, idade } from "../utils/datas";
@@ -117,6 +118,8 @@ export function Estudante() {
           )}
         </Alerta>
       )}
+
+      {papel === "DOCENTE" && dados.dados && <AvisoAjuste versoes={dados.dados.versoes} />}
 
       {/* ações por papel */}
       <h2>O que você pode fazer</h2>
