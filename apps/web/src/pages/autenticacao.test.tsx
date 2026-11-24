@@ -63,6 +63,14 @@ describe("Redirecionamento e sessão (TF-02, TF-37, TF-44)", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Consentimento" })).toBeInTheDocument();
   });
 
+  it.each(["/", "/ajuda", "/acessibilidade"])("'Entrar' do menu a partir de %s leva aos estudantes depois do login", async (rota) => {
+    await renderizarApp(rota);
+    await userEvent.click(within(screen.getByRole("navigation", { name: "Principal" })).getByRole("link", { name: "Entrar" }));
+    await userEvent.click(within(await screen.findByRole("list", { name: "Perfis de acesso" })).getByRole("link", { name: /Família/ }));
+    await userEvent.click(await screen.findByRole("button", { name: /Rosa/ }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Meus estudantes" })).toBeInTheDocument();
+  });
+
   it("sair encerra a sessão, volta ao início e as rotas protegidas voltam a redirecionar", async () => {
     await renderizarApp("/painel", ID.docente);
     await screen.findByRole("heading", { level: 1, name: "Meus estudantes" });

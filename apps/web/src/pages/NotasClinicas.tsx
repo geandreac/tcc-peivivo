@@ -29,7 +29,7 @@ export function NotasClinicas() {
 
   const salvar = useMutacao(async () => {
     if (!conteudo.trim()) {
-      setErros([{ campo: "conteudo", mensagem: "Escreva o conteúdo da nota." }]);
+      setErros([{ campo: "nota-conteudo", mensagem: "Escreva o conteúdo da nota." }]);
       return;
     }
     setErros([]);
@@ -91,14 +91,14 @@ export function NotasClinicas() {
             )}
             <Campo
               tipo="area"
-              id="conteudo"
+              id="nota-conteudo"
               rotulo="Conteúdo da nota"
               dica="Reservado. Outros profissionais de saúde vinculados ao mesmo estudante também leem (equipe multiprofissional)."
               required
               maxLength={LIMITE_NOTA_CLINICA}
               value={conteudo}
               onChange={(e) => setConteudo(e.target.value)}
-              erro={erros.find((x) => x.campo === "conteudo")?.mensagem ?? null}
+              erro={erros.find((x) => x.campo === "nota-conteudo")?.mensagem ?? null}
             />
             <div className="grupo-botoes">
               <Botao type="submit" carregando={salvar.ocupado} textoCarregando="Salvando…">

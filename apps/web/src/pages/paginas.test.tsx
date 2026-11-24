@@ -250,6 +250,12 @@ describe("Caminhos negados na interface (P4.20)", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Nova nota" })).toBeInTheDocument();
     expect(screen.getByText(/Hipótese de trabalho/)).toBeInTheDocument();
     await semViolacoesAxe(container);
+    const campo = screen.getByRole("textbox", { name: /Conteúdo da nota/ });
+    await userEvent.click(screen.getByRole("button", { name: "Registrar nota reservada" }));
+    const link = within(await screen.findByRole("alert")).getByRole("link", { name: "Escreva o conteúdo da nota." });
+    expect(document.querySelectorAll(link.getAttribute("href")!)).toHaveLength(1); // o "#conteudo" também era o <main>
+    await userEvent.click(link);
+    expect(campo).toHaveFocus();
   });
 });
 
