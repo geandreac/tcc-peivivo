@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { textoDoAdaptado } from "@pei-vivo/motor-adaptacao";
-import { api, mensagemAmigavel, type Material } from "../services";
+import { api, ErroApi, mensagemAmigavel, type Material } from "../services";
 import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { useEstudante } from "../hooks/useEstudante";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
 import { MaterialAdaptado } from "../components/MaterialAdaptado";
-import { Alerta, Badge, Carregando, ErroCarregamento, FalhaPagina } from "../components/Feedback";
+import { Alerta, Badge, Carregando, ErroCarregamento, FalhaPagina, VazioSecao } from "../components/Feedback";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Campo } from "../components/Campo";
 import { Modal } from "../components/Modal";
@@ -31,9 +31,13 @@ export function RevisarMaterial() {
 
   const textoInicial = material.dados?.textoAdaptado ? (material.dados.textoRevisado ?? textoDoAdaptado(material.dados.textoAdaptado)) : "";
   const texto = textoEditado ?? textoInicial;
+  // vale a edição mesmo com o campo fechado; sem mudança, fica o texto gerado (com o roteiro)
+  const revisado = texto !== textoInicial ? texto : (material.dados?.textoRevisado ?? undefined);
 
   const aprovar = useMutacao(async () => {
-    const m = await api.aprovarMaterial(id!, editando ? texto : undefined);
+    // vazio chegaria ao serviço como "sem revisão" e aprovaria o texto gerado
+    if (revisado !== undefined && !revisado.trim()) throw new ErroApi("VALIDACAO", "O texto adaptado está vazio. Escreva o conteúdo ou descarte o rascunho.");
+    const m = await api.aprovarMaterial(id!, revisado);
     anunciar("Material aprovado. Agora família, profissional e coordenação também o veem.", "sucesso");
     navigate(`/materiais/${m.id}`);
   });
@@ -119,8 +123,10 @@ export function RevisarMaterial() {
               value={texto}
               onChange={(e) => setTextoEditado(e.target.value)}
             />
+          ) : revisado !== undefined && !revisado.trim() ? (
+            <VazioSecao>Nenhum conteúdo para mostrar.</VazioSecao>
           ) : (
-            m.textoAdaptado && <MaterialAdaptado adaptado={m.textoAdaptado} mostrarExcedentes />
+            m.textoAdaptado && <MaterialAdaptado adaptado={m.textoAdaptado} textoRevisado={revisado ?? null} mostrarExcedentes />
           )}
           <div className="grupo-botoes">
             <Botao variante="secundario" onClick={() => setEditando((v) => !v)} aria-pressed={editando}>

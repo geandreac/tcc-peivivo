@@ -137,6 +137,75 @@ describe("Fluxo principal — gerar, revisar, aprovar, desfecho (HU-D.03–D.06)
   });
 });
 
+describe("Edição do rascunho e justificativa do ajuste", () => {
+  async function editar(texto: string) {
+    await userEvent.click(await screen.findByRole("button", { name: "Editar o texto adaptado" }));
+    const campo = screen.getByLabelText(/Texto adaptado \(editável\)/);
+    await userEvent.clear(campo);
+    if (texto) await userEvent.type(campo, texto);
+    await userEvent.click(screen.getByRole("button", { name: "Ver como ficará" }));
+  }
+
+  it("a edição aparece na prévia e vai para o material aprovado, mesmo com a edição fechada", async () => {
+    const { container } = await renderizarApp(`/materiais/${ID.materialRascunho}/revisar`, ID.docente);
+    await editar("Trecho reescrito pela docente.");
+    expect(screen.getByText("Trecho reescrito pela docente.")).toBeInTheDocument();
+    await semViolacoesAxe(container);
+    await userEvent.click(screen.getByRole("button", { name: "Aprovar material" }));
+    expect(await screen.findByText("Aprovado")).toBeInTheDocument();
+    expect(screen.getByText("Trecho reescrito pela docente.")).toBeInTheDocument();
+    expect((await api.obterMaterial(ID.materialRascunho)).textoRevisado).toBe("Trecho reescrito pela docente.");
+  });
+
+  it("negado: texto apagado não é aprovado (e não volta em silêncio ao texto gerado)", async () => {
+    await renderizarApp(`/materiais/${ID.materialRascunho}/revisar`, ID.docente);
+    await editar("");
+    await userEvent.click(screen.getByRole("button", { name: "Aprovar material" }));
+    expect(await screen.findByText(/O texto adaptado está vazio/)).toBeInTheDocument();
+    expect((await api.obterMaterial(ID.materialRascunho)).statusAprovacao).toBe("RASCUNHO");
+  });
+
+  it("abrir a edição sem mudar nada aprova o texto gerado, com o roteiro", async () => {
+    await renderizarApp(`/materiais/${ID.materialRascunho}/revisar`, ID.docente);
+    await userEvent.click(await screen.findByRole("button", { name: "Editar o texto adaptado" }));
+    await userEvent.click(screen.getByRole("button", { name: "Aprovar material" }));
+    expect(await screen.findByText("Aprovado")).toBeInTheDocument();
+    expect((await api.obterMaterial(ID.materialRascunho)).textoRevisado).toBeNull();
+  });
+
+  async function pedirAjuste() {
+    await api.entrar(ID.docente);
+    const { versao } = await api.fecharCiclo(ID.ciclo4);
+    await api.entrar(ID.profissional);
+    await api.validarVersao(versao.id, "AJUSTE", "Manter 8 blocos por enquanto.");
+  }
+
+  it.each([`/estudantes/${ID.estudanteA}`, `/estudantes/${ID.estudanteA}/fechar-ciclo`])("docente lê a justificativa do ajuste em %s", async (rota) => {
+    const { container } = await renderizarApp(rota, ID.docente, pedirAjuste);
+    expect(await screen.findByText("Manter 8 blocos por enquanto.")).toBeInTheDocument();
+    await semViolacoesAxe(container);
+  });
+
+  it("negado: a família não recebe a justificativa na visão do estudante", async () => {
+    await renderizarApp(`/estudantes/${ID.estudanteA}`, ID.responsavel, pedirAjuste);
+    await screen.findByRole("heading", { name: "Materiais" });
+    await screen.findByText(/Ajuste solicitado/);
+    expect(screen.queryByText("Manter 8 blocos por enquanto.")).not.toBeInTheDocument();
+  });
+
+  it("o aviso some quando uma proposta mais nova substitui a que foi devolvida", async () => {
+    await renderizarApp(`/estudantes/${ID.estudanteA}`, ID.docente, async () => {
+      await pedirAjuste();
+      await api.entrar(ID.docente);
+      const aberto = await api.obterCicloAberto(ID.estudanteA);
+      await api.registrarObservacao(aberto!.id, { dimensao: "ATENCAO_SUSTENTADA", valorEscala: "ESTAVEL" });
+      await api.fecharCiclo(aberto!.id);
+    });
+    await screen.findByText(/Aguardando validação clínica/);
+    expect(screen.queryByText("Manter 8 blocos por enquanto.")).not.toBeInTheDocument();
+  });
+});
+
 describe("Caminhos negados na interface (P4.20)", () => {
   it("docente não vê link para nota clínica e, acessando a rota direta, recebe 'Acesso negado (RN02)'", async () => {
     const { container } = await renderizarApp(`/estudantes/${ID.estudanteA}`, ID.docente);
@@ -181,6 +250,12 @@ describe("Caminhos negados na interface (P4.20)", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Nova nota" })).toBeInTheDocument();
     expect(screen.getByText(/Hipótese de trabalho/)).toBeInTheDocument();
     await semViolacoesAxe(container);
+    const campo = screen.getByRole("textbox", { name: /Conteúdo da nota/ });
+    await userEvent.click(screen.getByRole("button", { name: "Registrar nota reservada" }));
+    const link = within(await screen.findByRole("alert")).getByRole("link", { name: "Escreva o conteúdo da nota." });
+    expect(document.querySelectorAll(link.getAttribute("href")!)).toHaveLength(1); // o "#conteudo" também era o <main>
+    await userEvent.click(link);
+    expect(campo).toHaveFocus();
   });
 });
 

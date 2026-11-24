@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api, mensagemAmigavel, type Ciclo, type ObservacaoRegistro, type ResultadoFechamento } from "../services";
+import { api, mensagemAmigavel, type Ciclo, type ObservacaoRegistro, type ResultadoFechamento, type VersaoPerfil } from "../services";
 import { useEstudante } from "../hooks/useEstudante";
 import { useConsulta, useMutacao } from "../hooks/useConsulta";
 import { useAnuncio } from "../hooks/useAnuncio";
 import { useTitulo } from "../hooks/useTitulo";
 import { CabecalhoEstudante } from "../components/CabecalhoEstudante";
 import { Alerta, Badge, Card, Carregando, ErroCarregamento, EstadoVazio, FalhaPagina } from "../components/Feedback";
+import { AvisoAjuste } from "../components/AvisoAjuste";
 import { Botao, LinkBotao } from "../components/Botao";
 import { Modal } from "../components/Modal";
 import { DIMENSAO, ESCALA, PAPEL, PARAMETRO } from "../utils/rotulos";
@@ -59,6 +60,8 @@ export function FecharCiclo() {
     const [observacoes, previa] = await Promise.all([api.listarObservacoes(id), api.preverFechamento(ciclo.id)]);
     return { ciclo, observacoes: observacoes.filter((o) => o.cicloId === ciclo.id), previa };
   }, [id, podeLer]);
+
+  const versoes = useConsulta<VersaoPerfil[]>(async () => (id && podeLer ? api.listarVersoes(id) : []), [id, podeLer]);
 
   const fechar = useMutacao(async () => {
     const r = await api.fecharCiclo(previa.dados!.ciclo!.id);
@@ -126,6 +129,8 @@ export function FecharCiclo() {
         descricao="O sistema converte as observações do ciclo em parâmetros por regras fixas. Você vê o que mudaria antes de confirmar."
       />
 
+      {versoes.erro && <ErroCarregamento erro={versoes.erro} tentarNovamente={versoes.recarregar} />}
+      {versoes.dados && <AvisoAjuste versoes={versoes.dados} />}
       {previa.carregando && <Carregando texto="Calculando a proposta…" />}
       {previa.erro && <ErroCarregamento erro={previa.erro} tentarNovamente={previa.recarregar} />}
 

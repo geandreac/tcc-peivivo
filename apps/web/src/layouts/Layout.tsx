@@ -152,9 +152,7 @@ export function Layout() {
                   <NavLink to="/acessibilidade">Acessibilidade</NavLink>
                 </li>
                 <li>
-                  <NavLink to="/entrar" state={{ de: location.pathname }}>
-                    Entrar
-                  </NavLink>
+                  <NavLink to="/entrar">Entrar</NavLink>
                 </li>
               </ul>
             </nav>
